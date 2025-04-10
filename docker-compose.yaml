@@ -1,0 +1,25 @@
+---
+services:
+  kcrdb-db:
+    container_name: kcrdb-db
+    image: postgres:17
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+
+  kcrdb-be:
+    container_name: kcrdb-be
+    image: ghcr.io/hitomarukonpaku/kcrdb
+    # image: kcrdb
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    environment:
+      NO_COLOR: 1
+      DATABASE_URL: postgresql://postgres:admin@kcrdb-db:5432/postgres
+    depends_on:
+      - kcrdb-db
