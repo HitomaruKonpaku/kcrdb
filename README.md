@@ -1,0 +1,2 @@
+# kcrdb
+KanColle Replay DB
