@@ -14,10 +14,13 @@ export class SimulatorService extends BaseService<Simulator, SimulatorRepository
   }
 
   public async create(body: SimulatorCreate) {
-    const res = await this.save({
-      ...body,
-      hash: CryptoUtil.hash(body.data),
-    })
+    const hash = CryptoUtil.hash(body.data)
+    let res = await this.repository.repository.findOneBy({ hash })
+    if (res) {
+      return res
+    }
+
+    res = await this.insertOne({ ...body, hash })
     return res
   }
 }

@@ -17,6 +17,12 @@ export class ReplayService extends BaseService<Replay, ReplayRepository> {
   }
 
   public async create(body: ReplayCreate) {
+    const hash = CryptoUtil.hash(JSON.stringify(body.data))
+    let res = await this.repository.repository.findOneBy({ hash })
+    if (res) {
+      return res
+    }
+
     const { world, mapnum: map, diff } = body.data
 
     if (typeof world !== 'number') {
@@ -29,13 +35,7 @@ export class ReplayService extends BaseService<Replay, ReplayRepository> {
       throw new BadRequestException('MAPNUM_INVALID')
     }
 
-    const res = await this.save({
-      ...body,
-      hash: CryptoUtil.hash(JSON.stringify(body.data)),
-      world,
-      map,
-      diff,
-    })
+    res = await this.insertOne({ ...body, hash, world, map, diff })
     return res
   }
 }
