@@ -1,10 +1,23 @@
-import { ValidationPipe } from '@nestjs/common'
+import { INestApplication, ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { json } from 'body-parser'
 import 'dotenv/config'
 import { AppModule } from './app.module'
 import { Logger } from './shared/logger'
+
+function setupSwagger(app: INestApplication) {
+  const title = 'KCRDB API'
+  const description = 'KanColle Replay DB'
+  const config = new DocumentBuilder()
+    .setTitle(title)
+    .setDescription(description)
+    .build()
+  const document = SwaggerModule.createDocument(app, config)
+  SwaggerModule.setup('docs', app, document, {
+    customSiteTitle: title,
+  })
+}
 
 async function bootstrap() {
   const logger = new Logger('Main')
@@ -26,12 +39,7 @@ async function bootstrap() {
 
   app.enableShutdownHooks()
 
-  const config = new DocumentBuilder()
-    .setTitle('KCRDB API')
-    .setDescription('')
-    .build()
-  const document = SwaggerModule.createDocument(app, config)
-  SwaggerModule.setup('docs', app, document)
+  setupSwagger(app)
 
   const host = process.env.HOST || 'localhost'
   const port = process.env.PORT || 8080
