@@ -35,7 +35,7 @@ export class ReplayService extends BaseService<Replay, ReplayRepository> {
       throw new BadRequestException('MAPNUM_INVALID')
     }
 
-    res = await this.insertOne({ ...body, hash, world, map, diff })
+    res = await this.insertLoop({ ...body, hash, world, map, diff })
     return res
   }
 }

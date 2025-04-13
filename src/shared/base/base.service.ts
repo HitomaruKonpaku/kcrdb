@@ -10,11 +10,6 @@ export abstract class BaseService<E extends BaseEntity, R extends BaseRepository
     public readonly repository: R,
   ) { }
 
-  public async save(data: DeepPartial<E>) {
-    const res = await this.repository.save(data)
-    return res
-  }
-
   public async findOneById(id: E['id']) {
     const res = await this.repository.findOneById(id)
     if (!res) {
@@ -23,13 +18,30 @@ export abstract class BaseService<E extends BaseEntity, R extends BaseRepository
     return res
   }
 
-  public async insertOne(data: QueryDeepPartialEntity<E>) {
+  public async save(data: DeepPartial<E>) {
+    const res = await this.repository.save(data)
+    return res
+  }
+
+  public async insert(data: QueryDeepPartialEntity<E>) {
+    const id = IdUtil.generate()
+    const res = await this.repository.insert({ ...data, id })
+    return res
+  }
+
+  public async insertOrIgnore(data: QueryDeepPartialEntity<E>) {
+    const id = IdUtil.generate()
+    const res = await this.repository.insertOrIgnore({ ...data, id })
+    return res
+  }
+
+  public async insertLoop(data: QueryDeepPartialEntity<E>) {
     let id = IdUtil.generate()
 
     do {
       try {
         // eslint-disable-next-line no-await-in-loop
-        await this.repository.repository.insert({ ...data, id })
+        await this.repository.insert({ ...data, id })
         break
       } catch (error) {
         if (error.code === '23505') {

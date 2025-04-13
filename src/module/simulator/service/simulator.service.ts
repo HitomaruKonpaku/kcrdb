@@ -20,7 +20,7 @@ export class SimulatorService extends BaseService<Simulator, SimulatorRepository
       return res
     }
 
-    res = await this.insertOne({ ...body, hash })
+    res = await this.insertLoop({ ...body, hash })
     return res
   }
 }

@@ -28,7 +28,7 @@ export class UserAgentInterceptor implements NestInterceptor {
       || headers['data-origin']
 
     return next.handle().pipe(
-      tap((data) => {
+      tap(async (data) => {
         const sourceName = this.reflector.getAllAndOverride<string>(
           SOURCE_NAME,
           [context.getHandler(), context.getClass()],
@@ -38,7 +38,7 @@ export class UserAgentInterceptor implements NestInterceptor {
           return
         }
 
-        this.service.create({
+        await this.service.insertOrIgnore({
           sourceName,
           sourceId,
           raw,

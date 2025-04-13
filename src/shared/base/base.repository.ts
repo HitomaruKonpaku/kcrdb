@@ -1,4 +1,5 @@
 import { DeepPartial, Repository } from 'typeorm'
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { BaseEntity } from './base.entity'
 
 export abstract class BaseRepository<E extends BaseEntity> {
@@ -6,13 +7,28 @@ export abstract class BaseRepository<E extends BaseEntity> {
     public readonly repository: Repository<E>,
   ) { }
 
+  public async findOneById(id: E['id']) {
+    const res = await this.repository.findOneBy({ id } as any)
+    return res
+  }
+
   public async save(data: DeepPartial<E>) {
     const res = await this.repository.save(data)
     return res
   }
 
-  public async findOneById(id: E['id']) {
-    const res = await this.repository.findOneBy({ id } as any)
+  public async insert(data: QueryDeepPartialEntity<E>) {
+    const res = await this.repository.insert(data)
+    return res
+  }
+
+  public async insertOrIgnore(data: QueryDeepPartialEntity<E>) {
+    const res = await this.repository
+      .createQueryBuilder()
+      .insert()
+      .values(data)
+      .orIgnore()
+      .execute()
     return res
   }
 }

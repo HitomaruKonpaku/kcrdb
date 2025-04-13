@@ -14,7 +14,7 @@ export class UserAgentRepository extends BaseRepository<UserAgent> {
     super(repository)
   }
 
-  public async create(data: Partial<UserAgent>) {
+  public async upsert(data: Partial<UserAgent>) {
     const res = await this.repository.upsert(
       {
         ...data,
