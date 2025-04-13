@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
 import { ReplayCreate } from '../dto/replay-create.dto'
+import { Replay } from '../dto/replay.dto'
 import { ReplayService } from '../service/replay.service'
 
 @Controller('replays')
@@ -11,6 +12,7 @@ export class ReplayController {
   ) { }
 
   @Post()
+  @ApiCreatedResponse({ type: Replay })
   create(
     @Body() body: ReplayCreate,
   ) {
@@ -18,6 +20,8 @@ export class ReplayController {
   }
 
   @Get(':id')
+  @ApiOkResponse({ type: Replay })
+  @ApiNotFoundResponse()
   getId(
     @Param('id') id: string,
   ) {
@@ -25,6 +29,8 @@ export class ReplayController {
   }
 
   @Get(':id/data')
+  @ApiOkResponse({ type: Object })
+  @ApiNotFoundResponse()
   getIdData(
     @Param('id') id: string,
   ) {

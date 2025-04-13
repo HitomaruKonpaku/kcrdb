@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
 import { SimulatorCreate } from '../dto/simulator-create.dto'
+import { Simulator } from '../dto/simulator.dto'
 import { SimulatorService } from '../service/simulator.service'
 
 @Controller('simulators')
@@ -11,6 +12,7 @@ export class SimulatorController {
   ) { }
 
   @Post()
+  @ApiCreatedResponse({ type: Simulator })
   create(
     @Body() body: SimulatorCreate,
   ) {
@@ -18,6 +20,8 @@ export class SimulatorController {
   }
 
   @Get(':id')
+  @ApiOkResponse({ type: Simulator })
+  @ApiNotFoundResponse()
   getId(
     @Param('id') id: string,
   ) {
@@ -25,6 +29,8 @@ export class SimulatorController {
   }
 
   @Get(':id/data')
+  @ApiOkResponse({ type: String })
+  @ApiNotFoundResponse()
   getIdData(
     @Param('id') id: string,
   ) {
