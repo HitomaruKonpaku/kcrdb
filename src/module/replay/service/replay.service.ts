@@ -8,7 +8,7 @@ import { ReplayRepository } from '../repository/replay.repository'
 
 @Injectable()
 export class ReplayService extends BaseService<Replay, ReplayRepository> {
-  private readonly logger = new Logger('ReplayService')
+  private readonly logger = new Logger(ReplayService.name)
 
   constructor(
     public readonly repository: ReplayRepository,

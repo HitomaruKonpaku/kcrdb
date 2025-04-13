@@ -1,5 +1,7 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, UseInterceptors } from '@nestjs/common'
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
+import { SourceName } from '../../../decorator/source-name.decorator'
+import { UserAgentInterceptor } from '../../user-agent/interceptor/user-agent.interceptor'
 import { ReplayCreate } from '../dto/replay-create.dto'
 import { Replay } from '../dto/replay.dto'
 import { ReplayService } from '../service/replay.service'
@@ -12,6 +14,8 @@ export class ReplayController {
   ) { }
 
   @Post()
+  @UseInterceptors(UserAgentInterceptor)
+  @SourceName('replay')
   @ApiCreatedResponse({ type: Replay })
   create(
     @Body() body: ReplayCreate,

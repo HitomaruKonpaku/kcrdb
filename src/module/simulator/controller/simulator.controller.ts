@@ -1,5 +1,7 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, UseInterceptors } from '@nestjs/common'
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
+import { SourceName } from '../../../decorator/source-name.decorator'
+import { UserAgentInterceptor } from '../../user-agent/interceptor/user-agent.interceptor'
 import { SimulatorCreate } from '../dto/simulator-create.dto'
 import { Simulator } from '../dto/simulator.dto'
 import { SimulatorService } from '../service/simulator.service'
@@ -12,6 +14,8 @@ export class SimulatorController {
   ) { }
 
   @Post()
+  @UseInterceptors(UserAgentInterceptor)
+  @SourceName('simulator')
   @ApiCreatedResponse({ type: Simulator })
   create(
     @Body() body: SimulatorCreate,

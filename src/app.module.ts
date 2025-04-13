@@ -9,6 +9,8 @@ import { Replay } from './module/replay/model/replay.entity'
 import { ReplayModule } from './module/replay/replay.module'
 import { Simulator } from './module/simulator/model/simulator.entity'
 import { SimulatorModule } from './module/simulator/simulator.module'
+import { UserAgent } from './module/user-agent/model/user-agent.entity'
+import { UserAgentModule } from './module/user-agent/user-agent.module'
 import { ErrorInterceptor } from './shared/interceptor/error.interceptor'
 import { LoggingInterceptor } from './shared/interceptor/logging.interceptor'
 
@@ -28,6 +30,8 @@ import { LoggingInterceptor } from './shared/interceptor/logging.interceptor'
           entities: [
             Replay,
             Simulator,
+
+            UserAgent,
           ],
         }
         return opts
@@ -37,6 +41,8 @@ import { LoggingInterceptor } from './shared/interceptor/logging.interceptor'
 
     ReplayModule,
     SimulatorModule,
+
+    UserAgentModule,
   ],
   controllers: [
     AppController,
