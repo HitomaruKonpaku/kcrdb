@@ -14,6 +14,8 @@
       "skipFiles": [
         "<node_internals>/**"
       ],
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "/app"
     }
   ]
 }
