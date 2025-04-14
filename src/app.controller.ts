@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common'
+import { Controller, Get, Render } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { AppService } from './app.service'
 
@@ -10,7 +10,8 @@ export class AppController {
   ) { }
 
   @Get()
-  getHello(): string {
-    return this.service.getHello()
+  @Render('index')
+  root() {
+    return {}
   }
 }

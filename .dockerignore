@@ -1,6 +1,7 @@
 *
 !docker/
 !src/
+!view/
 !nest-cli.json
 !package*.json
 !tsconfig*.json
