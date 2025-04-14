@@ -9,6 +9,9 @@ export class Replay extends BaseEntity {
   @Column({ name: 'data', type: 'json' })
   data: Record<string, any>
 
+  @Column({ name: 'hit', type: 'int', nullable: true, default: 0 })
+  hit?: number
+
   @Column({ name: 'world', type: 'int' })
   world: number
 

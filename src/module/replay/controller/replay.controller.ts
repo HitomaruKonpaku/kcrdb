@@ -1,6 +1,8 @@
 import { Body, Controller, Get, Param, Post, UseInterceptors } from '@nestjs/common'
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
 import { SourceName } from '../../../decorator/source-name.decorator'
+import { DataInterceptor } from '../../../interceptor/data.interceptor'
+import { HitInterceptor } from '../../../interceptor/hit.interceptor'
 import { UserAgentInterceptor } from '../../user-agent/interceptor/user-agent.interceptor'
 import { ReplayCreate } from '../dto/replay-create.dto'
 import { Replay } from '../dto/replay.dto'
@@ -24,6 +26,8 @@ export class ReplayController {
   }
 
   @Get(':id')
+  @UseInterceptors(HitInterceptor)
+  @SourceName('replay')
   @ApiOkResponse({ type: Replay })
   @ApiNotFoundResponse()
   getId(
@@ -33,12 +37,13 @@ export class ReplayController {
   }
 
   @Get(':id/data')
+  @UseInterceptors(DataInterceptor, HitInterceptor)
+  @SourceName('replay')
   @ApiOkResponse({ type: Object })
   @ApiNotFoundResponse()
   getIdData(
     @Param('id') id: string,
   ) {
     return this.service.findOneById(id)
-      .then((v) => v.data)
   }
 }

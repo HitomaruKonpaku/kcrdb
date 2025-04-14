@@ -8,4 +8,7 @@ export class Simulator extends BaseEntity {
 
   @Column({ name: 'data', type: 'varchar' })
   data: string
+
+  @Column({ name: 'hit', type: 'int', nullable: true, default: 0 })
+  hit?: number
 }

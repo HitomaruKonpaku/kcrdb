@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { Observable, tap } from 'rxjs'
-import { SOURCE_NAME } from '../../../decorator/source-name.decorator'
+import { parseSourceName } from '../../../decorator/source-name.decorator'
 import { UserAgentService } from '../service/user-agent.service'
 
 @Injectable()
@@ -20,21 +20,21 @@ export class UserAgentInterceptor implements NestInterceptor {
   ) { }
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const req = context.switchToHttp().getRequest<Request>()
-    const headers = req.headers
-    const raw = headers['user-agent']
-    const origin = headers['origin']
-    const xOrigin = headers['x-origin']
-      || headers['data-origin']
-
     return next.handle().pipe(
       tap(async (data) => {
-        const sourceName = this.reflector.getAllAndOverride<string>(
-          SOURCE_NAME,
-          [context.getHandler(), context.getClass()],
-        )
+        const sourceName = parseSourceName(this.reflector, context)
         const sourceId = data.id
-        if (!sourceName || !sourceId || !raw) {
+        if (!sourceName || !sourceId) {
+          return
+        }
+
+        const req = context.switchToHttp().getRequest<Request>()
+        const headers = req.headers
+        const raw = headers['user-agent']
+        const origin = headers['origin']
+        const xOrigin = headers['x-origin']
+          || headers['data-origin']
+        if (!raw) {
           return
         }
 
