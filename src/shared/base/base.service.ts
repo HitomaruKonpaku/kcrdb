@@ -44,13 +44,14 @@ export abstract class BaseService<E extends BaseEntity, R extends BaseRepository
         await this.repository.insert({ ...data, id })
         break
       } catch (error) {
-        if (error.code === '23505') {
+        if (error.code === '23505' && error.detail && error.detail.includes('(id)')) {
           id = IdUtil.generate()
           // eslint-disable-next-line no-continue
           continue
         }
         throw error
       }
+      // eslint-disable-next-line no-constant-condition
     } while (true)
 
     const res = await this.findOneById(id)
