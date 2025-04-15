@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { json } from 'body-parser'
+import * as compression from 'compression'
 import 'dotenv/config'
 import { join } from 'path'
 import { AppModule } from './app.module'
@@ -33,6 +34,7 @@ async function bootstrap() {
 
   app.set('trust proxy', true)
 
+  app.use(compression())
   app.use(json({ limit: '20mb' }))
 
   app.useGlobalPipes(
