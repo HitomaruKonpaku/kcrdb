@@ -5,7 +5,6 @@ import {
   Logger,
   NestInterceptor,
 } from '@nestjs/common'
-import { randomUUID } from 'crypto'
 import { Observable } from 'rxjs'
 import { catchError, tap } from 'rxjs/operators'
 
@@ -13,18 +12,18 @@ import { catchError, tap } from 'rxjs/operators'
 export class LoggingInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.switchToHttp().getRequest()
-    const id = randomUUID()
     const now = Date.now()
     const method = String(req.method).toUpperCase()
+    const { ip } = req
 
-    Logger.debug(`${method} --> ${req.path} | ${JSON.stringify({ id, query: req.query })}`)
+    Logger.debug(`${method} --> ${req.path} | ${JSON.stringify({ ip, query: req.query })}`)
 
     return next.handle().pipe(
       tap(() => {
-        Logger.debug(`${method} <-- ${req.path} | ${Date.now() - now}ms | ${JSON.stringify({ id })}`)
+        Logger.debug(`${method} <-- ${req.path} | ${Date.now() - now}ms | ${JSON.stringify({ ip })}`)
       }),
       catchError((error) => {
-        Logger.error(`${method} <-- ${req.path} | ${Date.now() - now}ms | ${JSON.stringify({ id, error })}`)
+        Logger.error(`${method} <-- ${req.path} | ${Date.now() - now}ms | ${JSON.stringify({ ip, error })}`)
         throw error
       }),
     )

@@ -31,6 +31,8 @@ async function bootstrap() {
   app.enableCors()
   app.enableShutdownHooks()
 
+  app.set('trust proxy', true)
+
   app.use(json({ limit: '20mb' }))
 
   app.useGlobalPipes(

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { APP_INTERCEPTOR } from '@nestjs/core'
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core'
+import { seconds, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
@@ -39,6 +40,18 @@ import { LoggingInterceptor } from './shared/interceptor/logging.interceptor'
       inject: [ConfigService],
     }),
 
+    ThrottlerModule.forRootAsync({
+      useFactory: () => ({
+        throttlers: [
+          {
+            limit: 100,
+            ttl: seconds(10),
+          },
+        ],
+        errorMessage: 'Too Many Requests',
+      }),
+    }),
+
     ReplayModule,
     SimulatorModule,
 
@@ -55,6 +68,10 @@ import { LoggingInterceptor } from './shared/interceptor/logging.interceptor'
     {
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
     AppService,
   ],
