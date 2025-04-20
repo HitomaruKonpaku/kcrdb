@@ -15,8 +15,13 @@ export class LoggingInterceptor implements NestInterceptor {
     const now = Date.now()
     const method = String(req.method).toUpperCase()
     const { ip } = req
+    const detail = { ip }
 
-    Logger.debug(`${method} --> ${req.path} | ${JSON.stringify({ ip, query: req.query })}`)
+    if (Object.keys(req.query).length) {
+      Object.assign(detail, { query: req.query })
+    }
+
+    Logger.debug(`${method} --> ${req.path} | ${JSON.stringify(detail)}`)
 
     return next.handle().pipe(
       tap(() => {

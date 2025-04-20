@@ -11,6 +11,15 @@ services:
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
 
+  kcrdb-redis:
+    container_name: kcrdb-redis
+    image: redis
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    volumes:
+      - ./data/redis:/data
+
   kcrdb-be:
     container_name: kcrdb-be
     image: ghcr.io/hitomarukonpaku/kcrdb
@@ -19,6 +28,10 @@ services:
       - 8080:8080
     environment:
       NO_COLOR: 1
+      NO_TIMESTAMP: 1
       DATABASE_URL: postgresql://postgres:admin@kcrdb-db:5432/postgres
+      REDIS_URL: redis://kcrdb-redis:6379
+      CACHE_TTL: 10m
     depends_on:
       - kcrdb-db
+      - kcrdb-redis

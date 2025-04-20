@@ -1,16 +1,18 @@
+import { createKeyv } from '@keyv/redis'
+import { CacheModule, CacheOptions } from '@nestjs/cache-manager'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core'
 import { seconds, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
+import * as ms from 'ms'
+import { StringValue } from 'ms'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import configuration from './config/configuration'
-import { Replay } from './module/replay/model/replay.entity'
+import { ENTITIES } from './constant/common.constant'
 import { ReplayModule } from './module/replay/replay.module'
-import { Simulator } from './module/simulator/model/simulator.entity'
 import { SimulatorModule } from './module/simulator/simulator.module'
-import { UserAgent } from './module/user-agent/model/user-agent.entity'
 import { UserAgentModule } from './module/user-agent/user-agent.module'
 import { ErrorInterceptor } from './shared/interceptor/error.interceptor'
 import { LoggingInterceptor } from './shared/interceptor/logging.interceptor'
@@ -25,19 +27,28 @@ import { LoggingInterceptor } from './shared/interceptor/logging.interceptor'
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => {
         const opts: TypeOrmModuleOptions = {
-          type: 'postgres',
+          type: configService.get('DATABASE_TYPE'),
           url: configService.get('DATABASE_URL'),
           synchronize: true,
-          entities: [
-            Replay,
-            Simulator,
-
-            UserAgent,
-          ],
+          entities: ENTITIES,
         }
         return opts
       },
       inject: [ConfigService],
+    }),
+
+    CacheModule.registerAsync({
+      useFactory: (configService: ConfigService) => {
+        const opts: CacheOptions = {
+          stores: [
+            createKeyv(configService.get('REDIS_URL')),
+          ],
+          ttl: ms(configService.get('CACHE_TTL') as StringValue),
+        }
+        return opts
+      },
+      inject: [ConfigService],
+      isGlobal: true,
     }),
 
     ThrottlerModule.forRootAsync({

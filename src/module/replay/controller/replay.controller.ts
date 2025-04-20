@@ -1,7 +1,8 @@
 import { Body, Controller, Get, Param, Post, UseInterceptors } from '@nestjs/common'
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
 import { SourceName } from '../../../decorator/source-name.decorator'
-import { DataInterceptor } from '../../../interceptor/data.interceptor'
+import { DataCacheInterceptor } from '../../../interceptor/data-cache.interceptor'
+import { DataTransformInterceptor } from '../../../interceptor/data-transform.interceptor'
 import { HitInterceptor } from '../../../interceptor/hit.interceptor'
 import { UserAgentInterceptor } from '../../user-agent/interceptor/user-agent.interceptor'
 import { ReplayCreate } from '../dto/replay-create.dto'
@@ -16,7 +17,7 @@ export class ReplayController {
   ) { }
 
   @Post()
-  @UseInterceptors(UserAgentInterceptor)
+  @UseInterceptors(UserAgentInterceptor, DataCacheInterceptor)
   @SourceName('replay')
   @ApiCreatedResponse({ type: Replay })
   create(
@@ -37,7 +38,7 @@ export class ReplayController {
   }
 
   @Get(':id/data')
-  @UseInterceptors(DataInterceptor, HitInterceptor)
+  @UseInterceptors(DataTransformInterceptor, HitInterceptor, DataCacheInterceptor)
   @SourceName('replay')
   @ApiOkResponse({ type: Object })
   @ApiNotFoundResponse()
