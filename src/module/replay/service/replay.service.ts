@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { BaseService } from '../../../shared/base/base.service'
 import { Logger } from '../../../shared/logger'
 import { CryptoUtil } from '../../../shared/util/crypto.util'
@@ -24,17 +24,6 @@ export class ReplayService extends BaseService<Replay, ReplayRepository> {
     }
 
     const { world, mapnum: map, diff } = body.data
-
-    if (typeof world !== 'number') {
-      this.logger.error(`WORLD_INVALID | ${JSON.stringify({ value: world })}`)
-      throw new BadRequestException('WORLD_INVALID')
-    }
-
-    if (typeof map !== 'number') {
-      this.logger.error(`MAPNUM_INVALID | ${JSON.stringify({ value: map })}`)
-      throw new BadRequestException('MAPNUM_INVALID')
-    }
-
     res = await this.insertLoop({ ...body, hash, world, map, diff })
     return res
   }

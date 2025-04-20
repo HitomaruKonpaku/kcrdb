@@ -12,10 +12,10 @@ export class Replay extends BaseEntity {
   @Column({ name: 'hit', type: 'int', nullable: true, default: 0 })
   hit?: number
 
-  @Column({ name: 'world', type: 'int' })
+  @Column({ name: 'world', type: 'int', nullable: true })
   world: number
 
-  @Column({ name: 'map', type: 'int' })
+  @Column({ name: 'map', type: 'int', nullable: true })
   map: number
 
   @Column({ name: 'diff', type: 'int', nullable: true })
