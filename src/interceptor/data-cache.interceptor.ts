@@ -7,7 +7,7 @@ import {
   NestInterceptor,
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
-import { map, Observable, of, switchMap, tap } from 'rxjs'
+import { catchError, from, map, Observable, of, switchMap, tap } from 'rxjs'
 import { parseSourceName } from '../decorator/source-name.decorator'
 import { CacheUtil } from '../shared/util/cache.util'
 
@@ -40,7 +40,9 @@ export class DataCacheInterceptor implements NestInterceptor {
     if (req.method === 'GET' && req.params.id) {
       return of(null).pipe(
         map(() => CacheUtil.key(sourceName, req.params.id)),
-        switchMap((key) => this.cache.get<string>(key)),
+        switchMap((key) => from(this.cache.get<string>(key)).pipe(
+          catchError(() => of(null)),
+        )),
         switchMap((value) => {
           if (value !== null) {
             return of(JSON.parse(value))
