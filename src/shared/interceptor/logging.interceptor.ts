@@ -14,23 +14,45 @@ export class LoggingInterceptor implements NestInterceptor {
     const req = context.switchToHttp().getRequest()
     const now = Date.now()
     const method = String(req.method).toUpperCase()
-    const { ip } = req
-    const detail = { ip }
 
-    if (Object.keys(req.query).length) {
-      Object.assign(detail, { query: req.query })
-    }
-
-    Logger.debug(`${method} --> ${req.path} | ${JSON.stringify(detail)}`)
+    Logger.debug(`${method} --> ${req.path} | ${JSON.stringify(this.getRequestInfo(req))}`)
 
     return next.handle().pipe(
-      tap(() => {
-        Logger.debug(`${method} <-- ${req.path} | ${Date.now() - now}ms | ${JSON.stringify({ ip })}`)
+      tap((value) => {
+        Logger.debug(`${method} <-- ${req.path} | ${Date.now() - now}ms | ${JSON.stringify(this.getResponseInfo(req, value))}`)
       }),
       catchError((error) => {
-        Logger.error(`${method} <-- ${req.path} | ${Date.now() - now}ms | ${JSON.stringify({ ip, error })}`)
+        Logger.error(`${method} <-- ${req.path} | ${Date.now() - now}ms | ${JSON.stringify(this.getErrorInfo(req, error))}`)
         throw error
       }),
     )
+  }
+
+  private getRequestInfo(req: any) {
+    const res = {
+      ip: req.ip,
+    }
+    if (Object.keys(req.query).length) {
+      Object.assign(res, { query: req.query })
+    }
+    return res
+  }
+
+  private getResponseInfo(req: any, value: any) {
+    const res = {
+      ip: req.ip,
+    }
+    if (req.method === 'POST' && value.id) {
+      Object.assign(res, { id: value.id })
+    }
+    return res
+  }
+
+  private getErrorInfo(req: any, error) {
+    const res = {
+      ip: req.ip,
+      error,
+    }
+    return res
   }
 }
