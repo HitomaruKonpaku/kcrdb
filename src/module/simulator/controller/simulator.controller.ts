@@ -11,6 +11,7 @@ import { SimulatorService } from '../service/simulator.service'
 
 @Controller('simulators')
 @ApiTags('simulator')
+@SourceName('simulator')
 export class SimulatorController {
   constructor(
     private readonly service: SimulatorService,
@@ -18,7 +19,6 @@ export class SimulatorController {
 
   @Post()
   @UseInterceptors(UserAgentInterceptor, DataCacheInterceptor)
-  @SourceName('simulator')
   @ApiCreatedResponse({ type: Simulator })
   create(
     @Body() body: SimulatorCreate,
@@ -28,7 +28,6 @@ export class SimulatorController {
 
   @Get(':id')
   @UseInterceptors(HitInterceptor)
-  @SourceName('simulator')
   @ApiOkResponse({ type: Simulator })
   @ApiNotFoundResponse()
   getId(
@@ -39,7 +38,6 @@ export class SimulatorController {
 
   @Get(':id/data')
   @UseInterceptors(DataTransformInterceptor, HitInterceptor, DataCacheInterceptor)
-  @SourceName('simulator')
   @ApiOkResponse({ type: String })
   @ApiNotFoundResponse()
   getIdData(

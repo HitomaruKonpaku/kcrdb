@@ -11,6 +11,7 @@ import { ReplayService } from '../service/replay.service'
 
 @Controller('replays')
 @ApiTags('replay')
+@SourceName('replay')
 export class ReplayController {
   constructor(
     private readonly service: ReplayService,
@@ -18,7 +19,6 @@ export class ReplayController {
 
   @Post()
   @UseInterceptors(UserAgentInterceptor, DataCacheInterceptor)
-  @SourceName('replay')
   @ApiCreatedResponse({ type: Replay })
   create(
     @Body() body: ReplayCreate,
@@ -28,7 +28,6 @@ export class ReplayController {
 
   @Get(':id')
   @UseInterceptors(HitInterceptor)
-  @SourceName('replay')
   @ApiOkResponse({ type: Replay })
   @ApiNotFoundResponse()
   getId(
@@ -39,7 +38,6 @@ export class ReplayController {
 
   @Get(':id/data')
   @UseInterceptors(DataTransformInterceptor, HitInterceptor, DataCacheInterceptor)
-  @SourceName('replay')
   @ApiOkResponse({ type: Object })
   @ApiNotFoundResponse()
   getIdData(
