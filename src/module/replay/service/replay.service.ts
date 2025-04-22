@@ -18,7 +18,7 @@ export class ReplayService extends BaseService<Replay, ReplayRepository> {
 
   public async create(body: ReplayCreate) {
     const hash = CryptoUtil.hash(JSON.stringify(body.data))
-    let res = await this.repository.repository.findOneBy({ hash })
+    let res = await this.repository.findOneBy({ hash })
     if (res) {
       return res
     }

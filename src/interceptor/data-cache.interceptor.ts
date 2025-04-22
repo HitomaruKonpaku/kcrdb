@@ -27,13 +27,13 @@ export class DataCacheInterceptor implements NestInterceptor {
 
     const req = context.switchToHttp().getRequest()
     const obs = next.handle().pipe(
-      tap((value) => {
-        if (!value || !value.id) {
+      tap((data) => {
+        if (!data || !data.id) {
           return
         }
 
-        const key = CacheUtil.key(sourceName, value.id)
-        this.cache.set(key, JSON.stringify(value))
+        const key = CacheUtil.key(sourceName, data.id)
+        this.cache.set(key, JSON.stringify(data))
       }),
     )
 

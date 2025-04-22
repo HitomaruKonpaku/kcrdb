@@ -11,7 +11,7 @@ import { DataSource } from 'typeorm'
 import { parseSourceName } from '../decorator/source-name.decorator'
 
 @Injectable()
-export class HitInterceptor implements NestInterceptor {
+export class DataHitInterceptor implements NestInterceptor {
   private readonly limiter = new Bottleneck({ maxConcurrent: 1 })
 
   constructor(

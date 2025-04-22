@@ -1,4 +1,4 @@
-import { DeepPartial, Repository } from 'typeorm'
+import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm'
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { BaseEntity } from './base.entity'
 
@@ -6,6 +6,11 @@ export abstract class BaseRepository<E extends BaseEntity> {
   constructor(
     public readonly repository: Repository<E>,
   ) { }
+
+  public async findOneBy(where: FindOptionsWhere<E> | FindOptionsWhere<E>[]) {
+    const res = await this.repository.findOneBy(where)
+    return res
+  }
 
   public async findOneById(id: E['id']) {
     const res = await this.repository.findOneBy({ id } as any)

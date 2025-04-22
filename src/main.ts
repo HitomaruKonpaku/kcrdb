@@ -35,7 +35,7 @@ async function bootstrap() {
   app.set('trust proxy', true)
 
   app.use(compression())
-  app.use(json({ limit: '20mb' }))
+  app.use(json({ limit: process.env.BODY_JSON_LIMIT || '500kb' }))
 
   app.useGlobalPipes(
     new ValidationPipe({

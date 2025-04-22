@@ -15,7 +15,7 @@ export class SimulatorService extends BaseService<Simulator, SimulatorRepository
 
   public async create(body: SimulatorCreate) {
     const hash = CryptoUtil.hash(body.data)
-    let res = await this.repository.repository.findOneBy({ hash })
+    let res = await this.repository.findOneBy({ hash })
     if (res) {
       return res
     }
