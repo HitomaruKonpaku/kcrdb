@@ -3,7 +3,7 @@ import { BaseEntity } from '../../../shared/base/base.entity'
 
 @Entity({ name: 'replay' })
 export class Replay extends BaseEntity {
-  @Column({ name: 'hash', type: 'varchar', nullable: true })
+  @Column({ name: 'hash', type: 'varchar', nullable: true, unique: true })
   hash?: string
 
   @Column({ name: 'data', type: 'json' })
