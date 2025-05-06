@@ -26,7 +26,25 @@ export class DataCacheInterceptor implements NestInterceptor {
     }
 
     const req = context.switchToHttp().getRequest()
-    const obs = next.handle().pipe(
+
+    if (req.method === 'GET' && req.params.id) {
+      return of(null).pipe(
+        map(() => CacheUtil.key(sourceName, req.params.id)),
+        switchMap((key) => this.getCacheObservable(key)),
+        switchMap((value) => {
+          if (value !== null) {
+            return of(JSON.parse(value))
+          }
+          return this.handleObservable(next, sourceName)
+        }),
+      )
+    }
+
+    return this.handleObservable(next, sourceName)
+  }
+
+  private handleObservable(next: CallHandler, sourceName: string) {
+    return next.handle().pipe(
       tap((data) => {
         if (!data || !data.id) {
           return
@@ -36,22 +54,11 @@ export class DataCacheInterceptor implements NestInterceptor {
         this.cache.set(key, JSON.stringify(data))
       }),
     )
+  }
 
-    if (req.method === 'GET' && req.params.id) {
-      return of(null).pipe(
-        map(() => CacheUtil.key(sourceName, req.params.id)),
-        switchMap((key) => from(this.cache.get<string>(key)).pipe(
-          catchError(() => of(null)),
-        )),
-        switchMap((value) => {
-          if (value !== null) {
-            return of(JSON.parse(value))
-          }
-          return obs
-        }),
-      )
-    }
-
-    return obs
+  private getCacheObservable(key: string) {
+    return from(this.cache.get<string>(key)).pipe(
+      catchError(() => of(null)),
+    )
   }
 }
