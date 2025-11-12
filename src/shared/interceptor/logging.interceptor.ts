@@ -42,8 +42,13 @@ export class LoggingInterceptor implements NestInterceptor {
     const res = {
       ip: req.ip,
     }
-    if (req.method === 'POST' && value.id) {
-      Object.assign(res, { id: value.id })
+    if (req.method === 'POST' && value) {
+      if (value.id) {
+        Object.assign(res, { id: value.id })
+      }
+      if (value.ids) {
+        Object.assign(res, { ids: value.ids })
+      }
     }
     return res
   }

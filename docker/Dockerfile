@@ -1,8 +1,6 @@
 # BASE
 FROM node:lts-alpine AS base
 
-RUN apk add --no-cache tini
-
 WORKDIR /app
 
 COPY package*.json ./
@@ -24,12 +22,12 @@ RUN npm run build
 # RELEASE
 FROM base AS release
 
-RUN apk add --no-cache bash
-
-ENV NODE_ENV=production
+RUN apk add --no-cache tini bash
 
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=builder      /app/dist ./dist
 COPY --from=builder      /app/view ./view
+
+ENV NODE_ENV=production
 
 ENTRYPOINT [ "/sbin/tini", "--", "node", "dist/main" ]

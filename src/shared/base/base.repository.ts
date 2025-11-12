@@ -27,7 +27,7 @@ export abstract class BaseRepository<E extends BaseEntity> {
     return res
   }
 
-  public async insertOrIgnore(data: QueryDeepPartialEntity<E>) {
+  public async insertOrIgnore(data: QueryDeepPartialEntity<E> | QueryDeepPartialEntity<E>[]) {
     const res = await this.repository
       .createQueryBuilder()
       .insert()

@@ -10,6 +10,7 @@ import {
 import { Reflector } from '@nestjs/core'
 import { Observable, tap } from 'rxjs'
 import { parseSourceName } from '../../../decorator/source-name.decorator'
+import { UserAgent } from '../model/user-agent.entity'
 import { UserAgentService } from '../service/user-agent.service'
 
 @Injectable()
@@ -23,8 +24,12 @@ export class UserAgentInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap(async (data) => {
         const sourceName = parseSourceName(this.reflector, context)
-        const sourceId = data.id
-        if (!sourceName || !sourceId) {
+        if (!sourceName) {
+          return
+        }
+
+        const sourceIds = (data.ids || [data.id]).filter((v) => v) as string[]
+        if (!sourceIds.length) {
           return
         }
 
@@ -32,19 +37,19 @@ export class UserAgentInterceptor implements NestInterceptor {
         const headers = req.headers
         const raw = headers['user-agent']
         const origin = headers['origin']
-        const xOrigin = headers['x-origin']
-          || headers['data-origin']
+        const xOrigin = headers['x-origin'] || headers['data-origin']
         if (!raw) {
           return
         }
 
-        await this.service.insertOrIgnore({
+        const items: Partial<UserAgent>[] = sourceIds.map((sourceId) => ({
           sourceName,
           sourceId,
           raw,
           origin,
           xOrigin,
-        })
+        }))
+        await this.service.insertOrIgnoreMany(items)
       }),
     )
   }

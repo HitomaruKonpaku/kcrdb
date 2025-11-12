@@ -11,6 +11,7 @@ import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import configuration from './config/configuration'
 import { ENTITIES } from './constant/common.constant'
+import { QuestModule } from './module/quest/quest.module'
 import { ReplayModule } from './module/replay/replay.module'
 import { SimulatorModule } from './module/simulator/simulator.module'
 import { UserAgentModule } from './module/user-agent/user-agent.module'
@@ -65,6 +66,7 @@ import { LoggingInterceptor } from './shared/interceptor/logging.interceptor'
 
     ReplayModule,
     SimulatorModule,
+    QuestModule,
 
     UserAgentModule,
   ],

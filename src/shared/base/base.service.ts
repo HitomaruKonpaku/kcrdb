@@ -35,6 +35,12 @@ export abstract class BaseService<E extends BaseEntity, R extends BaseRepository
     return res
   }
 
+  public async insertOrIgnoreMany(data: QueryDeepPartialEntity<E>[]) {
+    const tmp = data.map((v) => Object.assign(v, { id: IdUtil.generate() }))
+    const res = await this.repository.insertOrIgnore(tmp)
+    return res
+  }
+
   public async insertLoop(data: QueryDeepPartialEntity<E>) {
     let id = IdUtil.generate()
 
