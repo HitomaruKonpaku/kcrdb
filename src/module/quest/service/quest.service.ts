@@ -50,39 +50,41 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
   }
 
   public async create(body: QuestCreate) {
+    const checkFields = [
+      'api_no',
+      'api_category',
+      'api_type',
+      'api_label_type',
+      'api_title',
+      'api_detail',
+    ]
+
+    const hashFields = [
+      ...checkFields,
+      'api_get_material',
+      'api_select_rewards',
+    ]
+
     const tmpQuests = body.list.map((data, index) => {
-      if (!data.api_no) {
-        throw new BadRequestException({
-          message: 'api_no not found',
-          error: 'Bad Request',
-          statusCode: 400,
-          index,
-        })
-      }
+      checkFields.forEach((field) => {
+        if (!data[field]) {
+          throw new BadRequestException({
+            message: `${field} not found`,
+            error: 'Bad Request',
+            statusCode: 400,
+            index,
+            data,
+          })
+        }
+      })
 
-      if (!data.api_title) {
-        throw new BadRequestException({
-          message: 'api_title not found',
-          error: 'Bad Request',
-          statusCode: 400,
-          index,
-        })
-      }
-
-      if (!data.api_detail) {
-        throw new BadRequestException({
-          message: 'api_detail not found',
-          error: 'Bad Request',
-          statusCode: 400,
-          index,
-        })
-      }
-
-      const hash = CryptoUtil.hash(JSON.stringify({
-        api_no: data.api_no,
-        api_title: data.api_title,
-        api_detail: data.api_detail,
-      }))
+      const hashObj = hashFields.reduce((obj, key) => {
+        if (data[key]) {
+          Object.assign(obj, { [key]: data[key] })
+        }
+        return obj
+      }, {})
+      const hash = CryptoUtil.hash(JSON.stringify(hashObj))
       const quest: Partial<Quest> = {
         id: IdUtil.generate(),
         hash,
