@@ -38,6 +38,7 @@ export class UserAgentInterceptor implements NestInterceptor {
         const raw = headers['user-agent']
         const origin = headers['origin']
         const xOrigin = headers['x-origin'] || headers['data-origin']
+        const xVersion = headers['x-version'] || headers['data-version']
         if (!raw) {
           return
         }
@@ -48,6 +49,7 @@ export class UserAgentInterceptor implements NestInterceptor {
           raw,
           origin,
           xOrigin,
+          xVersion,
         }))
         await this.service.insertOrIgnoreMany(items)
       }),

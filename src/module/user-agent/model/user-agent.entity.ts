@@ -19,4 +19,7 @@ export class UserAgent extends BaseEntity {
 
   @Column({ name: 'x_origin', type: 'varchar', nullable: true })
   xOrigin?: string
+
+  @Column({ name: 'x_version', type: 'varchar', nullable: true })
+  xVersion?: string
 }
