@@ -1,6 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
-import { IsNumber, IsOptional } from 'class-validator'
+import { IsBoolean, IsNumber, IsOptional } from 'class-validator'
+import { ToBoolean } from '../../../shared/decorator/to-boolean.decorator'
 
 export class QuestFilter {
   @IsOptional()
@@ -26,4 +27,10 @@ export class QuestFilter {
   @Type(() => Number)
   @ApiPropertyOptional()
   api_label_type?: number
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  @ApiPropertyOptional()
+  has_api_select_rewards?: boolean
 }

@@ -1,5 +1,7 @@
+/* eslint-disable quotes */
+
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { FindOptionsWhere, LessThanOrEqual, MoreThanOrEqual } from 'typeorm'
+import { SelectQueryBuilder } from 'typeorm'
 import { BaseService } from '../../../shared/base/base.service'
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
@@ -23,13 +25,8 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     filter?: QuestFilter,
     timeFilter?: TimeFilterDto,
   ) {
-    const where = this.buildWhere(filter, timeFilter)
-    const [items, total] = await this.repository.repository.findAndCount({
-      where,
-      order: { createdAt: 'DESC' },
-      skip: paging?.offset,
-      take: paging?.limit,
-    })
+    const qb = this.createQueryBuilder(paging, filter, timeFilter)
+    const [items, total] = await qb.getManyAndCount()
     return {
       total,
       items,
@@ -41,14 +38,9 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     filter?: QuestFilter,
     timeFilter?: TimeFilterDto,
   ) {
-    const where = this.buildWhere(filter, timeFilter)
-    const [items, total] = await this.repository.repository.findAndCount({
-      select: { data: true },
-      where,
-      order: { createdAt: 'DESC' },
-      skip: paging?.offset,
-      take: paging?.limit,
-    })
+    const qb = this.createQueryBuilder(paging, filter, timeFilter)
+    qb.select('q.data')
+    const [items, total] = await qb.getManyAndCount()
     return {
       total,
       items: items.map((v) => v.data),
@@ -115,17 +107,50 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     }
   }
 
-  private buildWhere(
+  private createQueryBuilder(
+    paging?: PagingDto,
     filter?: QuestFilter,
     timeFilter?: TimeFilterDto,
-  ): FindOptionsWhere<Quest> {
-    const res: FindOptionsWhere<Quest> = { ...(filter || {}) }
-    if (timeFilter?.before) {
-      res.createdAt = LessThanOrEqual(timeFilter.before)
+  ): SelectQueryBuilder<Quest> {
+    const qb = this.repository.repository.createQueryBuilder('q')
+
+    if (filter?.api_no !== undefined) {
+      qb.andWhere('q.api_no = :api_no', { api_no: filter.api_no })
     }
-    if (timeFilter?.after) {
-      res.createdAt = MoreThanOrEqual(timeFilter.after)
+    if (filter?.api_category !== undefined) {
+      qb.andWhere('q.api_category = :api_category', { api_category: filter.api_category })
     }
-    return res
+    if (filter?.api_type !== undefined) {
+      qb.andWhere('q.api_type = :api_type', { api_type: filter.api_type })
+    }
+    if (filter?.api_label_type !== undefined) {
+      qb.andWhere('q.api_label_type = :api_label_type', { api_label_type: filter.api_label_type })
+    }
+
+    if (filter?.has_api_select_rewards !== undefined) {
+      if (filter.has_api_select_rewards) {
+        qb.andWhere(`q.data::JSONB ? 'api_select_rewards'`)
+      } else {
+        qb.andWhere(`NOT q.data::JSONB ? 'api_select_rewards'`)
+      }
+    }
+
+    if (timeFilter?.before !== undefined) {
+      qb.andWhere('q.created_at <= :before', { before: timeFilter.before })
+    }
+    if (timeFilter?.after !== undefined) {
+      qb.andWhere('q.created_at >= :after', { after: timeFilter.after })
+    }
+
+    qb.addOrderBy('q.created_at', 'DESC')
+
+    if (paging?.offset !== undefined) {
+      qb.skip(paging.offset)
+    }
+    if (paging?.limit !== undefined) {
+      qb.take(paging.limit)
+    }
+
+    return qb
   }
 }
