@@ -2,15 +2,22 @@ import { ApiPropertyOptional } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
 import { IsDate, IsOptional } from 'class-validator'
 
+function getDefaultDate(offset = 0) {
+  const d = new Date(Date.now() + offset)
+  d.setMinutes(0)
+  d.setSeconds(0)
+  const s = d.toISOString().replace(/\.\d{3}/, '')
+  return s
+}
+
 export class TimeFilterDto {
   @IsOptional()
   @IsDate()
   @Type(() => Date)
   @ApiPropertyOptional({
-    type: String,
-    format: 'date-time',
+    type: Date,
     description: 'ISO format',
-    default: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
+    default: getDefaultDate(1 * 24 * 3600 * 1000),
   })
   before?: Date
 
@@ -18,10 +25,9 @@ export class TimeFilterDto {
   @IsDate()
   @Type(() => Date)
   @ApiPropertyOptional({
-    type: String,
-    format: 'date-time',
+    type: Date,
     description: 'ISO format',
-    default: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
+    default: getDefaultDate(-1 * 24 * 3600 * 1000),
   })
   after?: Date
 }
