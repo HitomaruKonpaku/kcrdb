@@ -7,11 +7,10 @@ export class TimeFilterDto {
   @IsDate()
   @Type(() => Date)
   @ApiPropertyOptional({
-    type: Date,
+    type: String,
+    format: 'date-time',
     description: 'ISO format',
-    default: new Date(Date.now() + 24 * 3600 * 1000)
-      .toISOString()
-      .replace(/\.\d{3}/, ''),
+    default: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
   })
   before?: Date
 
@@ -19,11 +18,10 @@ export class TimeFilterDto {
   @IsDate()
   @Type(() => Date)
   @ApiPropertyOptional({
-    type: Date,
+    type: String,
+    format: 'date-time',
     description: 'ISO format',
-    default: new Date(Date.now() - 24 * 3600 * 1000)
-      .toISOString()
-      .replace(/\.\d{3}/, ''),
+    default: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
   })
   after?: Date
 }
