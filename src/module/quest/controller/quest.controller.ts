@@ -3,6 +3,7 @@ import { ApiTags } from '@nestjs/swagger'
 import { SourceName } from '../../../decorator/source-name.decorator'
 import { ApiPaginatedResponse } from '../../../shared/decorator/pagination.decorator'
 import { PagingDto } from '../../../shared/dto/paging.dto'
+import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
 import { UserAgentInterceptor } from '../../user-agent/interceptor/user-agent.interceptor'
 import { QuestCreate } from '../dto/quest-create.dto'
 import { QuestFilter } from '../dto/quest-filter.dto'
@@ -23,8 +24,9 @@ export class QuestController {
   getAll(
     @Query() paging: PagingDto,
     @Query() filter: QuestFilter,
+    @Query() timeFilter: TimeFilterDto,
   ) {
-    return this.service.getAll(paging, filter)
+    return this.service.getAll(paging, filter, timeFilter)
   }
 
   @Get('raw')
@@ -32,8 +34,9 @@ export class QuestController {
   getAllRaw(
     @Query() paging: PagingDto,
     @Query() filter: QuestFilter,
+    @Query() timeFilter: TimeFilterDto,
   ) {
-    return this.service.getAllRaw(paging, filter)
+    return this.service.getAllRaw(paging, filter, timeFilter)
   }
 
   @Post()

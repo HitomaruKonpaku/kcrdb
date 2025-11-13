@@ -13,9 +13,6 @@ export class QuestRaw {
   @ApiProperty()
   api_label_type: number
 
-  @ApiPropertyOptional()
-  api_state?: number
-
   @ApiProperty()
   api_title: string
 
@@ -37,9 +34,16 @@ export class QuestRaw {
   @ApiPropertyOptional()
   api_bonus_flag?: number
 
+  // #region user related so can prob ignore
+
+  @ApiPropertyOptional()
+  api_state?: number
+
   @ApiPropertyOptional()
   api_progress_flag?: number
 
   @ApiPropertyOptional()
   api_invalid_flag?: number
+
+  // #endregion
 }

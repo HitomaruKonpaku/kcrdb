@@ -1,6 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
+import { FindOptionsWhere, LessThanOrEqual, MoreThanOrEqual } from 'typeorm'
 import { BaseService } from '../../../shared/base/base.service'
 import { PagingDto } from '../../../shared/dto/paging.dto'
+import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
 import { CryptoUtil } from '../../../shared/util/crypto.util'
 import { IdUtil } from '../../../shared/util/id.util'
 import { QuestCreate } from '../dto/quest-create.dto'
@@ -19,9 +21,11 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
   public async getAll(
     paging?: PagingDto,
     filter?: QuestFilter,
+    timeFilter?: TimeFilterDto,
   ) {
+    const where = this.buildWhere(filter, timeFilter)
     const [items, total] = await this.repository.repository.findAndCount({
-      where: { ...(filter || {}) },
+      where,
       order: { createdAt: 'DESC' },
       skip: paging?.offset,
       take: paging?.limit,
@@ -35,10 +39,12 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
   public async getAllRaw(
     paging?: PagingDto,
     filter?: QuestFilter,
+    timeFilter?: TimeFilterDto,
   ) {
+    const where = this.buildWhere(filter, timeFilter)
     const [items, total] = await this.repository.repository.findAndCount({
       select: { data: true },
-      where: { ...(filter || {}) },
+      where,
       order: { createdAt: 'DESC' },
       skip: paging?.offset,
       take: paging?.limit,
@@ -61,25 +67,31 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
 
     const hashFields = [
       ...checkFields,
+      'api_voice_id',
+      'api_lost_badges',
       'api_get_material',
       'api_select_rewards',
+      'api_bonus_flag',
     ]
 
     const tmpQuests = body.list.map((data, index) => {
-      checkFields.forEach((field) => {
-        if (!data[field]) {
+      checkFields.forEach((key) => {
+        if (!(key in data)) {
           throw new BadRequestException({
-            message: `${field} not found`,
+            message: `${key} not found`,
             error: 'Bad Request',
             statusCode: 400,
-            index,
-            data,
+            data: {
+              key,
+              index,
+              data,
+            },
           })
         }
       })
 
       const hashObj = hashFields.reduce((obj, key) => {
-        if (data[key]) {
+        if (key in data) {
           Object.assign(obj, { [key]: data[key] })
         }
         return obj
@@ -101,5 +113,19 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
       total: res.raw.length,
       ids,
     }
+  }
+
+  private buildWhere(
+    filter?: QuestFilter,
+    timeFilter?: TimeFilterDto,
+  ): FindOptionsWhere<Quest> {
+    const res: FindOptionsWhere<Quest> = { ...(filter || {}) }
+    if (timeFilter?.before) {
+      res.createdAt = LessThanOrEqual(timeFilter.before)
+    }
+    if (timeFilter?.after) {
+      res.createdAt = MoreThanOrEqual(timeFilter.after)
+    }
+    return res
   }
 }
