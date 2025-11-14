@@ -32,7 +32,7 @@ export class DataCacheInterceptor implements NestInterceptor {
         map(() => CacheUtil.key(sourceName, req.params.id)),
         switchMap((key) => this.getCacheObservable(key)),
         switchMap((value) => {
-          if (value !== null) {
+          if (value !== undefined && value !== null) {
             return of(JSON.parse(value))
           }
           return this.handleObservable(next, sourceName)
