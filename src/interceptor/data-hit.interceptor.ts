@@ -35,7 +35,7 @@ export class DataHitInterceptor implements NestInterceptor {
           .set({ hit: () => 'COALESCE(hit, 0) + 1' })
           .andWhere({ id: sourceId })
           .execute()
-          .then((error) => {
+          .catch((error) => {
             console.error(error)
           })
       }),
