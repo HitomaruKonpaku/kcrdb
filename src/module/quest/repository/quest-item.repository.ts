@@ -22,7 +22,7 @@ export class QuestItemRepository extends BaseRepository<QuestItem> implements On
     const queryRunner = this.dataSource.createQueryRunner()
     queryRunner.startTransaction()
     queryRunner
-      .query('CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_quest_item_datab_gin ON quest USING GIN (datab)')
+      .query('CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_quest_item_datab_gin ON quest_item USING GIN (datab)')
       .then(() => {
         queryRunner.commitTransaction()
       })
