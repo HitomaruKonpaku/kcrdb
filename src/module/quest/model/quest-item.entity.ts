@@ -1,7 +1,7 @@
 import { Column, Entity } from 'typeorm'
 import { BaseEntity } from '../../../shared/base/base.entity'
 
-@Entity({ name: 'quest-item' })
+@Entity({ name: 'quest_item' })
 export class QuestItem extends BaseEntity {
   @Column({ name: 'hash', type: 'varchar', nullable: true, unique: true, select: false })
   hash?: string
