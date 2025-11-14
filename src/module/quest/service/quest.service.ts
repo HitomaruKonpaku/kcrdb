@@ -117,8 +117,8 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     this.applyQueryNumberFilter(qb, filter)
     this.applyQueryTextFilter(qb, filter)
     this.applyQueryExistFilter(qb, filter)
-    this.applyQueryTimelineFilter(qb, timeFilter)
-    this.applyQuerySort(qb)
+    this.applyQueryTimeFilter(qb, timeFilter)
+    this.applyQuerySort(qb, filter)
     this.applyQueryPaging(qb, paging)
     return qb
   }
@@ -182,7 +182,7 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     }
   }
 
-  private applyQueryTimelineFilter(
+  private applyQueryTimeFilter(
     qb: SelectQueryBuilder<Quest>,
     timeFilter?: TimeFilterDto,
   ) {
@@ -196,7 +196,46 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
 
   private applyQuerySort(
     qb: SelectQueryBuilder<Quest>,
+    filter?: QuestFilter,
   ) {
-    qb.addOrderBy('q.created_at', 'DESC')
+    if (filter?.sort === undefined) {
+      qb.addOrderBy('q.created_at', 'DESC')
+      return
+    }
+
+    const allKeys = new Set([
+      'created_at',
+      'api_no',
+      'api_category',
+      'api_type',
+      'api_label_type',
+      'api_voice_id',
+      'api_bonus_flag',
+    ])
+
+    const sortKeys = new Set()
+    const curKeys = filter.sort.split(',')
+    curKeys.forEach((key) => {
+      let sortKey: string
+      let sortDirection: 'ASC' | 'DESC'
+      if (key.startsWith('-')) {
+        sortKey = key.substring(1)
+        sortDirection = 'DESC'
+      } else {
+        sortKey = key
+        sortDirection = 'ASC'
+      }
+
+      if (!allKeys.has(sortKey)) {
+        return
+      }
+
+      sortKeys.add(key)
+      qb.addOrderBy(`(q.datab ->> '${key}')::int`, sortDirection)
+    })
+
+    if (!sortKeys.has('created_at')) {
+      qb.addOrderBy('q.created_at', 'DESC')
+    }
   }
 }
