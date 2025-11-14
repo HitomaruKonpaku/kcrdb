@@ -1,5 +1,6 @@
 import { Column, Entity } from 'typeorm'
 import { BaseEntity } from '../../../shared/base/base.entity'
+import { QuestRaw } from '../dto/quest-raw.dto'
 
 @Entity({ name: 'quest' })
 export class Quest extends BaseEntity {
@@ -7,17 +8,8 @@ export class Quest extends BaseEntity {
   hash?: string
 
   @Column({ name: 'data', type: 'json' })
-  data: Record<string, any>
+  data: QuestRaw
 
-  @Column({ name: 'api_no', type: 'int', nullable: true })
-  api_no?: number
-
-  @Column({ name: 'api_category', type: 'int', nullable: true })
-  api_category?: number
-
-  @Column({ name: 'api_type', type: 'int', nullable: true })
-  api_type?: number
-
-  @Column({ name: 'api_label_type', type: 'int', nullable: true })
-  api_label_type?: number
+  @Column({ name: 'datab', type: 'jsonb', nullable: true, select: false })
+  datab?: QuestRaw
 }

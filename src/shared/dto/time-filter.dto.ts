@@ -16,8 +16,7 @@ export class TimeFilterDto {
   @Type(() => Date)
   @ApiPropertyOptional({
     type: Date,
-    description: 'ISO format',
-    default: getDefaultDate(1 * 24 * 3600 * 1000),
+    description: `ISO format. Example: <code>${getDefaultDate(1 * 24 * 3600 * 1000)}</code>`,
   })
   before?: Date
 
@@ -26,8 +25,7 @@ export class TimeFilterDto {
   @Type(() => Date)
   @ApiPropertyOptional({
     type: Date,
-    description: 'ISO format',
-    default: getDefaultDate(-1 * 24 * 3600 * 1000),
+    description: `ISO format. Example: <code>${getDefaultDate(-1 * 24 * 3600 * 1000)}</code>`,
   })
   after?: Date
 }

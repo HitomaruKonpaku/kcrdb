@@ -90,10 +90,11 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
       }, {})
       const hash = CryptoUtil.hash(JSON.stringify(hashObj))
       const quest: Partial<Quest> = {
+        ...data,
         id: IdUtil.generate(),
         hash,
-        ...data,
         data,
+        datab: data,
       }
       return quest
     })
@@ -113,44 +114,89 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     timeFilter?: TimeFilterDto,
   ): SelectQueryBuilder<Quest> {
     const qb = this.repository.repository.createQueryBuilder('q')
+    this.applyQueryNumberFilter(qb, filter)
+    this.applyQueryTextFilter(qb, filter)
+    this.applyQueryExistFilter(qb, filter)
+    this.applyQueryTimelineFilter(qb, timeFilter)
+    this.applyQuerySort(qb)
+    this.applyQueryPaging(qb, paging)
+    return qb
+  }
 
-    if (filter?.api_no !== undefined) {
-      qb.andWhere('q.api_no = :api_no', { api_no: filter.api_no })
-    }
-    if (filter?.api_category !== undefined) {
-      qb.andWhere('q.api_category = :api_category', { api_category: filter.api_category })
-    }
-    if (filter?.api_type !== undefined) {
-      qb.andWhere('q.api_type = :api_type', { api_type: filter.api_type })
-    }
-    if (filter?.api_label_type !== undefined) {
-      qb.andWhere('q.api_label_type = :api_label_type', { api_label_type: filter.api_label_type })
-    }
-
-    if (filter?.has_api_select_rewards !== undefined) {
-      if (filter.has_api_select_rewards) {
-        qb.andWhere(`q.data::JSONB ? 'api_select_rewards'`)
-      } else {
-        qb.andWhere(`NOT q.data::JSONB ? 'api_select_rewards'`)
-      }
-    }
-
-    if (timeFilter?.before !== undefined) {
-      qb.andWhere('q.created_at <= :before', { before: timeFilter.before })
-    }
-    if (timeFilter?.after !== undefined) {
-      qb.andWhere('q.created_at >= :after', { after: timeFilter.after })
-    }
-
-    qb.addOrderBy('q.created_at', 'DESC')
-
+  private applyQueryPaging(
+    qb: SelectQueryBuilder<Quest>,
+    paging?: PagingDto,
+  ) {
     if (paging?.offset !== undefined) {
       qb.skip(paging.offset)
     }
     if (paging?.limit !== undefined) {
       qb.take(paging.limit)
     }
+  }
 
-    return qb
+  private applyQueryNumberFilter(
+    qb: SelectQueryBuilder<Quest>,
+    filter?: QuestFilter,
+  ) {
+    const fields = [
+      'api_no',
+      'api_category',
+      'api_type',
+      'api_label_type',
+      'api_voice_id',
+      'api_bonus_flag',
+    ]
+    fields.forEach((key) => {
+      if (filter && filter[key] !== undefined) {
+        qb.andWhere(`(q.datab ->> '${key}')::int = :${key}`, { [key]: filter[key] })
+      }
+    })
+  }
+
+  private applyQueryTextFilter(
+    qb: SelectQueryBuilder<Quest>,
+    filter?: QuestFilter,
+  ) {
+    const textFields = [
+      'api_title',
+      'api_detail',
+    ]
+    textFields.forEach((key) => {
+      if (filter && filter[key] !== undefined) {
+        qb.andWhere(`(q.datab ->> '${key}') ILIKE :${key}`, { [key]: `%${filter[key]}%` })
+      }
+    })
+  }
+
+  private applyQueryExistFilter(
+    qb: SelectQueryBuilder<Quest>,
+    filter?: QuestFilter,
+  ) {
+    if (filter?.has_api_select_rewards !== undefined) {
+      if (filter.has_api_select_rewards) {
+        qb.andWhere(`q.datab ? 'api_select_rewards'`)
+      } else {
+        qb.andWhere(`NOT q.datab ? 'api_select_rewards'`)
+      }
+    }
+  }
+
+  private applyQueryTimelineFilter(
+    qb: SelectQueryBuilder<Quest>,
+    timeFilter?: TimeFilterDto,
+  ) {
+    if (timeFilter?.before !== undefined) {
+      qb.andWhere('q.created_at <= :before', { before: timeFilter.before })
+    }
+    if (timeFilter?.after !== undefined) {
+      qb.andWhere('q.created_at >= :after', { after: timeFilter.after })
+    }
+  }
+
+  private applyQuerySort(
+    qb: SelectQueryBuilder<Quest>,
+  ) {
+    qb.addOrderBy('q.created_at', 'DESC')
   }
 }
