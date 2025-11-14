@@ -235,12 +235,12 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
         return
       }
 
-      sortKeys.add(key)
+      sortKeys.add(sortKey)
 
-      if (apiKeys.includes(key)) {
-        qb.addOrderBy(`(q.datab ->> '${key}')::int`, sortDirection)
+      if (apiKeys.includes(sortKey)) {
+        qb.addOrderBy(`(q.datab ->> '${sortKey}')::int`, sortDirection)
       } else {
-        qb.addOrderBy(`q.${key}`, sortDirection)
+        qb.addOrderBy(`q.${sortKey}`, sortDirection)
       }
     })
 
