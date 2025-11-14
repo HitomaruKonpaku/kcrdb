@@ -88,6 +88,7 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
         }
         return obj
       }, {})
+
       const hash = CryptoUtil.hash(JSON.stringify(hashObj))
       const quest: Partial<Quest> = {
         ...data,

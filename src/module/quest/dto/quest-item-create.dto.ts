@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger'
-import { IsInt, IsObject } from 'class-validator'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { IsArray, IsInt, IsObject, IsOptional } from 'class-validator'
 import { QuestItemApiRoot } from '../interface/quest-item-api.interface'
 
 export class QuestItemCreate {
@@ -9,6 +9,12 @@ export class QuestItemCreate {
     example: 216,
   })
   api_quest_id: number
+
+  @IsOptional()
+  @IsArray()
+  @IsInt({ each: true })
+  @ApiPropertyOptional({ type: [Number] })
+  api_select_no?: number[]
 
   @IsObject()
   @ApiProperty({

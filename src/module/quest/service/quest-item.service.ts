@@ -32,10 +32,18 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
   }
 
   public async create(body: QuestItemCreate) {
-    const hashObj: Partial<QuestItem> = {
-      api_quest_id: body.api_quest_id,
-      data: body.data,
-    }
+    const hashFields = [
+      'api_quest_id',
+      'api_select_no',
+      'data',
+    ]
+
+    const hashObj = hashFields.reduce((obj, key) => {
+      if (key in body) {
+        Object.assign(obj, { [key]: body[key] })
+      }
+      return obj
+    }, {})
 
     const hash = CryptoUtil.hash(JSON.stringify(hashObj))
     let res = await this.repository.findOneBy({ hash })

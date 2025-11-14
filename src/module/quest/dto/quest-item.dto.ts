@@ -6,6 +6,9 @@ export class QuestItem extends BaseDto {
   @ApiProperty()
   api_quest_id: number
 
+  @ApiPropertyOptional({ type: [Number] })
+  api_select_no?: number[]
+
   @ApiProperty({ type: QuestItemApi })
   data: QuestItemApi
 

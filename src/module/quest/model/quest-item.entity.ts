@@ -10,6 +10,9 @@ export class QuestItem extends BaseEntity {
   @Column({ name: 'api_quest_id', type: 'int' })
   api_quest_id: number
 
+  @Column({ name: 'api_select_no', type: 'int', nullable: true, array: true })
+  api_select_no?: number[]
+
   @Column({ name: 'data', type: 'json' })
   data: QuestItemApi
 
