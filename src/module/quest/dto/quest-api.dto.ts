@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { QuestReward } from './quest-reward.dto'
 
-export class QuestRaw {
+export class QuestApi {
   @ApiProperty()
   api_no: number
 
@@ -26,10 +26,10 @@ export class QuestRaw {
   @ApiPropertyOptional()
   api_lost_badges?: number
 
-  @ApiPropertyOptional({ type: Number, isArray: true, default: [0, 0, 0, 0] })
+  @ApiPropertyOptional({ type: [Number], default: [0, 0, 0, 0] })
   api_get_material?: number[]
 
-  @ApiPropertyOptional({ type: QuestReward, isArray: true })
+  @ApiPropertyOptional({ type: [QuestReward] })
   api_select_rewards?: QuestReward[]
 
   @ApiPropertyOptional()

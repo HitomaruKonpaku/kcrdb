@@ -1,15 +1,17 @@
 import { Column, Entity } from 'typeorm'
 import { BaseEntity } from '../../../shared/base/base.entity'
-import { QuestApi } from '../dto/quest-api.dto'
 
-@Entity({ name: 'quest' })
-export class Quest extends BaseEntity {
+@Entity({ name: 'quest-item' })
+export class QuestItem extends BaseEntity {
   @Column({ name: 'hash', type: 'varchar', nullable: true, unique: true, select: false })
   hash?: string
 
+  @Column({ name: 'api_quest_id', type: 'int' })
+  api_quest_id: number
+
   @Column({ name: 'data', type: 'json' })
-  data: QuestApi
+  data: any
 
   @Column({ name: 'datab', type: 'jsonb', nullable: true, select: false })
-  datab?: QuestApi
+  datab?: any
 }

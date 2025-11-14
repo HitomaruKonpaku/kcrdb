@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { BaseDto } from '../../../shared/base/base.dto'
-import { QuestRaw } from './quest-raw.dto'
+import { QuestApi } from './quest-api.dto'
 
 export class Quest extends BaseDto {
-  @ApiProperty({ type: QuestRaw })
-  data: QuestRaw
+  @ApiProperty({ type: QuestApi })
+  data: QuestApi
 }

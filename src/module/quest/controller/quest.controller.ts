@@ -5,9 +5,9 @@ import { ApiPaginatedResponse } from '../../../shared/decorator/pagination.decor
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
 import { UserAgentInterceptor } from '../../user-agent/interceptor/user-agent.interceptor'
+import { QuestApi } from '../dto/quest-api.dto'
 import { QuestCreate } from '../dto/quest-create.dto'
 import { QuestFilter } from '../dto/quest-filter.dto'
-import { QuestRaw } from '../dto/quest-raw.dto'
 import { Quest } from '../dto/quest.dto'
 import { QuestService } from '../service/quest.service'
 
@@ -29,8 +29,8 @@ export class QuestController {
     return this.service.getAll(paging, filter, timeFilter)
   }
 
-  @Get('raw')
-  @ApiPaginatedResponse(QuestRaw)
+  @Get('data')
+  @ApiPaginatedResponse(QuestApi)
   getAllRaw(
     @Query() paging: PagingDto,
     @Query() filter: QuestFilter,
