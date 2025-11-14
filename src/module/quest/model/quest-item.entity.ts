@@ -1,5 +1,6 @@
 import { Column, Entity } from 'typeorm'
 import { BaseEntity } from '../../../shared/base/base.entity'
+import { QuestItemApi } from '../dto/quest-item-api.dto'
 
 @Entity({ name: 'quest_item' })
 export class QuestItem extends BaseEntity {
@@ -10,8 +11,8 @@ export class QuestItem extends BaseEntity {
   api_quest_id: number
 
   @Column({ name: 'data', type: 'json' })
-  data: any
+  data: QuestItemApi
 
-  @Column({ name: 'datab', type: 'jsonb', nullable: true, select: false })
-  datab?: any
+  // @Column({ name: 'datab', type: 'jsonb', nullable: true, select: false })
+  // datab?: any
 }

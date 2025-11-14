@@ -46,7 +46,7 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
     const tmp: Partial<QuestItem> = {
       ...body,
       hash,
-      datab: body.data,
+      // datab: body.data,
     }
     res = await this.insertLoop(tmp)
     return res

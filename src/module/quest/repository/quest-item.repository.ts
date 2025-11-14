@@ -19,16 +19,16 @@ export class QuestItemRepository extends BaseRepository<QuestItem> implements On
   }
 
   onModuleInit() {
-    const queryRunner = this.dataSource.createQueryRunner()
-    queryRunner.startTransaction()
-    queryRunner
-      .query('CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_quest_item_datab_gin ON quest_item USING GIN (datab)')
-      .then(() => {
-        queryRunner.commitTransaction()
-      })
-      .catch((error) => {
-        queryRunner.rollbackTransaction()
-        this.logger.error(`idx_quest_item_datab_gin: ${error.message}`)
-      })
+    // const queryRunner = this.dataSource.createQueryRunner()
+    // queryRunner.startTransaction()
+    // queryRunner
+    //   .query('CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_quest_item_datab_gin ON quest_item USING GIN (datab)')
+    //   .then(() => {
+    //     queryRunner.commitTransaction()
+    //   })
+    //   .catch((error) => {
+    //     queryRunner.rollbackTransaction()
+    //     this.logger.error(`idx_quest_item_datab_gin: ${error.message}`)
+    //   })
   }
 }
