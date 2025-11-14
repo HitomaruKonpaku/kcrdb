@@ -203,18 +203,23 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
       return
     }
 
-    const allKeys = new Set([
-      'created_at',
+    const apiKeys = [
       'api_no',
       'api_category',
       'api_type',
       'api_label_type',
       'api_voice_id',
       'api_bonus_flag',
-    ])
+    ]
+
+    const allowKeys = [
+      'created_at',
+      ...apiKeys,
+    ]
 
     const sortKeys = new Set()
     const curKeys = filter.sort.split(',')
+
     curKeys.forEach((key) => {
       let sortKey: string
       let sortDirection: 'ASC' | 'DESC'
@@ -226,12 +231,17 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
         sortDirection = 'ASC'
       }
 
-      if (!allKeys.has(sortKey)) {
+      if (!allowKeys.includes(sortKey)) {
         return
       }
 
       sortKeys.add(key)
-      qb.addOrderBy(`(q.datab ->> '${key}')::int`, sortDirection)
+
+      if (apiKeys.includes(key)) {
+        qb.addOrderBy(`(q.datab ->> '${key}')::int`, sortDirection)
+      } else {
+        qb.addOrderBy(`q.${key}`, sortDirection)
+      }
     })
 
     if (!sortKeys.has('created_at')) {
