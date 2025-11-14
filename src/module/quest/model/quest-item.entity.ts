@@ -13,6 +13,9 @@ export class QuestItem extends BaseEntity {
   @Column({ name: 'data', type: 'json' })
   data: QuestItemApi
 
+  @Column({ name: 'hit', type: 'int', nullable: true, default: 0 })
+  hit?: number
+
   // @Column({ name: 'datab', type: 'jsonb', nullable: true, select: false })
   // datab?: any
 }

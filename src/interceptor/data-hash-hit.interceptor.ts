@@ -6,11 +6,11 @@ import {
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { Observable, tap } from 'rxjs'
-import { DataSource } from 'typeorm'
+import { DataSource, In } from 'typeorm'
 import { parseSourceName } from '../decorator/source-name.decorator'
 
 @Injectable()
-export class DataHitInterceptor implements NestInterceptor {
+export class DataHashHitInterceptor implements NestInterceptor {
   constructor(
     private readonly reflector: Reflector,
     private readonly dataSource: DataSource,
@@ -24,8 +24,8 @@ export class DataHitInterceptor implements NestInterceptor {
           return
         }
 
-        const sourceId = data.id
-        if (!sourceId) {
+        const hashes = (data.hashes || [data.hash]).filter((v) => v) as string[]
+        if (!hashes.length) {
           return
         }
 
@@ -33,7 +33,7 @@ export class DataHitInterceptor implements NestInterceptor {
           .createQueryBuilder()
           .update(sourceName)
           .set({ hit: () => 'COALESCE(hit, 0) + 1' })
-          .andWhere({ id: sourceId })
+          .andWhere({ hash: In(hashes) })
           .execute()
           .then((error) => {
             console.error(error)

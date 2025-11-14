@@ -40,6 +40,7 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
     const hash = CryptoUtil.hash(JSON.stringify(hashObj))
     let res = await this.repository.findOneBy({ hash })
     if (res) {
+      res.hash = hash
       return res
     }
 
@@ -49,6 +50,7 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
       // datab: body.data,
     }
     res = await this.insertLoop(tmp)
+    res.hash = hash
     return res
   }
 }

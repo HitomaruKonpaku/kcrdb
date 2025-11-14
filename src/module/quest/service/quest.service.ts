@@ -102,9 +102,11 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     const res = await this.repository.insertOrIgnore(tmpQuests)
     const okQuests = tmpQuests.filter((v) => v.createdAt)
     const ids = okQuests.map((v) => v.id)
+    const hashes = tmpQuests.map((v) => v.hash).filter((v) => v)
     return {
       total: res.raw.length,
       ids,
+      hashes,
     }
   }
 
@@ -214,6 +216,7 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
 
     const allowKeys = [
       'created_at',
+      'hit',
       ...apiKeys,
     ]
 

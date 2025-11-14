@@ -63,6 +63,7 @@ Default <code>ASC</code>, add <code>-</code> for <code>DESC</code>
 <br>
 Fields:
 - <code>created_at</code>
+- <code>hit</code>
 - <code>api_no</code>
 - <code>api_category</code>
 - <code>api_type</code>

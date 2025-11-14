@@ -51,7 +51,11 @@ export class UserAgentInterceptor implements NestInterceptor {
           xOrigin,
           xVersion,
         }))
-        await this.service.insertOrIgnoreMany(items)
+        await this.service
+          .insertOrIgnoreMany(items)
+          .then((error) => {
+            console.error(error)
+          })
       }),
     )
   }

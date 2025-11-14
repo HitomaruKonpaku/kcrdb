@@ -27,6 +27,7 @@ export class QuestRepository extends BaseRepository<Quest> implements OnModuleIn
         queryRunner.commitTransaction()
       })
       .catch((error) => {
+        console.error(error)
         queryRunner.rollbackTransaction()
         this.logger.error(`idx_quest_datab_gin: ${error.message}`)
       })
