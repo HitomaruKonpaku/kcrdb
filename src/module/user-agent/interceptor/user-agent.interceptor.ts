@@ -53,7 +53,7 @@ export class UserAgentInterceptor implements NestInterceptor {
         }))
         await this.service
           .insertOrIgnoreMany(items)
-          .then((error) => {
+          .catch((error) => {
             console.error(error)
           })
       }),
