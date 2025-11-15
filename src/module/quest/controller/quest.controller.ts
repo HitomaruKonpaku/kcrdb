@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Post, Query, UseInterceptors } from '@nestjs/common'
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger'
+import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { KeyDelete } from '../../../decorator/key-delete.decorator'
 import { SourceName } from '../../../decorator/source-name.decorator'
 import { DataHashHitInterceptor } from '../../../interceptor/data-hash-hit.interceptor'
+import { DataKeyDeleteInterceptor } from '../../../interceptor/data-key-delete.interceptor'
 import { ApiPaginatedResponse } from '../../../shared/decorator/pagination.decorator'
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
@@ -41,7 +43,11 @@ export class QuestController {
   }
 
   @Post()
-  @UseInterceptors(UserAgentInterceptor, DataHashHitInterceptor)
+  @UseInterceptors(DataKeyDeleteInterceptor, UserAgentInterceptor, DataHashHitInterceptor)
+  @KeyDelete('hashes')
+  @ApiOperation({
+    description: '<code>/kcsapi/api_get_member/questlist</code> response data',
+  })
   @ApiCreatedResponse({
     schema: {
       allOf: [
@@ -51,10 +57,6 @@ export class QuestController {
               type: 'number',
             },
             ids: {
-              type: 'array',
-              items: { type: 'string' },
-            },
-            hashes: {
               type: 'array',
               items: { type: 'string' },
             },

@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common'
 import { Observable } from 'rxjs'
 import { catchError, tap } from 'rxjs/operators'
+import { RequestUtil } from '../util/request.util'
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
@@ -29,9 +30,7 @@ export class LoggingInterceptor implements NestInterceptor {
   }
 
   private getRequestInfo(req: any) {
-    const res = {
-      ip: req.ip,
-    }
+    const res = this.getBaseInfo(req)
     if (Object.keys(req.query).length) {
       Object.assign(res, { query: req.query })
     }
@@ -39,9 +38,7 @@ export class LoggingInterceptor implements NestInterceptor {
   }
 
   private getResponseInfo(req: any, value: any) {
-    const res = {
-      ip: req.ip,
-    }
+    const res = this.getBaseInfo(req)
     if (req.method === 'POST' && value) {
       if (value.id) {
         Object.assign(res, { id: value.id })
@@ -53,11 +50,26 @@ export class LoggingInterceptor implements NestInterceptor {
     return res
   }
 
-  private getErrorInfo(req: any, error) {
+  private getErrorInfo(req: any, error: any) {
     const res = {
-      ip: req.ip,
+      ...this.getBaseInfo(req),
       error,
     }
     return res
+  }
+
+  private getBaseInfo(req: any): Record<string, any> {
+    const obj: Record<string, any> = {
+      ip: req.ip,
+    }
+    const xOrigin = RequestUtil.getXOrigin(req.headers)
+    const xVersion = RequestUtil.getXVersion(req.headers)
+    if (xOrigin) {
+      Object.assign(obj, { 'x-origin': xOrigin })
+    }
+    if (xVersion) {
+      Object.assign(obj, { 'x-version': xVersion })
+    }
+    return obj
   }
 }

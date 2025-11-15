@@ -11,6 +11,7 @@ import { Reflector } from '@nestjs/core'
 import { Observable, tap } from 'rxjs'
 import { parseSourceName } from '../../../decorator/source-name.decorator'
 import { Logger } from '../../../shared/logger'
+import { RequestUtil } from '../../../shared/util/request.util'
 import { UserAgent } from '../model/user-agent.entity'
 import { UserAgentService } from '../service/user-agent.service'
 
@@ -40,8 +41,8 @@ export class UserAgentInterceptor implements NestInterceptor {
         const headers = req.headers
         const raw = headers['user-agent']
         const origin = headers['origin']
-        const xOrigin = headers['x-origin'] || headers['data-origin']
-        const xVersion = headers['x-version'] || headers['data-version']
+        const xOrigin = RequestUtil.getXOrigin(req.headers)
+        const xVersion = RequestUtil.getXVersion(req.headers)
         if (!raw) {
           this.logger.warn(`intercept: user-agent not found | ${JSON.stringify({
             method: req.method,

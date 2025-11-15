@@ -5,7 +5,7 @@ import { QuestItemApiRoot } from '../interface/quest-item-api.interface'
 export class QuestItemCreate {
   @IsInt()
   @ApiProperty({
-    description: 'quest <code>api_no</code>',
+    description: 'Quest <code>api_no</code>',
     example: 216,
   })
   api_quest_id: number
@@ -13,7 +13,16 @@ export class QuestItemCreate {
   @IsOptional()
   @IsArray()
   @IsInt({ each: true })
-  @ApiPropertyOptional({ type: [Number] })
+  @ApiPropertyOptional({
+    type: [Number],
+    description: `
+Array of <code>api_select_no[N]</code> params from original request
+<br><br>
+For example if request params is <code>api_token=...&api_verno=1&api_quest_id=374&api_select_no=1&api_select_no2=2</code>,
+<br>
+then this param <code>api_select_no</code> = <code>[1,2]</code>
+    `,
+  })
   api_select_no?: number[]
 
   @IsObject()

@@ -10,7 +10,7 @@ import { map, Observable } from 'rxjs'
 export class DataTransformInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
-      map((v) => v.data),
+      map((value) => value.data),
     )
   }
 }
