@@ -15,10 +15,27 @@ function setupSwagger<T>(app: INestApplication<T>) {
   const config = new DocumentBuilder()
     .setTitle(title)
     .setDescription(description)
+    .addGlobalParameters(
+      {
+        in: 'header',
+        name: 'x-origin',
+        description: 'Client origin',
+        required: false,
+      },
+      {
+        in: 'header',
+        name: 'x-version',
+        description: 'Client version',
+        required: false,
+      },
+    )
     .build()
   const document = SwaggerModule.createDocument(app, config)
   SwaggerModule.setup('docs', app, document, {
     customSiteTitle: title,
+    swaggerOptions: {
+      defaultModelsExpandDepth: 0,
+    },
   })
 }
 
