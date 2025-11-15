@@ -8,14 +8,19 @@
   <title>KCRDB</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
-    rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 
   <style>
     html {
       font-family: "Noto Sans Mono", monospace;
+    }
+
+    a:visited {
+      color: #0000ee;
     }
 
     table,
@@ -28,7 +33,12 @@
     }
 
     td.key {
-      text-align: right;
+      text-align: center;
+    }
+
+    .fa-brands {
+      font-size: 1.2rem;
+      line-height: 1.2;
     }
   </style>
 </head>
@@ -39,27 +49,68 @@
 
   <div>
     <h2>API</h2>
-    <a href="./docs">Docs</a>
+    <a href="./docs">
+      <div>Docs</div>
+    </a>
   </div>
 
   <div>
     <h2>Contact</h2>
     <table>
       <tr>
-        <td class="key">X</td>
-        <td class="value"><a href="https://x.com/HitomaruKonpaku" target="_blank">@HitomaruKonpaku</a></td>
+        <td class="key">
+          <i class="fa-brands fa-x-twitter"></i>
+        </td>
+        <td class="value">
+          <a href="https://x.com/HitomaruKonpaku" target="_blank">
+            <div>@HitomaruKonpaku</div>
+          </a>
+        </td>
       </tr>
+
       <tr>
-        <td class="key">Discord</td>
+        <td class="key">
+          <i class="fa-brands fa-discord"></i>
+        </td>
         <td class="value">@hitomaru</td>
       </tr>
+
       <tr>
-        <td class="key">GitHub</td>
-        <td class="value"><a href="https://github.com/HitomaruKonpaku/kcrdb" target="_blank">kcrdb</a></td>
+        <td class="key">
+          <i class="fa-brands fa-github"></i>
+        </td>
+        <td class="value">
+          <a href="https://github.com/HitomaruKonpaku/kcrdb" target="_blank">
+            <div>kcrdb</div>
+          </a>
+        </td>
       </tr>
+    </table>
+  </div>
+
+  <div>
+    <h2>Connections</h2>
+    <table>
       <tr>
-        <td class="key">GitHub</td>
-        <td class="value"><a href="https://github.com/KC3Kai/kancolle-replay" target="_blank">kancolle-replay</a></td>
+        <td class="key">
+          <i class="fa-brands fa-github"></i>
+        </td>
+        <td class="value">
+          <a href="https://github.com/KC3Kai/kancolle-replay" target="_blank">
+            <div>kancolle-replay</div>
+          </a>
+        </td>
+      </tr>
+
+      <tr>
+        <td class="key">
+          <i class="fa-brands fa-github"></i>
+        </td>
+        <td class="value">
+          <a href="https://github.com/KC3Kai/KC3Kai" target="_blank">
+            <div>KC3Kai</div>
+          </a>
+        </td>
       </tr>
     </table>
   </div>

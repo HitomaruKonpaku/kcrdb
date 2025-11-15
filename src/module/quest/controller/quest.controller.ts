@@ -47,6 +47,7 @@ export class QuestController {
   @KeyDelete('hashes')
   @ApiOperation({
     description: '<code>/kcsapi/api_get_member/questlist</code> response data',
+    tags: ['quest', 'kcsapi'],
   })
   @ApiCreatedResponse({
     schema: {

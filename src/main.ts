@@ -1,43 +1,13 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common'
+import { ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { NestExpressApplication } from '@nestjs/platform-express'
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { json } from 'body-parser'
 import * as compression from 'compression'
 import 'dotenv/config'
 import { join } from 'path'
 import { AppModule } from './app.module'
 import { Logger } from './shared/logger'
-
-function setupSwagger<T>(app: INestApplication<T>) {
-  const title = 'KCRDB API'
-  const description = 'KanColle Replay DB'
-  const config = new DocumentBuilder()
-    .setTitle(title)
-    .setDescription(description)
-    .addGlobalParameters(
-      {
-        in: 'header',
-        name: 'x-origin',
-        description: 'Client origin',
-        required: false,
-      },
-      {
-        in: 'header',
-        name: 'x-version',
-        description: 'Client version',
-        required: false,
-      },
-    )
-    .build()
-  const document = SwaggerModule.createDocument(app, config)
-  SwaggerModule.setup('docs', app, document, {
-    customSiteTitle: title,
-    swaggerOptions: {
-      defaultModelsExpandDepth: 0,
-    },
-  })
-}
+import { setupSwagger } from './swagger'
 
 async function bootstrap() {
   const logger = new Logger('Main')

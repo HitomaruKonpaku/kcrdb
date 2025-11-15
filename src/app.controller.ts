@@ -1,10 +1,10 @@
 import { Controller, Get, Render } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiExcludeController } from '@nestjs/swagger'
 import { SkipThrottle } from '@nestjs/throttler'
 import { AppService } from './app.service'
 
 @Controller()
-@ApiTags('app')
+@ApiExcludeController()
 @SkipThrottle()
 export class AppController {
   constructor(

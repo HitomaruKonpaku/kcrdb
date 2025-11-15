@@ -31,6 +31,7 @@ export class QuestItemController {
   @UseInterceptors(UserAgentInterceptor, DataHashHitInterceptor)
   @ApiOperation({
     description: '<code>/kcsapi/api_req_quest/clearitemget</code> response data',
+    tags: ['quest-item', 'kcsapi'],
   })
   @ApiCreatedResponse({ type: QuestItem })
   create(
