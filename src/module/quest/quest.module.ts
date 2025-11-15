@@ -7,6 +7,7 @@ import { Quest } from './model/quest.entity'
 import { QuestItemRepository } from './repository/quest-item.repository'
 import { QuestRepository } from './repository/quest.repository'
 import { QuestItemService } from './service/quest-item.service'
+import { QuestSusService } from './service/quest-sus.service'
 import { QuestService } from './service/quest.service'
 
 @Global()
@@ -26,6 +27,7 @@ import { QuestService } from './service/quest.service'
     QuestItemRepository,
     QuestService,
     QuestItemService,
+    QuestSusService,
   ],
   exports: [
     QuestRepository,
@@ -34,6 +36,7 @@ import { QuestService } from './service/quest.service'
     QuestItemRepository,
     QuestService,
     QuestItemService,
+    QuestSusService,
   ],
 })
 export class QuestModule { }

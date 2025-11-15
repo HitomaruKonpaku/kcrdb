@@ -10,9 +10,12 @@ export class Quest extends BaseEntity {
   @Column({ name: 'data', type: 'json' })
   data: QuestApi
 
+  @Column({ name: 'datab', type: 'jsonb', nullable: true, select: false })
+  datab?: QuestApi
+
   @Column({ name: 'hit', type: 'int', nullable: true, default: 0 })
   hit?: number
 
-  @Column({ name: 'datab', type: 'jsonb', nullable: true, select: false })
-  datab?: QuestApi
+  @Column({ name: 'is_sus', type: 'boolean', nullable: true })
+  isSus?: boolean
 }

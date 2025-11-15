@@ -1,8 +1,9 @@
 import { createKeyv } from '@keyv/redis'
 import { CacheModule, CacheOptions } from '@nestjs/cache-manager'
-import { Module } from '@nestjs/common'
+import { Module, OnApplicationShutdown } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core'
+import { ScheduleModule } from '@nestjs/schedule'
 import { seconds, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
 import * as ms from 'ms'
@@ -17,6 +18,7 @@ import { SimulatorModule } from './module/simulator/simulator.module'
 import { UserAgentModule } from './module/user-agent/user-agent.module'
 import { ErrorInterceptor } from './shared/interceptor/error.interceptor'
 import { LoggingInterceptor } from './shared/interceptor/logging.interceptor'
+import { Logger } from './shared/logger'
 
 @Module({
   imports: [
@@ -64,6 +66,8 @@ import { LoggingInterceptor } from './shared/interceptor/logging.interceptor'
       }),
     }),
 
+    ScheduleModule.forRoot(),
+
     ReplayModule,
     SimulatorModule,
     QuestModule,
@@ -89,4 +93,10 @@ import { LoggingInterceptor } from './shared/interceptor/logging.interceptor'
     AppService,
   ],
 })
-export class AppModule { }
+export class AppModule implements OnApplicationShutdown {
+  private readonly logger = new Logger(AppModule.name)
+
+  async onApplicationShutdown(signal?: string) {
+    this.logger.warn(`onApplicationShutdown | ${JSON.stringify({ signal })}`)
+  }
+}

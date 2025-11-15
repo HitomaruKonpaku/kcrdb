@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Query, UseInterceptors } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger'
 import { SourceName } from '../../../decorator/source-name.decorator'
 import { DataHashHitInterceptor } from '../../../interceptor/data-hash-hit.interceptor'
 import { ApiPaginatedResponse } from '../../../shared/decorator/pagination.decorator'
@@ -42,6 +42,27 @@ export class QuestController {
 
   @Post()
   @UseInterceptors(UserAgentInterceptor, DataHashHitInterceptor)
+  @ApiCreatedResponse({
+    schema: {
+      allOf: [
+        {
+          properties: {
+            total: {
+              type: 'number',
+            },
+            ids: {
+              type: 'array',
+              items: { type: 'string' },
+            },
+            hashes: {
+              type: 'array',
+              items: { type: 'string' },
+            },
+          },
+        },
+      ],
+    },
+  })
   create(
     @Body() body: QuestCreate,
   ) {

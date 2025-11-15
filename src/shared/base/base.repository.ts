@@ -22,6 +22,11 @@ export abstract class BaseRepository<E extends BaseEntity> {
     return res
   }
 
+  public async saveAll(data: DeepPartial<E>[]) {
+    const res = await this.repository.save(data)
+    return res
+  }
+
   public async insert(data: QueryDeepPartialEntity<E>) {
     const res = await this.repository.insert(data)
     return res

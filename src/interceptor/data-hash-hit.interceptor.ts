@@ -8,9 +8,12 @@ import { Reflector } from '@nestjs/core'
 import { Observable, tap } from 'rxjs'
 import { DataSource, In } from 'typeorm'
 import { parseSourceName } from '../decorator/source-name.decorator'
+import { Logger } from '../shared/logger'
 
 @Injectable()
 export class DataHashHitInterceptor implements NestInterceptor {
+  private readonly logger = new Logger(DataHashHitInterceptor.name)
+
   constructor(
     private readonly reflector: Reflector,
     private readonly dataSource: DataSource,
@@ -36,7 +39,7 @@ export class DataHashHitInterceptor implements NestInterceptor {
           .andWhere({ hash: In(hashes) })
           .execute()
           .catch((error) => {
-            console.error(error)
+            this.logger.error(error)
           })
       }),
     )

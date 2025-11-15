@@ -6,11 +6,14 @@ import {
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { Observable, tap } from 'rxjs'
-import { DataSource } from 'typeorm'
+import { DataSource, In } from 'typeorm'
 import { parseSourceName } from '../decorator/source-name.decorator'
+import { Logger } from '../shared/logger'
 
 @Injectable()
 export class DataHitInterceptor implements NestInterceptor {
+  private readonly logger = new Logger(DataHitInterceptor.name)
+
   constructor(
     private readonly reflector: Reflector,
     private readonly dataSource: DataSource,
@@ -24,8 +27,8 @@ export class DataHitInterceptor implements NestInterceptor {
           return
         }
 
-        const sourceId = data.id
-        if (!sourceId) {
+        const sourceIds = (data.ids || [data.id]).filter((v) => v) as string[]
+        if (!sourceIds.length) {
           return
         }
 
@@ -33,10 +36,10 @@ export class DataHitInterceptor implements NestInterceptor {
           .createQueryBuilder()
           .update(sourceName)
           .set({ hit: () => 'COALESCE(hit, 0) + 1' })
-          .andWhere({ id: sourceId })
+          .andWhere({ id: In(sourceIds) })
           .execute()
           .catch((error) => {
-            console.error(error)
+            this.logger.error(error)
           })
       }),
     )

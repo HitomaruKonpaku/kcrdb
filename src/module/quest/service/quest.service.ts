@@ -1,7 +1,7 @@
 /* eslint-disable quotes */
 
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { SelectQueryBuilder } from 'typeorm'
+import { In, SelectQueryBuilder } from 'typeorm'
 import { BaseService } from '../../../shared/base/base.service'
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
@@ -9,13 +9,16 @@ import { CryptoUtil } from '../../../shared/util/crypto.util'
 import { IdUtil } from '../../../shared/util/id.util'
 import { QuestCreate } from '../dto/quest-create.dto'
 import { QuestFilter } from '../dto/quest-filter.dto'
+import { QuestApiRoot } from '../interface/quest-api.interface'
 import { Quest } from '../model/quest.entity'
 import { QuestRepository } from '../repository/quest.repository'
+import { QuestSusService } from './quest-sus.service'
 
 @Injectable()
 export class QuestService extends BaseService<Quest, QuestRepository> {
   constructor(
     public readonly repository: QuestRepository,
+    private readonly questSusService: QuestSusService,
   ) {
     super(repository)
   }
@@ -48,6 +51,29 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
   }
 
   public async create(body: QuestCreate) {
+    if (!body.list.length) {
+      return {
+        total: 0,
+      }
+    }
+
+    const tmpQuests = body.list.map((data, index) => this.createInputQuest(data, index))
+    await this.repository.insertOrIgnore(tmpQuests)
+
+    const hashes = tmpQuests.map((v) => v.hash).filter((v) => v)
+    const [items, total] = await this.repository.repository.findAndCount({
+      select: { id: true, hash: true },
+      where: { hash: In(hashes) },
+    })
+
+    return {
+      total,
+      ids: items.map((v) => v.id),
+      hashes: items.map((v) => v.hash),
+    }
+  }
+
+  private createInputQuest(data: QuestApiRoot, index: number): Partial<Quest> {
     const checkFields = [
       'api_no',
       'api_category',
@@ -66,49 +92,39 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
       'api_bonus_flag',
     ]
 
-    const tmpQuests = body.list.map((data, index) => {
-      checkFields.forEach((key) => {
-        if (!(key in data)) {
-          throw new BadRequestException({
-            message: `${key} not found`,
-            error: 'Bad Request',
-            statusCode: 400,
-            data: {
-              key,
-              index,
-              data,
-            },
-          })
-        }
-      })
-
-      const hashObj = hashFields.reduce((obj, key) => {
-        if (key in data) {
-          Object.assign(obj, { [key]: data[key] })
-        }
-        return obj
-      }, {})
-
-      const hash = CryptoUtil.hash(JSON.stringify(hashObj))
-      const quest: Partial<Quest> = {
-        ...data,
-        id: IdUtil.generate(),
-        hash,
-        data,
-        datab: data,
+    checkFields.forEach((key) => {
+      if (!(key in data)) {
+        throw new BadRequestException({
+          message: `${key} not found`,
+          error: 'Bad Request',
+          statusCode: 400,
+          data: {
+            key,
+            index,
+            data,
+          },
+        })
       }
-      return quest
     })
 
-    const res = await this.repository.insertOrIgnore(tmpQuests)
-    const okQuests = tmpQuests.filter((v) => v.createdAt)
-    const ids = okQuests.map((v) => v.id)
-    const hashes = tmpQuests.map((v) => v.hash).filter((v) => v)
-    return {
-      total: res.raw.length,
-      ids,
-      hashes,
+    const hashObj = hashFields.reduce((obj, key) => {
+      if (key in data) {
+        Object.assign(obj, { [key]: data[key] })
+      }
+      return obj
+    }, {})
+
+    const hash = CryptoUtil.hash(JSON.stringify(hashObj))
+    const quest: Partial<Quest> = {
+      ...data,
+      id: IdUtil.generate(),
+      hash,
+      data,
+      datab: data,
+      isSus: this.questSusService.isSus(data),
     }
+
+    return quest
   }
 
   private createQueryBuilder(
@@ -117,9 +133,10 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     timeFilter?: TimeFilterDto,
   ): SelectQueryBuilder<Quest> {
     const qb = this.repository.repository.createQueryBuilder('q')
-    this.applyQueryNumberFilter(qb, filter)
-    this.applyQueryTextFilter(qb, filter)
-    this.applyQueryExistFilter(qb, filter)
+    this.applyQueryApiNumberFilter(qb, filter)
+    this.applyQueryApiTextFilter(qb, filter)
+    this.applyQueryApiExistFilter(qb, filter)
+    this.applyQueryDefaultFilter(qb, filter)
     this.applyQueryTimeFilter(qb, timeFilter)
     this.applyQuerySort(qb, filter)
     this.applyQueryPaging(qb, paging)
@@ -138,7 +155,7 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     }
   }
 
-  private applyQueryNumberFilter(
+  private applyQueryApiNumberFilter(
     qb: SelectQueryBuilder<Quest>,
     filter?: QuestFilter,
   ) {
@@ -157,7 +174,7 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     })
   }
 
-  private applyQueryTextFilter(
+  private applyQueryApiTextFilter(
     qb: SelectQueryBuilder<Quest>,
     filter?: QuestFilter,
   ) {
@@ -172,7 +189,7 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     })
   }
 
-  private applyQueryExistFilter(
+  private applyQueryApiExistFilter(
     qb: SelectQueryBuilder<Quest>,
     filter?: QuestFilter,
   ) {
@@ -182,6 +199,15 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
       } else {
         qb.andWhere(`NOT q.datab ? 'api_select_rewards'`)
       }
+    }
+  }
+
+  private applyQueryDefaultFilter(
+    qb: SelectQueryBuilder<Quest>,
+    filter?: QuestFilter,
+  ) {
+    if (filter?.is_sus !== undefined) {
+      qb.andWhere('q.is_sus = :is_sus', { is_sus: filter.is_sus })
     }
   }
 

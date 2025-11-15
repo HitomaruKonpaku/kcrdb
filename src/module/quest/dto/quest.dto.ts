@@ -8,4 +8,7 @@ export class Quest extends BaseDto {
 
   @ApiPropertyOptional()
   hit?: number
+
+  @ApiPropertyOptional()
+  isSus?: boolean
 }

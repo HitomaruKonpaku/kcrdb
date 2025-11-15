@@ -55,6 +55,12 @@ export class QuestFilter {
   has_api_select_rewards?: boolean
 
   @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  @ApiPropertyOptional()
+  is_sus?: boolean
+
+  @IsOptional()
   @ApiPropertyOptional({
     description: `
 Order by fields, separated by comma (<code>,</code>)
