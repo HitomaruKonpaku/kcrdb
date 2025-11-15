@@ -46,8 +46,8 @@ export class LoggingInterceptor implements NestInterceptor {
       if (value.id) {
         Object.assign(res, { id: value.id })
       }
-      if (value.ids) {
-        Object.assign(res, { ids: value.ids })
+      if (value.ids && value.ids.length) {
+        Object.assign(res, { count: value.ids.length })
       }
     }
     return res

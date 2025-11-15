@@ -26,12 +26,13 @@ export class QuestSusService {
     return false
   }
 
-  @Cron('0 */10 * * * *', { waitForCompletion: true })
+  @Cron('0 */5 * * * *', { waitForCompletion: true })
   async onTick() {
     try {
       const items = await this.repository.repository.find({
         where: { isSus: IsNull() },
-        take: 1000,
+        order: { createdAt: 'DESC' },
+        take: 500,
       })
       if (!items.length) {
         return
