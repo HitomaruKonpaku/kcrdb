@@ -116,11 +116,9 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
 
     const hash = CryptoUtil.hash(JSON.stringify(hashObj))
     const quest: Partial<Quest> = {
-      ...data,
       id: IdUtil.generate(),
       hash,
       data,
-      datab: data,
       isSus: this.questSusService.isSus(data),
     }
 
@@ -159,7 +157,7 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     qb: SelectQueryBuilder<Quest>,
     filter?: QuestFilter,
   ) {
-    const fields = [
+    const keys = [
       'api_no',
       'api_category',
       'api_type',
@@ -167,9 +165,9 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
       'api_voice_id',
       'api_bonus_flag',
     ]
-    fields.forEach((key) => {
+    keys.forEach((key) => {
       if (filter && filter[key] !== undefined) {
-        qb.andWhere(`(q.datab ->> '${key}')::int = :${key}`, { [key]: filter[key] })
+        qb.andWhere(`q.${key} = :${key}`, { [key]: filter[key] })
       }
     })
   }
@@ -178,13 +176,13 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     qb: SelectQueryBuilder<Quest>,
     filter?: QuestFilter,
   ) {
-    const textFields = [
+    const keys = [
       'api_title',
       'api_detail',
     ]
-    textFields.forEach((key) => {
+    keys.forEach((key) => {
       if (filter && filter[key] !== undefined) {
-        qb.andWhere(`(q.datab ->> '${key}') ILIKE :${key}`, { [key]: `%${filter[key]}%` })
+        qb.andWhere(`q.${key} ILIKE :${key}`, { [key]: `%${filter[key]}%` })
       }
     })
   }
@@ -193,22 +191,29 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     qb: SelectQueryBuilder<Quest>,
     filter?: QuestFilter,
   ) {
-    if (filter?.has_api_select_rewards !== undefined) {
-      if (filter.has_api_select_rewards) {
-        qb.andWhere(`q.datab ? 'api_select_rewards'`)
-      } else {
-        qb.andWhere(`NOT q.datab ? 'api_select_rewards'`)
+    const keys = [
+      'has_api_select_rewards',
+    ]
+    keys.forEach((key) => {
+      if (filter && filter[key] !== undefined) {
+        qb.andWhere(`q.${key} = :${key}`, { [key]: filter[key] })
       }
-    }
+    })
   }
 
   private applyQueryDefaultFilter(
     qb: SelectQueryBuilder<Quest>,
     filter?: QuestFilter,
   ) {
-    if (filter?.is_sus !== undefined) {
-      qb.andWhere('q.is_sus = :is_sus', { is_sus: filter.is_sus })
-    }
+    const keys = [
+      'is_verified',
+      'is_sus',
+    ]
+    keys.forEach((key) => {
+      if (filter && filter[key] !== undefined) {
+        qb.andWhere(`q.${key} = :${key}`, { [key]: filter[key] })
+      }
+    })
   }
 
   private applyQueryTimeFilter(
@@ -232,20 +237,19 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
       return
     }
 
-    const apiKeys = [
+    const allowKeys = new Set([
+      'created_at',
+      'updated_at',
+      'hit',
+      'is_verified',
+      'is_sus',
       'api_no',
       'api_category',
       'api_type',
       'api_label_type',
       'api_voice_id',
       'api_bonus_flag',
-    ]
-
-    const allowKeys = [
-      'created_at',
-      'hit',
-      ...apiKeys,
-    ]
+    ])
 
     const sortKeys = new Set()
     const curKeys = filter.sort.split(',')
@@ -261,17 +265,12 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
         sortDirection = 'ASC'
       }
 
-      if (!allowKeys.includes(sortKey)) {
+      if (!allowKeys.has(sortKey)) {
         return
       }
 
       sortKeys.add(sortKey)
-
-      if (apiKeys.includes(sortKey)) {
-        qb.addOrderBy(`(q.datab ->> '${sortKey}')::int`, sortDirection)
-      } else {
-        qb.addOrderBy(`q.${sortKey}`, sortDirection)
-      }
+      qb.addOrderBy(`q.${sortKey}`, sortDirection)
     })
 
     if (!sortKeys.has('created_at')) {
