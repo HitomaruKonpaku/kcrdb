@@ -7,6 +7,7 @@ import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
 import { CryptoUtil } from '../../../shared/util/crypto.util'
 import { IdUtil } from '../../../shared/util/id.util'
+import { QueryBuilderUtil } from '../../../shared/util/query-builder.util'
 import { QuestCreate } from '../dto/quest-create.dto'
 import { QuestFilter } from '../dto/quest-filter.dto'
 import { QuestApiRoot } from '../interface/quest-api.interface'
@@ -29,6 +30,7 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     timeFilter?: TimeFilterDto,
   ) {
     const qb = this.createQueryBuilder(paging, filter, timeFilter)
+    qb.addSelect('q.updatedAt')
     const [items, total] = await qb.getManyAndCount()
     return {
       total,
@@ -137,20 +139,8 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     this.applyQueryDefaultFilter(qb, filter)
     this.applyQueryTimeFilter(qb, timeFilter)
     this.applyQuerySort(qb, filter)
-    this.applyQueryPaging(qb, paging)
+    QueryBuilderUtil.applyQueryPaging(qb, paging)
     return qb
-  }
-
-  private applyQueryPaging(
-    qb: SelectQueryBuilder<Quest>,
-    paging?: PagingDto,
-  ) {
-    if (paging?.offset !== undefined) {
-      qb.skip(paging.offset)
-    }
-    if (paging?.limit !== undefined) {
-      qb.take(paging.limit)
-    }
   }
 
   private applyQueryApiNumberFilter(
