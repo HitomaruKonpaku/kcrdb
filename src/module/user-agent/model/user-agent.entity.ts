@@ -1,8 +1,7 @@
-import { Column, Entity, Index, Unique } from 'typeorm'
+import { Column, Entity, Index } from 'typeorm'
 import { BaseEntity } from '../../../shared/base/base.entity'
 
 @Entity({ name: 'user_agent' })
-@Unique(['sourceName', 'sourceId'])
 export class UserAgent extends BaseEntity {
   @Index()
   @Column({ name: 'source_name', type: 'varchar' })
@@ -22,4 +21,7 @@ export class UserAgent extends BaseEntity {
 
   @Column({ name: 'x_version', type: 'varchar', nullable: true })
   xVersion?: string
+
+  @Column({ name: 'hit', type: 'int', nullable: true, default: 0 })
+  hit?: number
 }

@@ -1,4 +1,3 @@
-/* eslint-disable dot-notation */
 /* eslint-disable prefer-destructuring */
 
 import {
@@ -9,6 +8,7 @@ import {
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { Observable, tap } from 'rxjs'
+import { FindOptionsWhere, IsNull } from 'typeorm'
 import { parseSourceName } from '../../../decorator/source-name.decorator'
 import { Logger } from '../../../shared/logger'
 import { RequestUtil } from '../../../shared/util/request.util'
@@ -40,7 +40,7 @@ export class UserAgentInterceptor implements NestInterceptor {
         const req = context.switchToHttp().getRequest<Request>()
         const headers = req.headers
         const raw = headers['user-agent']
-        const origin = headers['origin']
+        const origin = RequestUtil.getOrigin(req.headers)
         const xOrigin = RequestUtil.getXOrigin(req.headers)
         const xVersion = RequestUtil.getXVersion(req.headers)
         if (!raw) {
@@ -52,19 +52,35 @@ export class UserAgentInterceptor implements NestInterceptor {
           return
         }
 
-        const items: Partial<UserAgent>[] = sourceIds.map((sourceId) => ({
-          sourceName,
-          sourceId,
-          raw,
-          origin,
-          xOrigin,
-          xVersion,
-        }))
-        await this.service
-          .insertOrIgnoreMany(items)
-          .catch((error) => {
-            this.logger.error(error)
+        try {
+          const items: Partial<UserAgent>[] = sourceIds.map((sourceId) => ({
+            sourceName,
+            sourceId,
+            raw,
+            origin,
+            xOrigin,
+            xVersion,
+          }))
+
+          const findItems: FindOptionsWhere<UserAgent>[] = items.map((obj) => {
+            const tmp: FindOptionsWhere<UserAgent> = { ...obj }
+            const keys = Object.keys(tmp)
+            keys.forEach((key) => {
+              if (tmp[key] === undefined || tmp[key] === null) {
+                tmp[key] = IsNull()
+              }
+            })
+            return tmp
           })
+
+          await this.service.insertOrIgnoreMany(items)
+          await this.service.repository.repository.update(
+            findItems,
+            { hit: () => 'COALESCE(hit, 0) + 1' },
+          )
+        } catch (error) {
+          this.logger.error(`intercept: ${error.message} | ${JSON.stringify({ error })}`)
+        }
       }),
     )
   }
