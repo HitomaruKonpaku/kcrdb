@@ -10,6 +10,7 @@ import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
 import { UserAgentInterceptor } from '../../user-agent/interceptor/user-agent.interceptor'
 import { QuestApi } from '../dto/quest-api.dto'
 import { QuestCreate } from '../dto/quest-create.dto'
+import { QuestExtra } from '../dto/quest-extra.dto'
 import { QuestFilter } from '../dto/quest-filter.dto'
 import { Quest } from '../dto/quest.dto'
 import { QuestService } from '../service/quest.service'
@@ -28,8 +29,9 @@ export class QuestController {
     @Query() paging: PagingDto,
     @Query() filter: QuestFilter,
     @Query() timeFilter: TimeFilterDto,
+    @Query() extra: QuestExtra,
   ) {
-    return this.service.getAll(paging, filter, timeFilter)
+    return this.service.getAll(paging, filter, timeFilter, extra)
   }
 
   @Get('data')
