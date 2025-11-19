@@ -11,6 +11,8 @@ import { CacheUtil } from '../shared/util/cache.util'
 
 @Injectable()
 export class DataCacheUrlInterceptor implements NestInterceptor {
+  private readonly ttl = 60e3
+
   constructor(
     @Inject(CACHE_MANAGER)
     private readonly cache: Cache,
@@ -45,7 +47,7 @@ export class DataCacheUrlInterceptor implements NestInterceptor {
         }
 
         const key = CacheUtil.key(sourceName, sourceId)
-        this.cache.set(key, JSON.stringify(data))
+        this.cache.set(key, JSON.stringify(data), this.ttl)
       }),
     )
   }
