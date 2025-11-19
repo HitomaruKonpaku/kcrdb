@@ -6,7 +6,8 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common'
-import { catchError, from, map, Observable, of, switchMap, tap } from 'rxjs'
+import { ServerResponse } from 'http'
+import { catchError, forkJoin, from, map, Observable, of, switchMap, tap } from 'rxjs'
 import { CacheUtil } from '../shared/util/cache.util'
 
 @Injectable()
@@ -26,20 +27,48 @@ export class DataCacheUrlInterceptor implements NestInterceptor {
     if (req.method === 'GET') {
       return of(null).pipe(
         map(() => CacheUtil.key(sourceName, sourceId)),
-        switchMap((key) => this.getCacheObservable(key)),
-        switchMap((value) => {
+        switchMap((key) => this.getCacheEntry(key)),
+        switchMap(({ key, value }) => {
           if (value !== undefined && value !== null) {
-            return of(JSON.parse(value))
+            return this.handleCached(context, key, value)
           }
-          return this.handleObservable(next, sourceName, sourceId)
+          return this.handleNoneCache(context, next, sourceName, sourceId)
         }),
       )
     }
 
-    return this.handleObservable(next, sourceName, sourceId)
+    return this.handleNoneCache(context, next, sourceName, sourceId)
   }
 
-  private handleObservable(next: CallHandler, sourceName: string, sourceId: string) {
+  private getCacheEntry(key: string) {
+    return from(this.cache.get<string>(key)).pipe(
+      map((value) => ({ key, value })),
+      catchError(() => of({ key, value: undefined })),
+    )
+  }
+
+  private handleCached(context: ExecutionContext, key: string, value: any): Observable<any> {
+    const res = context.switchToHttp().getResponse<ServerResponse>()
+    res.setHeader('X-Cache', 1)
+
+    return of(null).pipe(
+      switchMap(() => forkJoin([
+        from(this.cache.ttl(key)).pipe(
+          catchError(() => of(null)),
+          tap((ttl) => {
+            if (!ttl) return
+            res.setHeader('X-Cache-TTL', ttl)
+          }),
+        ),
+      ])),
+      map(() => JSON.parse(value)),
+    )
+  }
+
+  private handleNoneCache(context: ExecutionContext, next: CallHandler, sourceName: string, sourceId: string): Observable<any> {
+    const res = context.switchToHttp().getResponse<ServerResponse>()
+    res.setHeader('X-Cache', 0)
+
     return next.handle().pipe(
       tap((data) => {
         if (!data || !sourceId) {
@@ -49,12 +78,6 @@ export class DataCacheUrlInterceptor implements NestInterceptor {
         const key = CacheUtil.key(sourceName, sourceId)
         this.cache.set(key, JSON.stringify(data), this.ttl)
       }),
-    )
-  }
-
-  private getCacheObservable(key: string) {
-    return from(this.cache.get<string>(key)).pipe(
-      catchError(() => of(null)),
     )
   }
 }
