@@ -1,7 +1,8 @@
 import { Body, Controller, Get, Post, Query, UseInterceptors } from '@nestjs/common'
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { SourceName } from '../../../decorator/source-name.decorator'
-import { DataHashHitInterceptor } from '../../../interceptor/data-hash-hit.interceptor'
+import { DataCacheUrlInterceptor } from '../../../interceptor/data-cache-url.interceptor'
+import { DataHitHashInterceptor } from '../../../interceptor/data-hit-hash.interceptor'
 import { ApiPaginatedResponse } from '../../../shared/decorator/pagination.decorator'
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { UserAgentInterceptor } from '../../user-agent/interceptor/user-agent.interceptor'
@@ -19,6 +20,7 @@ export class QuestItemController {
   ) { }
 
   @Get()
+  @UseInterceptors(DataCacheUrlInterceptor)
   @ApiPaginatedResponse(QuestItem)
   getAll(
     @Query() paging: PagingDto,
@@ -28,7 +30,7 @@ export class QuestItemController {
   }
 
   @Post()
-  @UseInterceptors(UserAgentInterceptor, DataHashHitInterceptor)
+  @UseInterceptors(UserAgentInterceptor, DataHitHashInterceptor)
   @ApiOperation({
     description: '<code>/kcsapi/api_req_quest/clearitemget</code> response data',
     tags: ['quest-item', 'kcsapi'],

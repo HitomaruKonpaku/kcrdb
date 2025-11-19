@@ -6,51 +6,45 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common'
-import { Reflector } from '@nestjs/core'
 import { catchError, from, map, Observable, of, switchMap, tap } from 'rxjs'
-import { parseSourceName } from '../decorator/source-name.decorator'
 import { CacheUtil } from '../shared/util/cache.util'
 
 @Injectable()
-export class DataCacheInterceptor implements NestInterceptor {
+export class DataCacheUrlInterceptor implements NestInterceptor {
   constructor(
-    private readonly reflector: Reflector,
     @Inject(CACHE_MANAGER)
     private readonly cache: Cache,
   ) { }
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const sourceName = parseSourceName(this.reflector, context)
-    if (!sourceName) {
-      return next.handle()
-    }
-
     const req = context.switchToHttp().getRequest()
+    const sourceName = 'url'
+    const sourceId = req.url
 
-    if (req.method === 'GET' && req.params.id) {
+    if (req.method === 'GET') {
       return of(null).pipe(
-        map(() => CacheUtil.key(sourceName, req.params.id)),
+        map(() => CacheUtil.key(sourceName, sourceId)),
         switchMap((key) => this.getCacheObservable(key)),
         switchMap((value) => {
           if (value !== undefined && value !== null) {
             return of(JSON.parse(value))
           }
-          return this.handleObservable(next, sourceName)
+          return this.handleObservable(next, sourceName, sourceId)
         }),
       )
     }
 
-    return this.handleObservable(next, sourceName)
+    return this.handleObservable(next, sourceName, sourceId)
   }
 
-  private handleObservable(next: CallHandler, sourceName: string) {
+  private handleObservable(next: CallHandler, sourceName: string, sourceId: string) {
     return next.handle().pipe(
       tap((data) => {
-        if (!data || !data.id) {
+        if (!data || !sourceId) {
           return
         }
 
-        const key = CacheUtil.key(sourceName, data.id)
+        const key = CacheUtil.key(sourceName, sourceId)
         this.cache.set(key, JSON.stringify(data))
       }),
     )

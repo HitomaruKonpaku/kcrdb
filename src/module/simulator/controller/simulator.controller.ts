@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Param, Post, UseInterceptors } from '@nestjs/common'
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
 import { SourceName } from '../../../decorator/source-name.decorator'
-import { DataCacheInterceptor } from '../../../interceptor/data-cache.interceptor'
-import { DataHitInterceptor } from '../../../interceptor/data-hit.interceptor'
+import { DataCacheIdInterceptor } from '../../../interceptor/data-cache-id.interceptor'
+import { DataHitIdInterceptor } from '../../../interceptor/data-hit-id.interceptor'
 import { DataTransformInterceptor } from '../../../interceptor/data-transform.interceptor'
 import { UserAgentInterceptor } from '../../user-agent/interceptor/user-agent.interceptor'
 import { SimulatorCreate } from '../dto/simulator-create.dto'
@@ -18,7 +18,7 @@ export class SimulatorController {
   ) { }
 
   @Post()
-  @UseInterceptors(UserAgentInterceptor, DataCacheInterceptor)
+  @UseInterceptors(UserAgentInterceptor, DataCacheIdInterceptor)
   @ApiCreatedResponse({ type: Simulator })
   create(
     @Body() body: SimulatorCreate,
@@ -27,7 +27,7 @@ export class SimulatorController {
   }
 
   @Get(':id')
-  @UseInterceptors(DataHitInterceptor)
+  @UseInterceptors(DataHitIdInterceptor)
   @ApiOkResponse({ type: Simulator })
   @ApiNotFoundResponse()
   getId(
@@ -37,7 +37,7 @@ export class SimulatorController {
   }
 
   @Get(':id/data')
-  @UseInterceptors(DataTransformInterceptor, DataHitInterceptor, DataCacheInterceptor)
+  @UseInterceptors(DataTransformInterceptor, DataHitIdInterceptor, DataCacheIdInterceptor)
   @ApiOkResponse({ type: String })
   @ApiNotFoundResponse()
   getIdData(

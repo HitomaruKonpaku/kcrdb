@@ -2,7 +2,8 @@ import { Body, Controller, Get, Post, Query, UseInterceptors } from '@nestjs/com
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { KeyDelete } from '../../../decorator/key-delete.decorator'
 import { SourceName } from '../../../decorator/source-name.decorator'
-import { DataHashHitInterceptor } from '../../../interceptor/data-hash-hit.interceptor'
+import { DataCacheUrlInterceptor } from '../../../interceptor/data-cache-url.interceptor'
+import { DataHitHashInterceptor } from '../../../interceptor/data-hit-hash.interceptor'
 import { DataKeyDeleteInterceptor } from '../../../interceptor/data-key-delete.interceptor'
 import { ApiPaginatedResponse } from '../../../shared/decorator/pagination.decorator'
 import { PagingDto } from '../../../shared/dto/paging.dto'
@@ -24,6 +25,7 @@ export class QuestController {
   ) { }
 
   @Get()
+  @UseInterceptors(DataCacheUrlInterceptor)
   @ApiPaginatedResponse(Quest)
   getAll(
     @Query() paging: PagingDto,
@@ -35,6 +37,7 @@ export class QuestController {
   }
 
   @Get('data')
+  @UseInterceptors(DataCacheUrlInterceptor)
   @ApiPaginatedResponse(QuestApi)
   getAllRaw(
     @Query() paging: PagingDto,
@@ -45,7 +48,7 @@ export class QuestController {
   }
 
   @Post()
-  @UseInterceptors(DataKeyDeleteInterceptor, UserAgentInterceptor, DataHashHitInterceptor)
+  @UseInterceptors(DataKeyDeleteInterceptor, UserAgentInterceptor, DataHitHashInterceptor)
   @KeyDelete('hashes')
   @ApiOperation({
     description: '<code>/kcsapi/api_get_member/questlist</code> response data',

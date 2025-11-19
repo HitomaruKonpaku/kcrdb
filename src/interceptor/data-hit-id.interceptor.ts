@@ -11,8 +11,8 @@ import { parseSourceName } from '../decorator/source-name.decorator'
 import { Logger } from '../shared/logger'
 
 @Injectable()
-export class DataHashHitInterceptor implements NestInterceptor {
-  private readonly logger = new Logger(DataHashHitInterceptor.name)
+export class DataHitIdInterceptor implements NestInterceptor {
+  private readonly logger = new Logger(DataHitIdInterceptor.name)
 
   constructor(
     private readonly reflector: Reflector,
@@ -27,8 +27,8 @@ export class DataHashHitInterceptor implements NestInterceptor {
           return
         }
 
-        const hashes = (data.hashes || [data.hash]).filter((v) => v) as string[]
-        if (!hashes.length) {
+        const sourceIds = (data.ids || [data.id]).filter((v) => v) as string[]
+        if (!sourceIds.length) {
           return
         }
 
@@ -36,7 +36,7 @@ export class DataHashHitInterceptor implements NestInterceptor {
           .createQueryBuilder()
           .update(sourceName)
           .set({ hit: () => 'COALESCE(hit, 0) + 1' })
-          .andWhere({ hash: In(hashes) })
+          .andWhere({ id: In(sourceIds) })
           .execute()
           .catch((error) => {
             this.logger.error(error)
