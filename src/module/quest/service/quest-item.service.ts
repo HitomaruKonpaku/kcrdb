@@ -5,6 +5,7 @@ import { PagingDto } from '../../../shared/dto/paging.dto'
 import { CryptoUtil } from '../../../shared/util/crypto.util'
 import { QueryBuilderUtil } from '../../../shared/util/query-builder.util'
 import { QuestItemCreate } from '../dto/quest-item-create.dto'
+import { QuestItemExtra } from '../dto/quest-item-extra.dto'
 import { QuestItemFilter } from '../dto/quest-item-filter.dto'
 import { QuestItem } from '../model/quest-item.entity'
 import { QuestItemRepository } from '../repository/quest-item.repository'
@@ -20,9 +21,12 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
   public async getAll(
     paging?: PagingDto,
     filter?: QuestItemFilter,
+    extra?: QuestItemExtra,
   ) {
-    const qb = this.createQueryBuilder(paging, filter)
+    const qb = this.createQueryBuilder()
+    this.applyQuestJoin(qb, extra)
     qb.addSelect('qi.updatedAt')
+    this.initQueryBuilder(paging, filter, qb)
     const [items, total] = await qb.getManyAndCount()
     return {
       total,
@@ -60,14 +64,66 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
     return res
   }
 
-  private createQueryBuilder(
+  private createQueryBuilder() {
+    const qb = this.repository.repository.createQueryBuilder('qi')
+    return qb
+  }
+
+  private initQueryBuilder(
     paging?: PagingDto,
     filter?: QuestItemFilter,
+    baseQueryBuilder?: SelectQueryBuilder<QuestItem>,
   ): SelectQueryBuilder<QuestItem> {
-    const qb = this.repository.repository.createQueryBuilder('qi')
+    const qb = baseQueryBuilder || this.createQueryBuilder()
     this.applyQueryDefaultFilter(qb, filter)
     QueryBuilderUtil.applyQueryPaging(qb, paging)
     return qb
+  }
+
+  private applyQuestJoin(
+    qb: SelectQueryBuilder<QuestItem>,
+    extra?: QuestItemExtra,
+  ) {
+    if (extra?.extend === undefined) {
+      return
+    }
+
+    const keys = Array.isArray(extra.extend)
+      ? extra.extend
+      : extra.extend.split(',')
+    if (!keys.length) {
+      return
+    }
+
+    const selectFields = [
+      'qi.id',
+      'qi.isActive',
+      'qi.createdAt',
+      'qi.api_quest_id',
+      'qi.api_select_no',
+      'qi.data',
+      'qi.hit',
+    ]
+
+    if (keys.includes('origins')) {
+      qb.leftJoinAndMapMany(
+        'qi.origins',
+        'user_agent',
+        'ua',
+        'ua.source_name = :source_name AND ua.source_id = qi.id',
+        { source_name: 'quest_item' },
+      )
+
+      selectFields.push(
+        'ua.raw',
+        'ua.origin',
+        'ua.xOrigin',
+        'ua.xVersion',
+        'ua.hit',
+      )
+    }
+
+    qb.select(selectFields)
   }
 
   private applyQueryDefaultFilter(

@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { BaseDto } from '../../../shared/base/base.dto'
+import { UAOrigin } from '../../user-agent/dto/ua-origin.dto'
 import { QuestItemApi } from './quest-item-api.dto'
 
 export class QuestItem extends BaseDto {
@@ -14,4 +15,7 @@ export class QuestItem extends BaseDto {
 
   @ApiPropertyOptional()
   hit?: number
+
+  @ApiPropertyOptional({ type: [UAOrigin] })
+  origins?: UAOrigin[]
 }

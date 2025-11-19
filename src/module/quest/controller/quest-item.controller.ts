@@ -7,6 +7,7 @@ import { ApiPaginatedResponse } from '../../../shared/decorator/pagination.decor
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { UserAgentInterceptor } from '../../user-agent/interceptor/user-agent.interceptor'
 import { QuestItemCreate } from '../dto/quest-item-create.dto'
+import { QuestItemExtra } from '../dto/quest-item-extra.dto'
 import { QuestItemFilter } from '../dto/quest-item-filter.dto'
 import { QuestItem } from '../dto/quest-item.dto'
 import { QuestItemService } from '../service/quest-item.service'
@@ -25,8 +26,9 @@ export class QuestItemController {
   getAll(
     @Query() paging: PagingDto,
     @Query() filter: QuestItemFilter,
+    @Query() extra: QuestItemExtra,
   ) {
-    return this.service.getAll(paging, filter)
+    return this.service.getAll(paging, filter, extra)
   }
 
   @Post()
