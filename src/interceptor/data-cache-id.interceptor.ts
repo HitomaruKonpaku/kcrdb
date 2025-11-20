@@ -61,7 +61,7 @@ export class DataCacheIdInterceptor implements NestInterceptor {
           catchError(() => of(null)),
           tap((ttl) => {
             if (!ttl) return
-            res.setHeader('X-Cache-TTL', ttl)
+            res.setHeader('X-Cache-Exp', ttl)
           }),
         ),
       ])),
