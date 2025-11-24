@@ -30,7 +30,11 @@ export class AdminService {
         const api_no = Number(key)
         const api_title = data[key].name
         const api_detail = data[key].desc
-        return { api_no, api_title, api_detail }
+        return {
+          api_no,
+          api_title,
+          api_detail,
+        }
       })
       .filter((v) => !Number.isNaN(v.api_no))
 
@@ -49,7 +53,7 @@ export class AdminService {
             }))
             .andWhere('api_no = :api_no', { api_no: item.api_no })
             .andWhere('api_title = :api_title', { api_title: item.api_title })
-            .andWhere(`REPLACE(api_detail, '<br>', '') = :api_detail`, { api_detail: item.api_detail })
+            .andWhere(`REPLACE(api_detail, '<br>', '') = REPLACE(:api_detail, '<br>', '')`, { api_detail: item.api_detail })
             .execute()
 
           await manager
