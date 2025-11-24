@@ -174,6 +174,7 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
       'q.createdAt',
       'q.data',
       'q.hit',
+      'q.isVerified',
       'q.isSus',
     ]
 
