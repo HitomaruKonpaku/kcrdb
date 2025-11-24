@@ -12,6 +12,7 @@ import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import configuration from './config/configuration'
 import { ENTITIES } from './constant/common.constant'
+import { AdminModule } from './module/admin/admin.module'
 import { QuestModule } from './module/quest/quest.module'
 import { ReplayModule } from './module/replay/replay.module'
 import { SimulatorModule } from './module/simulator/simulator.module'
@@ -72,6 +73,7 @@ import { Logger } from './shared/logger'
     SimulatorModule,
     QuestModule,
 
+    AdminModule,
     UserAgentModule,
   ],
   controllers: [

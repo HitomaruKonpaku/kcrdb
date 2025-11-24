@@ -58,6 +58,12 @@ export class QuestFilter {
   @IsBoolean()
   @ToBoolean()
   @ApiPropertyOptional()
+  is_verified?: boolean
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  @ApiPropertyOptional()
   is_sus?: boolean
 
   @IsOptional()
@@ -70,6 +76,8 @@ Default <code>ASC</code>, add <code>-</code> for <code>DESC</code>
 Fields:
 - <code>created_at</code>
 - <code>hit</code>
+- <code>is_verified</code>
+- <code>is_sus</code>
 - <code>api_no</code>
 - <code>api_category</code>
 - <code>api_type</code>

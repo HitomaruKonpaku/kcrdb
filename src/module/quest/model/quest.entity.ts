@@ -16,7 +16,7 @@ export class Quest extends BaseEntity {
   @Column({ name: 'hit', type: 'bigint', nullable: true, default: 0, transformer: BigIntTransformer })
   hit?: number
 
-  @Column({ name: 'is_verified', type: 'boolean', default: false, select: false })
+  @Column({ name: 'is_verified', type: 'boolean', default: false })
   isVerified?: boolean
 
   @Column({ name: 'is_sus', type: 'boolean', nullable: true })

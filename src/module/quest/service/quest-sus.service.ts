@@ -14,18 +14,6 @@ export class QuestSusService {
     public readonly repository: QuestRepository,
   ) { }
 
-  public isSus(data: QuestApiRoot): boolean {
-    try {
-      if (/^.?\[[A-Za-z 0-9]+?\]/.test(data.api_title)) {
-        return true
-      }
-    } catch (error) {
-      this.logger.warn(`isSus: ${error.message} | ${JSON.stringify({ error, data })}`)
-    }
-
-    return false
-  }
-
   @Cron('0 */5 * * * *', { waitForCompletion: true })
   async onTick() {
     try {
@@ -44,5 +32,17 @@ export class QuestSusService {
     } catch (error) {
       this.logger.error(`onTick: ${error.message} | ${JSON.stringify({ error })}`)
     }
+  }
+
+  public isSus(data: QuestApiRoot): boolean {
+    try {
+      if (/^.?\[[A-Za-z 0-9]+?\]/.test(data.api_title)) {
+        return true
+      }
+    } catch (error) {
+      this.logger.warn(`isSus: ${error.message} | ${JSON.stringify({ error, data })}`)
+    }
+
+    return false
   }
 }

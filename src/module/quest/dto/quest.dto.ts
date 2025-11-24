@@ -10,6 +10,9 @@ export class Quest extends BaseDto {
   @ApiPropertyOptional()
   hit?: number
 
+  @ApiPropertyOptional({ default: false })
+  isVerified?: boolean
+
   @ApiPropertyOptional()
   isSus?: boolean
 
