@@ -7,6 +7,7 @@ import axios from 'axios'
 import { Brackets, DataSource } from 'typeorm'
 import { Logger } from '../../../shared/logger'
 import { Quest } from '../../quest/model/quest.entity'
+import { AdminQuestSusResetQuery } from '../dto/admin-quest-sus-reset-query.dto'
 
 @Injectable()
 export class AdminService {
@@ -85,7 +86,7 @@ export class AdminService {
   }
 
   public async confirmSusQuest() {
-    await this.dataSource.createQueryBuilder()
+    const query = this.dataSource.createQueryBuilder()
       .update(Quest)
       .set({
         isVerified: false,
@@ -93,18 +94,36 @@ export class AdminService {
         isMod: true,
       })
       .andWhere('isSus = TRUE')
-      .execute()
+
+    await query.execute()
   }
 
-  public async resetSusQuest() {
-    await this.dataSource.createQueryBuilder()
+  public async resetSusQuest(q: AdminQuestSusResetQuery) {
+    const query = this.dataSource.createQueryBuilder()
       .update(Quest)
       .set({
         isVerified: false,
         isSus: false,
         isMod: false,
       })
-      .andWhere('isSus = TRUE')
-      .execute()
+
+    const api_no = (q?.api_no ?? '')
+      .split(',')
+      .map((v) => Number(v))
+      .filter((v) => !Number.isNaN(v))
+
+    if (api_no.length) {
+      query
+        .andWhere('api_no IN (:...api_no)', { api_no })
+        .andWhere(new Brackets((qb) => {
+          qb
+            .orWhere('isSus = TRUE')
+            .orWhere('isMod = TRUE')
+        }))
+    } else {
+      query.andWhere('isSus = TRUE')
+    }
+
+    await query.execute()
   }
 }
