@@ -48,11 +48,8 @@ export class AdminService {
             .update(Quest)
             .set({ isVerified: true })
             .andWhere('isVerified = FALSE')
-            .andWhere(new Brackets((qb) => {
-              qb
-                .orWhere('isSus ISNULL')
-                .orWhere('isSus = FALSE')
-            }))
+            .andWhere('isSus = FALSE')
+            .andWhere('isMod = FALSE')
             .andWhere(new Brackets((qb) => {
               items.forEach((item, i) => {
                 const api_no_key = `api_no_${i}`
@@ -72,11 +69,8 @@ export class AdminService {
             .update(Quest)
             .set({ isSus: true })
             .andWhere('isVerified = FALSE')
-            .andWhere(new Brackets((qb) => {
-              qb
-                .orWhere('isSus ISNULL')
-                .orWhere('isSus = FALSE')
-            }))
+            .andWhere('isSus = FALSE')
+            .andWhere('isMod = FALSE')
             .andWhere('api_no IN (:...api_no)', { api_no: items.map((v) => v.api_no) })
             .execute()
         })

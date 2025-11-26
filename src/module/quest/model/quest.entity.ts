@@ -19,8 +19,11 @@ export class Quest extends BaseEntity {
   @Column({ name: 'is_verified', type: 'boolean', default: false })
   isVerified?: boolean
 
-  @Column({ name: 'is_sus', type: 'boolean', nullable: true })
+  @Column({ name: 'is_sus', type: 'boolean', default: false })
   isSus?: boolean
+
+  @Column({ name: 'is_mod', type: 'boolean', default: false })
+  isMod?: boolean
 
   @Column({
     name: 'api_no',

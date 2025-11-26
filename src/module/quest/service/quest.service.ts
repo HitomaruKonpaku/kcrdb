@@ -176,6 +176,7 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
       'q.hit',
       'q.isVerified',
       'q.isSus',
+      'q.isMod',
     ]
 
     if (keys.includes('clearItems')) {
@@ -269,6 +270,7 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     const keys = [
       'is_verified',
       'is_sus',
+      'is_mod',
     ]
     keys.forEach((key) => {
       if (filter && filter[key] !== undefined) {
@@ -304,6 +306,7 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
       'hit',
       'is_verified',
       'is_sus',
+      'is_mod',
       'api_no',
       'api_category',
       'api_type',

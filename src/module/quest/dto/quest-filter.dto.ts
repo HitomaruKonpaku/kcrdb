@@ -2,6 +2,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
 import { IsBoolean, IsInt, IsOptional } from 'class-validator'
 import { ToBoolean } from '../../../shared/decorator/to-boolean.decorator'
+import { QUEST_IS_MOD_DESC, QUEST_IS_SUS_DESC, QUEST_IS_VERIFIED_DESC } from '../constant/quest.constant'
 
 export class QuestFilter {
   @IsOptional()
@@ -57,14 +58,20 @@ export class QuestFilter {
   @IsOptional()
   @IsBoolean()
   @ToBoolean()
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ description: QUEST_IS_VERIFIED_DESC })
   is_verified?: boolean
 
   @IsOptional()
   @IsBoolean()
   @ToBoolean()
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ description: QUEST_IS_SUS_DESC })
   is_sus?: boolean
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  @ApiPropertyOptional({ description: QUEST_IS_MOD_DESC })
+  is_mod?: boolean
 
   @IsOptional()
   @ApiPropertyOptional({
@@ -78,6 +85,7 @@ Fields:
 - <code>hit</code>
 - <code>is_verified</code>
 - <code>is_sus</code>
+- <code>is_mod</code>
 - <code>api_no</code>
 - <code>api_category</code>
 - <code>api_type</code>
