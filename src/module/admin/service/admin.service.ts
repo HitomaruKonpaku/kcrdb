@@ -18,15 +18,17 @@ export class AdminService {
     private readonly dataSource: DataSource,
   ) { }
 
-  @Cron('0 0 * * * *', { waitForCompletion: true })
+  @Cron('0 */30 * * * *', { waitForCompletion: true })
   onTick() {
     this.verifyQuest()
   }
 
-  public async verifyQuest() {
-    const t0 = performance.now()
-    this.logger.debug('verifyQuest')
+  public async fetchQuest(): Promise<Record<string, any>> {
+    const { data } = await axios.get(this.KC3_QUEST_URL)
+    return data
+  }
 
+  public async verifyQuest() {
     const data = await this.fetchQuest()
     const items = Object.keys(data)
       .map((key) => {
@@ -41,50 +43,68 @@ export class AdminService {
       })
       .filter((v) => !Number.isNaN(v.api_no))
 
-    if (items.length) {
-      try {
-        await this.dataSource.transaction(async (manager) => {
-          await manager.createQueryBuilder()
-            .update(Quest)
-            .set({ isVerified: true })
-            .andWhere('isVerified = FALSE')
-            .andWhere('isSus = FALSE')
-            .andWhere('isMod = FALSE')
-            .andWhere(new Brackets((qb) => {
-              items.forEach((item, i) => {
-                const api_no_key = `api_no_${i}`
-                const api_title_key = `api_title_${i}`
-                const api_detail_key = `api_detail_${i}`
-                qb.orWhere(new Brackets((qb1) => {
-                  qb1
-                    .andWhere(`api_no = :${api_no_key}`, { [api_no_key]: item.api_no })
-                    .andWhere(`api_title = :${api_title_key}`, { [api_title_key]: item.api_title })
-                    .andWhere(`REPLACE(api_detail, '<br>', '') = REPLACE(:${api_detail_key}, '<br>', '')`, { [api_detail_key]: item.api_detail })
-                }))
-              })
-            }))
-            .execute()
-
-          await manager.createQueryBuilder()
-            .update(Quest)
-            .set({ isSus: true })
-            .andWhere('isVerified = FALSE')
-            .andWhere('isSus = FALSE')
-            .andWhere('isMod = FALSE')
-            .andWhere('api_no IN (:...api_no)', { api_no: items.map((v) => v.api_no) })
-            .execute()
-        })
-      } catch (error) {
-        this.logger.error(`verifyQuest: ${error.message} | ${JSON.stringify({ error })}`)
-      }
+    if (!items.length) {
+      return
     }
 
-    const dt = Math.floor(performance.now() - t0)
-    this.logger.debug(`verifyQuest: ${dt}ms`)
+    try {
+      await this.dataSource.transaction(async (manager) => {
+        await manager.createQueryBuilder()
+          .update(Quest)
+          .set({ isVerified: true })
+          .andWhere('isVerified = FALSE')
+          .andWhere('isSus = FALSE')
+          .andWhere('isMod = FALSE')
+          .andWhere(new Brackets((qb) => {
+            items.forEach((item, i) => {
+              const api_no_key = `api_no_${i}`
+              const api_title_key = `api_title_${i}`
+              const api_detail_key = `api_detail_${i}`
+              qb.orWhere(new Brackets((qb1) => {
+                qb1
+                  .andWhere(`api_no = :${api_no_key}`, { [api_no_key]: item.api_no })
+                  .andWhere(`api_title = :${api_title_key}`, { [api_title_key]: item.api_title })
+                  .andWhere(`REPLACE(api_detail, '<br>', '') = REPLACE(:${api_detail_key}, '<br>', '')`, { [api_detail_key]: item.api_detail })
+              }))
+            })
+          }))
+          .execute()
+
+        await manager.createQueryBuilder()
+          .update(Quest)
+          .set({ isSus: true })
+          .andWhere('isVerified = FALSE')
+          .andWhere('isSus = FALSE')
+          .andWhere('isMod = FALSE')
+          .andWhere('api_no IN (:...api_no)', { api_no: items.map((v) => v.api_no) })
+          .execute()
+      })
+    } catch (error) {
+      this.logger.error(`verifyQuest: ${error.message} | ${JSON.stringify({ error })}`)
+    }
   }
 
-  public async fetchQuest(): Promise<Record<string, any>> {
-    const { data } = await axios.get(this.KC3_QUEST_URL)
-    return data
+  public async confirmSusQuest() {
+    await this.dataSource.createQueryBuilder()
+      .update(Quest)
+      .set({
+        isVerified: false,
+        isSus: false,
+        isMod: true,
+      })
+      .andWhere('isSus = TRUE')
+      .execute()
+  }
+
+  public async resetSusQuest() {
+    await this.dataSource.createQueryBuilder()
+      .update(Quest)
+      .set({
+        isVerified: false,
+        isSus: false,
+        isMod: false,
+      })
+      .andWhere('isSus = TRUE')
+      .execute()
   }
 }
