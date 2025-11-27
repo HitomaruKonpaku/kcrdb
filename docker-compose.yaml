@@ -20,8 +20,8 @@ services:
     volumes:
       - ./data/redis:/data
 
-  kcrdb-be:
-    container_name: kcrdb-be
+  kcrdb:
+    container_name: kcrdb
     image: ghcr.io/hitomarukonpaku/kcrdb
     restart: unless-stopped
     ports:

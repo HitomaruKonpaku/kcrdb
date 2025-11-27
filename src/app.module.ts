@@ -16,6 +16,7 @@ import { AdminModule } from './module/admin/admin.module'
 import { QuestModule } from './module/quest/quest.module'
 import { ReplayModule } from './module/replay/replay.module'
 import { SimulatorModule } from './module/simulator/simulator.module'
+import { TokenModule } from './module/token/token.module'
 import { UserAgentModule } from './module/user-agent/user-agent.module'
 import { ErrorInterceptor } from './shared/interceptor/error.interceptor'
 import { LoggingInterceptor } from './shared/interceptor/logging.interceptor'
@@ -73,8 +74,10 @@ import { Logger } from './shared/logger'
     SimulatorModule,
     QuestModule,
 
-    AdminModule,
     UserAgentModule,
+
+    AdminModule,
+    TokenModule,
   ],
   controllers: [
     AppController,

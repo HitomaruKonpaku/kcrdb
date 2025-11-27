@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import { API_KEY_HEADER_NAME } from './constant/common.constant'
 
 export function setupSwagger<T>(app: INestApplication<T>) {
   const title = 'KCRDB API'
@@ -13,6 +14,14 @@ export function setupSwagger<T>(app: INestApplication<T>) {
     .addTag('quest')
     .addTag('quest-item')
     .addTag('kcsapi')
+    .addApiKey(
+      {
+        type: 'apiKey',
+        in: 'header',
+        name: API_KEY_HEADER_NAME,
+      },
+      API_KEY_HEADER_NAME,
+    )
     .addGlobalParameters(
       {
         in: 'header',
@@ -34,6 +43,8 @@ export function setupSwagger<T>(app: INestApplication<T>) {
   SwaggerModule.setup('docs', app, document, {
     customSiteTitle: title,
     swaggerOptions: {
+      filter: true,
+      persistAuthorization: true,
       defaultModelsExpandDepth: 0,
     },
   })
