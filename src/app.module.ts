@@ -16,6 +16,7 @@ import { AdminModule } from './module/admin/admin.module'
 import { QuestModule } from './module/quest/quest.module'
 import { ReplayModule } from './module/replay/replay.module'
 import { SimulatorModule } from './module/simulator/simulator.module'
+import { TokenSeenAtInterceptor } from './module/token/interceptor/token-seen-at.interceptor'
 import { TokenModule } from './module/token/token.module'
 import { UserAgentModule } from './module/user-agent/user-agent.module'
 import { ErrorInterceptor } from './shared/interceptor/error.interceptor'
@@ -94,6 +95,10 @@ import { Logger } from './shared/logger'
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TokenSeenAtInterceptor,
     },
     AppService,
   ],
