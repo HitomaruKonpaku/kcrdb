@@ -1,11 +1,11 @@
 import { Body, Controller, Get, Post, Query, UseInterceptors } from '@nestjs/common'
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { SourceName } from '../../../decorator/source-name.decorator'
+import { TrackUserAgent } from '../../../decorator/track-user-agent.decorator'
 import { DataCacheUrlInterceptor } from '../../../interceptor/data-cache-url.interceptor'
 import { DataHitHashInterceptor } from '../../../interceptor/data-hit-hash.interceptor'
 import { ApiPaginatedResponse } from '../../../shared/decorator/pagination.decorator'
 import { PagingDto } from '../../../shared/dto/paging.dto'
-import { UserAgentInterceptor } from '../../user-agent/interceptor/user-agent.interceptor'
 import { QuestItemCreate } from '../dto/quest-item-create.dto'
 import { QuestItemExtra } from '../dto/quest-item-extra.dto'
 import { QuestItemFilter } from '../dto/quest-item-filter.dto'
@@ -32,7 +32,8 @@ export class QuestItemController {
   }
 
   @Post()
-  @UseInterceptors(UserAgentInterceptor, DataHitHashInterceptor)
+  @UseInterceptors(DataHitHashInterceptor)
+  @TrackUserAgent()
   @ApiOperation({
     description: '<code>/kcsapi/api_req_quest/clearitemget</code> response data',
     tags: ['quest-item', 'kcsapi'],

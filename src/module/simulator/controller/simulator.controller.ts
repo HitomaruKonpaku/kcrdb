@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Param, Post, UseInterceptors } from '@nestjs/common'
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
 import { SourceName } from '../../../decorator/source-name.decorator'
+import { TrackUserAgent } from '../../../decorator/track-user-agent.decorator'
 import { DataCacheIdInterceptor } from '../../../interceptor/data-cache-id.interceptor'
 import { DataHitIdInterceptor } from '../../../interceptor/data-hit-id.interceptor'
 import { DataTransformInterceptor } from '../../../interceptor/data-transform.interceptor'
-import { UserAgentInterceptor } from '../../user-agent/interceptor/user-agent.interceptor'
 import { SimulatorCreate } from '../dto/simulator-create.dto'
 import { Simulator } from '../dto/simulator.dto'
 import { SimulatorService } from '../service/simulator.service'
@@ -18,7 +18,8 @@ export class SimulatorController {
   ) { }
 
   @Post()
-  @UseInterceptors(UserAgentInterceptor, DataCacheIdInterceptor)
+  @UseInterceptors(DataCacheIdInterceptor)
+  @TrackUserAgent()
   @ApiCreatedResponse({ type: Simulator })
   create(
     @Body() body: SimulatorCreate,

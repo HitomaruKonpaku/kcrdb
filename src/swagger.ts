@@ -22,20 +22,6 @@ export function setupSwagger<T>(app: INestApplication<T>) {
       },
       API_KEY_HEADER_NAME,
     )
-    .addGlobalParameters(
-      {
-        in: 'header',
-        name: 'x-origin',
-        description: 'Client origin',
-        required: false,
-      },
-      {
-        in: 'header',
-        name: 'x-version',
-        description: 'Client version',
-        required: false,
-      },
-    )
     .build()
 
   const document = SwaggerModule.createDocument(app, config)
