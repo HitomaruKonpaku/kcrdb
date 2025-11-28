@@ -8,18 +8,22 @@ import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
 import { CryptoUtil } from '../../../shared/util/crypto.util'
 import { IdUtil } from '../../../shared/util/id.util'
 import { QueryBuilderUtil } from '../../../shared/util/query-builder.util'
+import { UserAgentService } from '../../user-agent/service/user-agent.service'
 import { QuestCreate } from '../dto/quest-create.dto'
 import { QuestExtra } from '../dto/quest-extra.dto'
 import { QuestFilter } from '../dto/quest-filter.dto'
 import { QuestApiRoot } from '../interface/quest-api.interface'
 import { Quest } from '../model/quest.entity'
 import { QuestRepository } from '../repository/quest.repository'
+import { QuestItemService } from './quest-item.service'
 import { QuestSusService } from './quest-sus.service'
 
 @Injectable()
 export class QuestService extends BaseService<Quest, QuestRepository> {
   constructor(
     public readonly repository: QuestRepository,
+    private readonly userAgentService: UserAgentService,
+    private readonly questItemService: QuestItemService,
     private readonly questSusService: QuestSusService,
   ) {
     super(repository)
@@ -32,10 +36,10 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     extra?: QuestExtra,
   ) {
     const qb = this.createQueryBuilder()
-    this.applyQuestJoin(qb, extra)
     qb.addSelect('q.updatedAt')
     this.initQueryBuilder(paging, filter, timeFilter, qb)
     const [items, total] = await qb.getManyAndCount()
+    await this.applyJoin(items, extra)
     return {
       total,
       items,
@@ -151,68 +155,6 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     this.applyQuerySort(qb, filter)
     QueryBuilderUtil.applyQueryPaging(qb, paging)
     return qb
-  }
-
-  private applyQuestJoin(
-    qb: SelectQueryBuilder<Quest>,
-    extra?: QuestExtra,
-  ) {
-    if (extra?.extend === undefined) {
-      return
-    }
-
-    const keys = Array.isArray(extra.extend)
-      ? extra.extend
-      : extra.extend.split(',')
-    if (!keys.length) {
-      return
-    }
-
-    const selectFields = [
-      'q.id',
-      'q.isActive',
-      'q.createdAt',
-      'q.data',
-      'q.hit',
-      'q.isVerified',
-      'q.isSus',
-      'q.isMod',
-    ]
-
-    if (keys.includes('clearItems')) {
-      qb.leftJoinAndMapMany(
-        'q.clearItems',
-        'quest_item',
-        'qi',
-        'qi.api_quest_id = q.api_no',
-      )
-
-      selectFields.push(
-        'qi.api_select_no',
-        'qi.data',
-        'qi.hit',
-      )
-    }
-
-    if (keys.includes('origins')) {
-      qb.leftJoinAndMapMany(
-        'q.origins',
-        'user_agent',
-        'ua',
-        'ua.source_name = :source_name AND ua.source_id = q.id',
-        { source_name: 'quest' },
-      )
-
-      selectFields.push(
-        'ua.raw',
-        'ua.origin',
-        'ua.xOrigin',
-        'ua.xVersion',
-        'ua.hit',
-      )
-    }
-
-    qb.select(selectFields)
   }
 
   private applyQueryApiNumberFilter(
@@ -339,6 +281,30 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
 
     if (!sortKeys.has('created_at')) {
       qb.addOrderBy('q.created_at', 'DESC')
+    }
+  }
+
+  private async applyJoin(
+    entities: Quest[],
+    extra?: QuestExtra,
+  ) {
+    if (extra?.extend === undefined) {
+      return
+    }
+
+    const keys = Array.isArray(extra.extend)
+      ? extra.extend
+      : extra.extend.split(',')
+    if (!keys.length) {
+      return
+    }
+
+    if (keys.includes('origins')) {
+      await this.userAgentService.attachOrigins(entities, 'quest')
+    }
+
+    if (keys.includes('clearItems')) {
+      await this.questItemService.attachClearItems(entities)
     }
   }
 }

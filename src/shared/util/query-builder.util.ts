@@ -7,10 +7,10 @@ export class QueryBuilderUtil {
     paging?: PagingDto,
   ) {
     if (paging?.offset !== undefined) {
-      qb.offset(paging.offset)
+      qb.skip(paging.offset)
     }
     if (paging?.limit !== undefined) {
-      qb.limit(paging.limit)
+      qb.take(paging.limit)
     }
   }
 }

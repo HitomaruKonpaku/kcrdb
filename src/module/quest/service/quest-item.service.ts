@@ -1,19 +1,22 @@
 import { Injectable } from '@nestjs/common'
-import { SelectQueryBuilder } from 'typeorm'
+import { In, SelectQueryBuilder } from 'typeorm'
 import { BaseService } from '../../../shared/base/base.service'
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { CryptoUtil } from '../../../shared/util/crypto.util'
 import { QueryBuilderUtil } from '../../../shared/util/query-builder.util'
+import { UserAgentService } from '../../user-agent/service/user-agent.service'
 import { QuestItemCreate } from '../dto/quest-item-create.dto'
 import { QuestItemExtra } from '../dto/quest-item-extra.dto'
 import { QuestItemFilter } from '../dto/quest-item-filter.dto'
 import { QuestItem } from '../model/quest-item.entity'
+import { Quest } from '../model/quest.entity'
 import { QuestItemRepository } from '../repository/quest-item.repository'
 
 @Injectable()
 export class QuestItemService extends BaseService<QuestItem, QuestItemRepository> {
   constructor(
     public readonly repository: QuestItemRepository,
+    private readonly userAgentService: UserAgentService,
   ) {
     super(repository)
   }
@@ -24,10 +27,10 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
     extra?: QuestItemExtra,
   ) {
     const qb = this.createQueryBuilder()
-    this.applyQuestJoin(qb, extra)
     qb.addSelect('qi.updatedAt')
     this.initQueryBuilder(paging, filter, qb)
     const [items, total] = await qb.getManyAndCount()
+    await this.applyJoin(items, extra)
     return {
       total,
       items,
@@ -64,6 +67,42 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
     return res
   }
 
+  public async attachClearItems(
+    entities: Quest[],
+    mapToProperty = 'clearItems',
+  ) {
+    if (!entities?.length || !mapToProperty) {
+      return
+    }
+
+    const items = await this.repository.repository.find({
+      select: [
+        'api_quest_id',
+        'api_select_no',
+        'data',
+        'hit',
+      ],
+      where: {
+        api_quest_id: In(entities.map((v) => v.api_no || v.data.api_no).filter((v) => v)),
+      },
+      order: {
+        hit: 'DESC',
+        api_select_no: 'ASC',
+      },
+    })
+
+    entities.forEach((entity) => {
+      // eslint-disable-next-line no-param-reassign
+      entity[mapToProperty] = items
+        .filter((v) => v.api_quest_id === entity.api_no || v.api_quest_id === entity.data.api_no)
+        .map((v) => {
+          const obj: Partial<QuestItem> = { ...v }
+          delete obj.api_quest_id
+          return obj
+        })
+    })
+  }
+
   private createQueryBuilder() {
     const qb = this.repository.repository.createQueryBuilder('qi')
     return qb
@@ -80,8 +119,22 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
     return qb
   }
 
-  private applyQuestJoin(
+  private applyQueryDefaultFilter(
     qb: SelectQueryBuilder<QuestItem>,
+    filter?: QuestItemFilter,
+  ) {
+    const keys = [
+      'api_quest_id',
+    ]
+    keys.forEach((key) => {
+      if (filter && filter[key] !== undefined) {
+        qb.andWhere(`qi.${key} = :${key}`, { [key]: filter[key] })
+      }
+    })
+  }
+
+  private async applyJoin(
+    entities: QuestItem[],
     extra?: QuestItemExtra,
   ) {
     if (extra?.extend === undefined) {
@@ -95,48 +148,8 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
       return
     }
 
-    const selectFields = [
-      'qi.id',
-      'qi.isActive',
-      'qi.createdAt',
-      'qi.api_quest_id',
-      'qi.api_select_no',
-      'qi.data',
-      'qi.hit',
-    ]
-
     if (keys.includes('origins')) {
-      qb.leftJoinAndMapMany(
-        'qi.origins',
-        'user_agent',
-        'ua',
-        'ua.source_name = :source_name AND ua.source_id = qi.id',
-        { source_name: 'quest_item' },
-      )
-
-      selectFields.push(
-        'ua.raw',
-        'ua.origin',
-        'ua.xOrigin',
-        'ua.xVersion',
-        'ua.hit',
-      )
+      await this.userAgentService.attachOrigins(entities, 'quest_item')
     }
-
-    qb.select(selectFields)
-  }
-
-  private applyQueryDefaultFilter(
-    qb: SelectQueryBuilder<QuestItem>,
-    filter?: QuestItemFilter,
-  ) {
-    const keys = [
-      'api_quest_id',
-    ]
-    keys.forEach((key) => {
-      if (filter && filter[key] !== undefined) {
-        qb.andWhere(`qi.${key} = :${key}`, { [key]: filter[key] })
-      }
-    })
   }
 }

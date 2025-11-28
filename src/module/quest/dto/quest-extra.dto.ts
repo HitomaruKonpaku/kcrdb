@@ -6,8 +6,8 @@ export class QuestExtra {
   @ApiPropertyOptional({
     description: `
 Fields:
-- <code>clearItems</code>
 - <code>origins</code>
+- <code>clearItems</code>
     `,
     default: null,
     examples: {
@@ -15,16 +15,16 @@ Fields:
         value: null,
         summary: 'default',
       },
-      clearItems: {
-        value: 'clearItems',
-        summary: 'clearItems',
-      },
       origins: {
         value: 'origins',
         summary: 'origins',
       },
+      clearItems: {
+        value: 'clearItems',
+        summary: 'clearItems',
+      },
       all: {
-        value: 'clearItems,origins',
+        value: 'origins,clearItems',
         summary: 'ALL',
       },
     },
