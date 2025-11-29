@@ -8,8 +8,11 @@ import { join } from 'path'
 import { AppModule } from './app.module'
 import { Logger } from './shared/logger'
 import { setupSwagger } from './swagger'
+import otelSDK from './tracing'
 
 async function bootstrap() {
+  otelSDK?.start()
+
   const logger = new Logger('Main')
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -37,12 +40,15 @@ async function bootstrap() {
   setupSwagger(app)
 
   const host = process.env.HOST || 'localhost'
-  const port = process.env.PORT || 8080
+  const port = Number(process.env.PORT) || 8080
 
   await app.listen(port, () => {
     const url = `http://${host}:${port}`
-    logger.log(`🚀 Server listening on ${url}`)
-    logger.log(`📄 Docs: ${url}/docs`)
+    logger.log(`🚀 Server  | ${url}`)
+    logger.log(`📄 Docs    | ${url}/docs`)
+    if (otelSDK) {
+      logger.log(`📊 Metrics | ${otelSDK.url}`)
+    }
   })
 }
 

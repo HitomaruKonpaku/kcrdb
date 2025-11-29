@@ -4,10 +4,11 @@ import { Module, OnApplicationShutdown } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core'
 import { ScheduleModule } from '@nestjs/schedule'
-import { seconds, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
+import { seconds, ThrottlerGuard, ThrottlerModule, ThrottlerModuleOptions } from '@nestjs/throttler'
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
 import * as ms from 'ms'
 import { StringValue } from 'ms'
+import { OpenTelemetryModule, OpenTelemetryModuleOptions } from 'nestjs-otel'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import configuration from './config/configuration'
@@ -29,6 +30,8 @@ import { Logger } from './shared/logger'
       isGlobal: true,
       load: [configuration],
     }),
+
+    ScheduleModule.forRoot(),
 
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => {
@@ -58,18 +61,37 @@ import { Logger } from './shared/logger'
     }),
 
     ThrottlerModule.forRootAsync({
-      useFactory: () => ({
-        throttlers: [
-          {
-            limit: 100,
-            ttl: seconds(10),
-          },
-        ],
-        errorMessage: 'Too Many Requests',
-      }),
+      useFactory: () => {
+        const opts: ThrottlerModuleOptions = {
+          throttlers: [
+            {
+              limit: 100,
+              ttl: seconds(10),
+            },
+          ],
+          errorMessage: 'Too Many Requests',
+        }
+        return opts
+      },
     }),
 
-    ScheduleModule.forRoot(),
+    OpenTelemetryModule.forRootAsync({
+      useFactory: () => {
+        const opts: OpenTelemetryModuleOptions = {
+          metrics: {
+            // hostMetrics: true,
+            apiMetrics: {
+              enable: true,
+              ignoreRoutes: [
+                '/favicon.ico',
+              ],
+              ignoreUndefinedRoutes: false,
+            },
+          },
+        }
+        return opts
+      },
+    }),
 
     ReplayModule,
     SimulatorModule,
@@ -93,12 +115,12 @@ import { Logger } from './shared/logger'
       useClass: LoggingInterceptor,
     },
     {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
-    {
       provide: APP_INTERCEPTOR,
       useClass: TokenSeenAtInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
     AppService,
   ],

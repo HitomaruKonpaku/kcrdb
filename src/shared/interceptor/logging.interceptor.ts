@@ -12,8 +12,8 @@ import { RequestUtil } from '../util/request.util'
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const req = context.switchToHttp().getRequest()
     const now = Date.now()
+    const req = context.switchToHttp().getRequest()
     const method = String(req.method).toUpperCase()
 
     Logger.debug(`${method} --> ${req.path} | ${JSON.stringify(this.getRequestInfo(req))}`)
