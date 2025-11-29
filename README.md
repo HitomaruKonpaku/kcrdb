@@ -6,14 +6,16 @@ KanColle Replay DB
 
 | Name            | Desc                  | Default                                             |
 |-----------------|-----------------------|-----------------------------------------------------|
-| PORT            |                       | 8080                                                |
-| NO_COLOR        | Disable log color     |                                                     |
-| NO_TIMESTAMP    | Disable log timestamp |                                                     |
-| BODY_JSON_LIMIT |                       | 500kb                                               |
 | DATABASE_TYPE   |                       | postgres                                            |
 | DATABASE_URL    |                       | postgresql://postgres:admin@localhost:5432/postgres |
 | REDIS_URL       |                       | redis://localhost:6379                              |
 | CACHE_TTL       |                       | 1m                                                  |
+| PORT            |                       | 8080                                                |
+| NO_COLOR        | Disable log color     |                                                     |
+| NO_TIMESTAMP    | Disable log timestamp |                                                     |
+| BODY_JSON_LIMIT |                       | 500kb                                               |
+| METRICS_ENABLED |                       | 0 (false)                                           |
+| METRICS_PORT    |                       | 8081                                                |
 
 ## Related
 
