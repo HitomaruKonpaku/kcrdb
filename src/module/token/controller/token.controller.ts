@@ -8,8 +8,8 @@ import { TokenService } from '../service/token.service'
 
 @Controller('tokens')
 @ApiTags('token')
-@UseTokenGuard()
 @UseGuards(TokenOwnerGuard)
+@UseTokenGuard()
 export class TokenController {
   constructor(
     private readonly service: TokenService,

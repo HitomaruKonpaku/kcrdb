@@ -8,8 +8,8 @@ import { WebhookService } from '../service/webhook.service'
 
 @Controller('webhooks')
 @ApiTags('webhook')
-@UseTokenGuard()
 @UseGuards(TokenOwnerGuard)
+@UseTokenGuard()
 export class WebhookController {
   constructor(
     private readonly service: WebhookService,
