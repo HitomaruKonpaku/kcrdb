@@ -41,4 +41,14 @@ export abstract class BaseRepository<E extends BaseEntity> {
       .execute()
     return res
   }
+
+  public async updateById(id: string, body: QueryDeepPartialEntity<E>) {
+    const res = await this.repository.update({ id } as FindOptionsWhere<E>, body)
+    return res
+  }
+
+  public async deleteById(id: string) {
+    const res = await this.repository.delete({ id } as FindOptionsWhere<E>)
+    return res
+  }
 }

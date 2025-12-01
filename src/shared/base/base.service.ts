@@ -63,4 +63,18 @@ export abstract class BaseService<E extends BaseEntity, R extends BaseRepository
     const res = await this.findOneById(id)
     return res
   }
+
+  public async updateById(id: string, body: QueryDeepPartialEntity<E>) {
+    const res = await this.repository.updateById(id, body)
+    if (!res.affected) {
+      throw new NotFoundException()
+    }
+  }
+
+  public async deleteById(id: string) {
+    const res = await this.repository.deleteById(id)
+    if (!res.affected) {
+      throw new NotFoundException()
+    }
+  }
 }

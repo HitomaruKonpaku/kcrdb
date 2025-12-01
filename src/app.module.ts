@@ -1,6 +1,6 @@
 import { createKeyv } from '@keyv/redis'
 import { CacheModule, CacheOptions } from '@nestjs/cache-manager'
-import { Module, OnApplicationShutdown } from '@nestjs/common'
+import { Module, OnApplicationBootstrap, OnApplicationShutdown, OnModuleInit } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core'
 import { ScheduleModule } from '@nestjs/schedule'
@@ -20,6 +20,7 @@ import { SimulatorModule } from './module/simulator/simulator.module'
 import { TokenSeenAtInterceptor } from './module/token/interceptor/token-seen-at.interceptor'
 import { TokenModule } from './module/token/token.module'
 import { UserAgentModule } from './module/user-agent/user-agent.module'
+import { WebhookModule } from './module/webhook/webhook.module'
 import { ErrorInterceptor } from './shared/interceptor/error.interceptor'
 import { LoggingInterceptor } from './shared/interceptor/logging.interceptor'
 import { Logger } from './shared/logger'
@@ -100,6 +101,8 @@ import { Logger } from './shared/logger'
     UserAgentModule,
 
     AdminModule,
+    WebhookModule,
+
     TokenModule,
   ],
   controllers: [
@@ -125,8 +128,16 @@ import { Logger } from './shared/logger'
     AppService,
   ],
 })
-export class AppModule implements OnApplicationShutdown {
+export class AppModule implements OnModuleInit, OnApplicationShutdown, OnApplicationBootstrap {
   private readonly logger = new Logger(AppModule.name)
+
+  onModuleInit() {
+    // this.logger.debug('onModuleInit')
+  }
+
+  onApplicationBootstrap() {
+    // this.logger.debug('onApplicationBootstrap')
+  }
 
   async onApplicationShutdown(signal?: string) {
     this.logger.warn(`onApplicationShutdown | ${JSON.stringify({ signal })}`)

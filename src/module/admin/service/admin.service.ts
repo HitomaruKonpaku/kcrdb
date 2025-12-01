@@ -6,7 +6,11 @@ import { Cron } from '@nestjs/schedule'
 import axios from 'axios'
 import { Brackets, DataSource } from 'typeorm'
 import { Logger } from '../../../shared/logger'
+import { IdUtil } from '../../../shared/util/id.util'
 import { Quest } from '../../quest/model/quest.entity'
+import { WebhookHistory } from '../../webhook/model/webhook-history.entity'
+import { Webhook } from '../../webhook/model/webhook.entity'
+import { WebhookService } from '../../webhook/service/webhook.service'
 import { AdminQuestSusResetQuery } from '../dto/admin-quest-sus-reset-query.dto'
 
 @Injectable()
@@ -17,6 +21,7 @@ export class AdminService {
 
   constructor(
     private readonly dataSource: DataSource,
+    private readonly webhookService: WebhookService,
   ) { }
 
   @Cron('0 */30 * * * *', { waitForCompletion: true })
@@ -83,6 +88,8 @@ export class AdminService {
     } catch (error) {
       this.logger.error(`verifyQuest: ${error.message} | ${JSON.stringify({ error })}`)
     }
+
+    this.notifyUnknownQuests()
   }
 
   public async confirmSusQuest() {
@@ -125,5 +132,73 @@ export class AdminService {
     }
 
     await query.execute()
+  }
+
+  private async notifyUnknownQuests() {
+    const quests = await this.dataSource
+      .createQueryBuilder(Quest, 'q')
+      .andWhere('q.isVerified = FALSE')
+      .andWhere('q.isSus = FALSE')
+      .andWhere('q.isMod = FALSE')
+      .getMany()
+
+    if (!quests.length) {
+      return
+    }
+
+    const webhooks = await this.dataSource
+      .createQueryBuilder(Webhook, 'w')
+      .leftJoinAndMapOne('w.history', WebhookHistory, 'wh', 'wh.webhookId = w.id')
+      .andWhere('w.isActive = TRUE')
+      .andWhere('w.onQuestNewUnknown = TRUE')
+      .andWhere('wh ISNULL')
+      .getMany()
+
+    if (!webhooks.length) {
+      return
+    }
+
+    await Promise.allSettled(webhooks.map(async (webhook) => {
+      await Promise.allSettled(quests.map(async (quest) => {
+        const id = IdUtil.generate()
+        const content = `\`\`\`${JSON.stringify(quest)}\`\`\``
+        const repository = this.dataSource.getRepository(WebhookHistory)
+
+        try {
+          await repository.createQueryBuilder()
+            .insert()
+            .values({
+              id,
+              webhookId: webhook.id,
+              sourceName: 'quest',
+              sourceId: quest.id,
+            })
+            .orIgnore()
+            .execute()
+
+          await this.webhookService.send(webhook, content, true)
+
+          await repository.update(
+            { id },
+            {
+              isSuccess: true,
+              isError: false,
+              errorMessage: null,
+              errorStack: null,
+            } as any,
+          )
+        } catch (error) {
+          await repository.update(
+            { id },
+            {
+              isSuccess: false,
+              isError: true,
+              errorMessage: error.message,
+              errorStack: error.stack,
+            } as any,
+          )
+        }
+      }))
+    }))
   }
 }

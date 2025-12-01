@@ -7,7 +7,7 @@ import { TokenGuard } from '../guard/token.guard'
 import { TokenResultInterceptor } from '../interceptor/token-result.interceptor'
 import { TokenService } from '../service/token.service'
 
-@Controller('token')
+@Controller('tokens')
 @UseGuards(TokenGuard)
 @ApiTags('token')
 @ApiSecurity(API_KEY_HEADER_NAME)
