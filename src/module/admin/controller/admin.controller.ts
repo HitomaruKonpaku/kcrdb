@@ -1,18 +1,14 @@
-import { Controller, HttpCode, Post, Query, UseGuards } from '@nestjs/common'
-import { ApiForbiddenResponse, ApiOperation, ApiSecurity, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger'
+import { Controller, HttpCode, Post, Query } from '@nestjs/common'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { Throttle, seconds } from '@nestjs/throttler'
-import { API_KEY_HEADER_NAME } from '../../../constant/common.constant'
+import { UseTokenGuard } from '../../../decorator/use-token-guard.decorator'
 import { QUEST_IS_VERIFIED_DESC } from '../../quest/constant/quest.constant'
-import { TokenGuard } from '../../token/guard/token.guard'
 import { AdminQuestSusResetQuery } from '../dto/admin-quest-sus-reset-query.dto'
 import { AdminService } from '../service/admin.service'
 
 @Controller('admin')
-@UseGuards(TokenGuard)
 @ApiTags('admin')
-@ApiSecurity(API_KEY_HEADER_NAME)
-@ApiUnauthorizedResponse()
-@ApiForbiddenResponse()
+@UseTokenGuard()
 export class AdminController {
   constructor(
     private readonly service: AdminService,

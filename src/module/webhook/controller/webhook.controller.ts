@@ -1,18 +1,15 @@
 import { Body, Controller, Delete, Param, Patch, Post, UseGuards } from '@nestjs/common'
-import { ApiForbiddenResponse, ApiSecurity, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger'
-import { API_KEY_HEADER_NAME } from '../../../constant/common.constant'
+import { ApiTags } from '@nestjs/swagger'
+import { UseTokenGuard } from '../../../decorator/use-token-guard.decorator'
 import { TokenOwnerGuard } from '../../token/guard/token-owner.guard'
-import { TokenGuard } from '../../token/guard/token.guard'
 import { WebhookCreate } from '../dto/webhook-create.dto'
 import { WebhookUpdate } from '../dto/webhook-update.dto'
 import { WebhookService } from '../service/webhook.service'
 
 @Controller('webhooks')
-@UseGuards(TokenGuard, TokenOwnerGuard)
 @ApiTags('webhook')
-@ApiSecurity(API_KEY_HEADER_NAME)
-@ApiUnauthorizedResponse()
-@ApiForbiddenResponse()
+@UseTokenGuard()
+@UseGuards(TokenOwnerGuard)
 export class WebhookController {
   constructor(
     private readonly service: WebhookService,
