@@ -1,5 +1,23 @@
 ---
 services:
+  kcrdb:
+    container_name: kcrdb
+    image: ghcr.io/hitomarukonpaku/kcrdb
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    environment:
+      DATABASE_URL: postgresql://postgres:admin@kcrdb-db:5432/postgres
+      REDIS_URL: redis://kcrdb-redis:6379
+      CACHE_TTL: 10m
+      NO_COLOR: 1
+      NO_TIMESTAMP: 1
+      # METRICS_ENABLED: 1
+      # ENCRYPTION_SECRET: kcrdb_secret
+    depends_on:
+      - kcrdb-db
+      - kcrdb-redis
+
   kcrdb-db:
     container_name: kcrdb-db
     image: postgres:17
@@ -19,23 +37,6 @@ services:
       - 6379:6379
     volumes:
       - ./data/redis:/data
-
-  kcrdb:
-    container_name: kcrdb
-    image: ghcr.io/hitomarukonpaku/kcrdb
-    restart: unless-stopped
-    ports:
-      - 8080:8080
-    environment:
-      DATABASE_URL: postgresql://postgres:admin@kcrdb-db:5432/postgres
-      REDIS_URL: redis://kcrdb-redis:6379
-      CACHE_TTL: 10m
-      NO_COLOR: 1
-      NO_TIMESTAMP: 1
-      # METRICS_ENABLED: 1
-    depends_on:
-      - kcrdb-db
-      - kcrdb-redis
 
   # kcrdb-prom:
   #   container_name: kcrdb-prom

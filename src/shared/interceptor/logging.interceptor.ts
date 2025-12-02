@@ -14,7 +14,7 @@ export class LoggingInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const now = Date.now()
     const req = context.switchToHttp().getRequest()
-    const method = String(req.method).toUpperCase()
+    const method = String(req.method).toUpperCase().padStart(6, ' ')
 
     Logger.debug(`${method} --> ${req.path} | ${JSON.stringify(this.getRequestInfo(req))}`)
 
