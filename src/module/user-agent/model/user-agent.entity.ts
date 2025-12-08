@@ -7,6 +7,7 @@ export class UserAgent extends BaseEntity {
   @Column({ name: 'source_name', type: 'varchar' })
   sourceName: string
 
+  @Index()
   @Column({ name: 'source_id', type: 'varchar' })
   sourceId: string
 
