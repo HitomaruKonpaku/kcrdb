@@ -22,7 +22,7 @@ RUN npm run build
 # RELEASE
 FROM base AS release
 
-RUN apk add --no-cache tini
+RUN apk add --no-cache tini bash
 
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=builder      /app/dist ./dist
