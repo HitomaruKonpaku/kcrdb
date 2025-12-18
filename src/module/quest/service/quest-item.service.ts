@@ -158,18 +158,11 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
     entities: QuestItem[],
     extra?: QuestItemExtra,
   ) {
-    if (extra?.extend === undefined) {
+    if (!extra?.extend?.length) {
       return
     }
 
-    const keys = Array.isArray(extra.extend)
-      ? extra.extend
-      : extra.extend.split(',')
-    if (!keys.length) {
-      return
-    }
-
-    if (keys.includes('origins')) {
+    if (extra.extend.includes('origins')) {
       await this.userAgentService.attachOrigins(entities, 'quest_item')
     }
   }

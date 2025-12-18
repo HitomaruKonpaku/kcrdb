@@ -1,14 +1,16 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
 import { IsOptional } from 'class-validator'
+import { ToArray } from '../../../shared/decorator/to-array.decorator'
 
 export class QuestExtra {
   @IsOptional()
+  @ToArray()
   @ApiPropertyOptional({
     description: `
 Fields:
 - <code>origins</code>
 - <code>clearItems</code>
-    `,
+    `.trim(),
     default: null,
     examples: {
       default: {
@@ -29,5 +31,5 @@ Fields:
       },
     },
   })
-  extend?: string
+  extend?: string[]
 }
