@@ -86,6 +86,7 @@ export class QuestFilter {
   @IsOptional()
   @ToArray()
   @ApiPropertyOptional({
+    type: 'string',
     description: `
 Order by fields, separated by comma (<code>,</code>)
 <br>

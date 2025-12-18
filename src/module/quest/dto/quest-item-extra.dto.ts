@@ -6,10 +6,11 @@ export class QuestItemExtra {
   @IsOptional()
   @ToArray()
   @ApiPropertyOptional({
+    type: 'string',
     description: `
 Fields:
 - <code>origins</code>
-    `.trim(),
+    `,
     default: null,
     examples: {
       default: {
