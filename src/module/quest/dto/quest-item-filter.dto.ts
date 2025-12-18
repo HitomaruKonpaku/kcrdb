@@ -2,16 +2,21 @@ import { ApiPropertyOptional } from '@nestjs/swagger'
 import { IsInt, IsOptional } from 'class-validator'
 import { ToArray } from '../../../shared/decorator/to-array.decorator'
 import { ToNumber } from '../../../shared/decorator/to-number.decorator'
+import { getPropertyNumberArrayDescription } from '../constant/quest.constant'
 
 export class QuestItemFilter {
   @IsOptional()
   @IsInt({ each: true })
   @ToArray()
   @ToNumber()
-  @ApiPropertyOptional({ type: 'number' })
+  @ApiPropertyOptional({
+    type: 'string',
+    description: getPropertyNumberArrayDescription('api_quest_id'),
+  })
   api_quest_id?: number[]
 
   @IsOptional()
+  @ToArray()
   @ApiPropertyOptional({
     description: `
 Order by fields, separated by comma (<code>,</code>)
@@ -36,5 +41,5 @@ Fields:
       },
     },
   })
-  sort?: string
+  sort?: string[]
 }

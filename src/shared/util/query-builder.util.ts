@@ -27,4 +27,39 @@ export class QueryBuilderUtil {
       qb.andWhere(`${qb.alias}.created_at >= :after`, { after: timeFilter.after })
     }
   }
+
+  public static applyQuerySort(
+    qb: SelectQueryBuilder<BaseEntity>,
+    allowFields: string[],
+    sorts?: string[],
+  ) {
+    if (sorts === undefined) {
+      qb.addOrderBy(`${qb.alias}.created_at`, 'DESC')
+      return
+    }
+
+    const allKeys = new Set(allowFields)
+    const sortKeys = new Set()
+
+    sorts.forEach((key) => {
+      let sortKey = key
+      let sortDirection: 'ASC' | 'DESC' = 'ASC'
+
+      if (key.startsWith('-')) {
+        sortKey = key.substring(1)
+        sortDirection = 'DESC'
+      }
+
+      if (!allKeys.has(sortKey)) {
+        return
+      }
+
+      sortKeys.add(sortKey)
+      qb.addOrderBy(`${qb.alias}.${sortKey}`, sortDirection)
+    })
+
+    if (!sortKeys.has('created_at')) {
+      qb.addOrderBy(`${qb.alias}.created_at`, 'DESC')
+    }
+  }
 }

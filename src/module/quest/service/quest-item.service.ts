@@ -119,7 +119,17 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
     const qb = baseQueryBuilder || this.createQueryBuilder()
     this.applyQueryDefaultFilter(qb, filter)
     QueryBuilderUtil.applyQueryTimeFilter(qb, timeFilter)
-    this.applyQuerySort(qb, filter)
+    QueryBuilderUtil.applyQuerySort(
+      qb,
+      [
+        'created_at',
+        'updated_at',
+        'hit',
+        'api_quest_id',
+        'api_select_no',
+      ],
+      filter?.sort,
+    )
     QueryBuilderUtil.applyQueryPaging(qb, paging)
     return qb
   }
@@ -142,50 +152,6 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
         }
       }
     })
-  }
-
-  private applyQuerySort(
-    qb: SelectQueryBuilder<QuestItem>,
-    filter?: QuestItemFilter,
-  ) {
-    if (filter?.sort === undefined) {
-      qb.addOrderBy('qi.created_at', 'DESC')
-      return
-    }
-
-    const allowKeys = new Set([
-      'created_at',
-      'updated_at',
-      'hit',
-      'api_quest_id',
-      'api_select_no',
-    ])
-
-    const sortKeys = new Set()
-    const curKeys = filter.sort.split(',')
-
-    curKeys.forEach((key) => {
-      let sortKey: string
-      let sortDirection: 'ASC' | 'DESC'
-      if (key.startsWith('-')) {
-        sortKey = key.substring(1)
-        sortDirection = 'DESC'
-      } else {
-        sortKey = key
-        sortDirection = 'ASC'
-      }
-
-      if (!allowKeys.has(sortKey)) {
-        return
-      }
-
-      sortKeys.add(sortKey)
-      qb.addOrderBy(`qi.${sortKey}`, sortDirection)
-    })
-
-    if (!sortKeys.has('created_at')) {
-      qb.addOrderBy('qi.created_at', 'DESC')
-    }
   }
 
   private async applyJoin(

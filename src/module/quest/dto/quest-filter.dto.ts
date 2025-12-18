@@ -1,36 +1,41 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
-import { Type } from 'class-transformer'
 import { IsBoolean, IsInt, IsOptional } from 'class-validator'
 import { ToArray } from '../../../shared/decorator/to-array.decorator'
 import { ToBoolean } from '../../../shared/decorator/to-boolean.decorator'
 import { ToNumber } from '../../../shared/decorator/to-number.decorator'
-import { QUEST_IS_MOD_DESC, QUEST_IS_SUS_DESC, QUEST_IS_VERIFIED_DESC } from '../constant/quest.constant'
+import { getPropertyNumberArrayDescription, QUEST_IS_MOD_DESC, QUEST_IS_SUS_DESC, QUEST_IS_VERIFIED_DESC } from '../constant/quest.constant'
 
 export class QuestFilter {
   @IsOptional()
   @IsInt({ each: true })
   @ToArray()
   @ToNumber()
-  @ApiPropertyOptional({ type: 'number' })
+  @ApiPropertyOptional({
+    type: 'string',
+    description: getPropertyNumberArrayDescription('api_no'),
+  })
   api_no?: number[]
 
   @IsOptional()
-  @IsInt()
-  @Type(() => Number)
-  @ApiPropertyOptional()
-  api_category?: number
+  @IsInt({ each: true })
+  @ToArray()
+  @ToNumber()
+  @ApiPropertyOptional({ type: 'string' })
+  api_category?: number[]
 
   @IsOptional()
-  @IsInt()
-  @Type(() => Number)
-  @ApiPropertyOptional()
-  api_type?: number
+  @IsInt({ each: true })
+  @ToArray()
+  @ToNumber()
+  @ApiPropertyOptional({ type: 'string' })
+  api_type?: number[]
 
   @IsOptional()
-  @IsInt()
-  @Type(() => Number)
-  @ApiPropertyOptional()
-  api_label_type?: number
+  @IsInt({ each: true })
+  @ToArray()
+  @ToNumber()
+  @ApiPropertyOptional({ type: 'string' })
+  api_label_type?: number[]
 
   @IsOptional()
   @ApiPropertyOptional()
@@ -41,16 +46,18 @@ export class QuestFilter {
   api_detail?: string
 
   @IsOptional()
-  @IsInt()
-  @Type(() => Number)
-  @ApiPropertyOptional()
-  api_voice_id?: number
+  @IsInt({ each: true })
+  @ToArray()
+  @ToNumber()
+  @ApiPropertyOptional({ type: 'string' })
+  api_voice_id?: number[]
 
   @IsOptional()
-  @IsInt()
-  @Type(() => Number)
-  @ApiPropertyOptional()
-  api_bonus_flag?: number
+  @IsInt({ each: true })
+  @ToArray()
+  @ToNumber()
+  @ApiPropertyOptional({ type: 'string' })
+  api_bonus_flag?: number[]
 
   @IsOptional()
   @IsBoolean()
@@ -77,6 +84,7 @@ export class QuestFilter {
   is_mod?: boolean
 
   @IsOptional()
+  @ToArray()
   @ApiPropertyOptional({
     description: `
 Order by fields, separated by comma (<code>,</code>)
@@ -109,5 +117,5 @@ Fields:
       },
     },
   })
-  sort?: string
+  sort?: string[]
 }

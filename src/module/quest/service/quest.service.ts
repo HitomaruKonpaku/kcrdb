@@ -1,5 +1,3 @@
-/* eslint-disable quotes */
-
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { In, SelectQueryBuilder } from 'typeorm'
 import { BaseService } from '../../../shared/base/base.service'
@@ -152,7 +150,25 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     this.applyQueryApiExistFilter(qb, filter)
     this.applyQueryDefaultFilter(qb, filter)
     QueryBuilderUtil.applyQueryTimeFilter(qb, timeFilter)
-    this.applyQuerySort(qb, filter)
+    QueryBuilderUtil.applyQuerySort(
+      qb,
+      [
+        'created_at',
+        'updated_at',
+        'hit',
+        'is_verified',
+        'is_sus',
+        'is_mod',
+        'api_no',
+        'api_category',
+        'api_type',
+        'api_label_type',
+        'api_voice_id',
+        'api_bonus_flag',
+        'has_api_select_rewards',
+      ],
+      filter?.sort,
+    )
     QueryBuilderUtil.applyQueryPaging(qb, paging)
     return qb
   }
@@ -225,58 +241,6 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
         qb.andWhere(`q.${key} = :${key}`, { [key]: filter[key] })
       }
     })
-  }
-
-  private applyQuerySort(
-    qb: SelectQueryBuilder<Quest>,
-    filter?: QuestFilter,
-  ) {
-    if (filter?.sort === undefined) {
-      qb.addOrderBy('q.created_at', 'DESC')
-      return
-    }
-
-    const allowKeys = new Set([
-      'created_at',
-      'updated_at',
-      'hit',
-      'is_verified',
-      'is_sus',
-      'is_mod',
-      'api_no',
-      'api_category',
-      'api_type',
-      'api_label_type',
-      'api_voice_id',
-      'api_bonus_flag',
-      'has_api_select_rewards',
-    ])
-
-    const sortKeys = new Set()
-    const curKeys = filter.sort.split(',')
-
-    curKeys.forEach((key) => {
-      let sortKey: string
-      let sortDirection: 'ASC' | 'DESC'
-      if (key.startsWith('-')) {
-        sortKey = key.substring(1)
-        sortDirection = 'DESC'
-      } else {
-        sortKey = key
-        sortDirection = 'ASC'
-      }
-
-      if (!allowKeys.has(sortKey)) {
-        return
-      }
-
-      sortKeys.add(sortKey)
-      qb.addOrderBy(`q.${sortKey}`, sortDirection)
-    })
-
-    if (!sortKeys.has('created_at')) {
-      qb.addOrderBy('q.created_at', 'DESC')
-    }
   }
 
   private async applyJoin(
