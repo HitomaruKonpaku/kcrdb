@@ -114,14 +114,9 @@ export class AdminService {
         isMod: false,
       })
 
-    const api_no = (q?.api_no ?? '')
-      .split(',')
-      .map((v) => Number(v))
-      .filter((v) => !Number.isNaN(v))
-
-    if (api_no.length) {
+    if (q?.api_no?.length) {
       query
-        .andWhere('api_no IN (:...api_no)', { api_no })
+        .andWhere('api_no IN (:...api_no)', { api_no: q.api_no })
         .andWhere(new Brackets((qb) => {
           qb
             .orWhere('isSus = TRUE')

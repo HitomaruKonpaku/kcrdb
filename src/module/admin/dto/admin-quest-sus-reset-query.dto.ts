@@ -1,8 +1,17 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
-import { IsOptional } from 'class-validator'
+import { IsInt, IsOptional } from 'class-validator'
+import { ToArray } from '../../../shared/decorator/to-array.decorator'
+import { ToNumber } from '../../../shared/decorator/to-number.decorator'
+import { getPropertyNumberArrayDescription } from '../../quest/constant/quest.constant'
 
 export class AdminQuestSusResetQuery {
   @IsOptional()
-  @ApiPropertyOptional()
-  api_no?: string
+  @IsInt({ each: true })
+  @ToArray()
+  @ToNumber()
+  @ApiPropertyOptional({
+    type: 'string',
+    description: getPropertyNumberArrayDescription('api_no'),
+  })
+  api_no?: number[]
 }
