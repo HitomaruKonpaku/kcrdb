@@ -1,11 +1,9 @@
 import { Transform } from 'class-transformer'
+import { BooleanUtil } from '../util/boolean.util'
 
 export const ToBoolean = () => Transform(({ value }) => {
-  const dict = {
-    1: true,
-    0: false,
-    true: true,
-    false: false,
+  if (Array.isArray(value)) {
+    return value.map((v) => BooleanUtil.parse(v))
   }
-  return dict[value]
+  return BooleanUtil.parse(value)
 })

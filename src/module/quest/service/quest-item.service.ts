@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { In, SelectQueryBuilder } from 'typeorm'
 import { BaseService } from '../../../shared/base/base.service'
 import { PagingDto } from '../../../shared/dto/paging.dto'
+import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
 import { CryptoUtil } from '../../../shared/util/crypto.util'
 import { QueryBuilderUtil } from '../../../shared/util/query-builder.util'
 import { UserAgentService } from '../../user-agent/service/user-agent.service'
@@ -24,11 +25,12 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
   public async getAll(
     paging?: PagingDto,
     filter?: QuestItemFilter,
+    timeFilter?: TimeFilterDto,
     extra?: QuestItemExtra,
   ) {
     const qb = this.createQueryBuilder()
     qb.addSelect('qi.updatedAt')
-    this.initQueryBuilder(paging, filter, qb)
+    this.initQueryBuilder(paging, filter, timeFilter, qb)
     const [items, total] = await qb.getManyAndCount()
     await this.applyJoin(items, extra)
     return {
@@ -111,10 +113,13 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
   private initQueryBuilder(
     paging?: PagingDto,
     filter?: QuestItemFilter,
+    timeFilter?: TimeFilterDto,
     baseQueryBuilder?: SelectQueryBuilder<QuestItem>,
   ): SelectQueryBuilder<QuestItem> {
     const qb = baseQueryBuilder || this.createQueryBuilder()
     this.applyQueryDefaultFilter(qb, filter)
+    QueryBuilderUtil.applyQueryTimeFilter(qb, timeFilter)
+    this.applyQuerySort(qb, filter)
     QueryBuilderUtil.applyQueryPaging(qb, paging)
     return qb
   }
@@ -128,9 +133,59 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
     ]
     keys.forEach((key) => {
       if (filter && filter[key] !== undefined) {
-        qb.andWhere(`qi.${key} = :${key}`, { [key]: filter[key] })
+        if (Array.isArray(filter[key])) {
+          if (filter[key].length) {
+            qb.andWhere(`qi.${key} IN (:...${key})`, { [key]: filter[key] })
+          }
+        } else {
+          qb.andWhere(`qi.${key} = :${key}`, { [key]: filter[key] })
+        }
       }
     })
+  }
+
+  private applyQuerySort(
+    qb: SelectQueryBuilder<QuestItem>,
+    filter?: QuestItemFilter,
+  ) {
+    if (filter?.sort === undefined) {
+      qb.addOrderBy('qi.created_at', 'DESC')
+      return
+    }
+
+    const allowKeys = new Set([
+      'created_at',
+      'updated_at',
+      'hit',
+      'api_quest_id',
+      'api_select_no',
+    ])
+
+    const sortKeys = new Set()
+    const curKeys = filter.sort.split(',')
+
+    curKeys.forEach((key) => {
+      let sortKey: string
+      let sortDirection: 'ASC' | 'DESC'
+      if (key.startsWith('-')) {
+        sortKey = key.substring(1)
+        sortDirection = 'DESC'
+      } else {
+        sortKey = key
+        sortDirection = 'ASC'
+      }
+
+      if (!allowKeys.has(sortKey)) {
+        return
+      }
+
+      sortKeys.add(sortKey)
+      qb.addOrderBy(`qi.${sortKey}`, sortDirection)
+    })
+
+    if (!sortKeys.has('created_at')) {
+      qb.addOrderBy('qi.created_at', 'DESC')
+    }
   }
 
   private async applyJoin(

@@ -6,6 +6,7 @@ import { DataCacheUrlInterceptor } from '../../../interceptor/data-cache-url.int
 import { DataHitHashInterceptor } from '../../../interceptor/data-hit-hash.interceptor'
 import { ApiPaginatedResponse } from '../../../shared/decorator/pagination.decorator'
 import { PagingDto } from '../../../shared/dto/paging.dto'
+import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
 import { QuestItemCreate } from '../dto/quest-item-create.dto'
 import { QuestItemExtra } from '../dto/quest-item-extra.dto'
 import { QuestItemFilter } from '../dto/quest-item-filter.dto'
@@ -26,9 +27,10 @@ export class QuestItemController {
   getAll(
     @Query() paging: PagingDto,
     @Query() filter: QuestItemFilter,
+    @Query() timeFilter: TimeFilterDto,
     @Query() extra: QuestItemExtra,
   ) {
-    return this.service.getAll(paging, filter, extra)
+    return this.service.getAll(paging, filter, timeFilter, extra)
   }
 
   @Post()

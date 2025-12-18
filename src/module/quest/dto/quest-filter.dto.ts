@@ -1,15 +1,18 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
 import { IsBoolean, IsInt, IsOptional } from 'class-validator'
+import { ToArray } from '../../../shared/decorator/to-array.decorator'
 import { ToBoolean } from '../../../shared/decorator/to-boolean.decorator'
+import { ToNumber } from '../../../shared/decorator/to-number.decorator'
 import { QUEST_IS_MOD_DESC, QUEST_IS_SUS_DESC, QUEST_IS_VERIFIED_DESC } from '../constant/quest.constant'
 
 export class QuestFilter {
   @IsOptional()
-  @IsInt()
-  @Type(() => Number)
-  @ApiPropertyOptional()
-  api_no?: number
+  @IsInt({ each: true })
+  @ToArray()
+  @ToNumber()
+  @ApiPropertyOptional({ type: 'number' })
+  api_no?: number[]
 
   @IsOptional()
   @IsInt()
@@ -82,6 +85,7 @@ Default <code>ASC</code>, add <code>-</code> for <code>DESC</code>
 <br>
 Fields:
 - <code>created_at</code>
+- <code>updated_at</code>
 - <code>hit</code>
 - <code>is_verified</code>
 - <code>is_sus</code>
@@ -92,6 +96,7 @@ Fields:
 - <code>api_label_type</code>
 - <code>api_voice_id</code>
 - <code>api_bonus_flag</code>
+- <code>has_api_select_rewards</code>
     `,
     examples: {
       default: {

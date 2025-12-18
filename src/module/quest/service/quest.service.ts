@@ -151,7 +151,7 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     this.applyQueryApiTextFilter(qb, filter)
     this.applyQueryApiExistFilter(qb, filter)
     this.applyQueryDefaultFilter(qb, filter)
-    this.applyQueryTimeFilter(qb, timeFilter)
+    QueryBuilderUtil.applyQueryTimeFilter(qb, timeFilter)
     this.applyQuerySort(qb, filter)
     QueryBuilderUtil.applyQueryPaging(qb, paging)
     return qb
@@ -171,7 +171,13 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     ]
     keys.forEach((key) => {
       if (filter && filter[key] !== undefined) {
-        qb.andWhere(`q.${key} = :${key}`, { [key]: filter[key] })
+        if (Array.isArray(filter[key])) {
+          if (filter[key].length) {
+            qb.andWhere(`q.${key} IN (:...${key})`, { [key]: filter[key] })
+          }
+        } else {
+          qb.andWhere(`q.${key} = :${key}`, { [key]: filter[key] })
+        }
       }
     })
   }
@@ -221,18 +227,6 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     })
   }
 
-  private applyQueryTimeFilter(
-    qb: SelectQueryBuilder<Quest>,
-    timeFilter?: TimeFilterDto,
-  ) {
-    if (timeFilter?.before !== undefined) {
-      qb.andWhere('q.created_at <= :before', { before: timeFilter.before })
-    }
-    if (timeFilter?.after !== undefined) {
-      qb.andWhere('q.created_at >= :after', { after: timeFilter.after })
-    }
-  }
-
   private applyQuerySort(
     qb: SelectQueryBuilder<Quest>,
     filter?: QuestFilter,
@@ -255,6 +249,7 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
       'api_label_type',
       'api_voice_id',
       'api_bonus_flag',
+      'has_api_select_rewards',
     ])
 
     const sortKeys = new Set()
