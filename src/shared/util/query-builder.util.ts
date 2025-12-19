@@ -38,24 +38,33 @@ export class QueryBuilderUtil {
       return
     }
 
+    const regex = /^([+-]{0,1})([\w]+)([+-]{0,1})$/
     const allKeys = new Set(allowFields)
     const sortKeys = new Set()
 
     sorts.forEach((key) => {
-      let sortKey = key
-      let sortDirection: 'ASC' | 'DESC' = 'ASC'
-
-      if (key.startsWith('-')) {
-        sortKey = key.substring(1)
-        sortDirection = 'DESC'
+      const matchArr = key.match(regex)
+      if (!matchArr) {
+        return
       }
 
+      const sortKey = matchArr[2]
+      let sortDirection: 'ASC' | 'DESC' = 'ASC'
+      let sortNulls: 'NULLS FIRST' | 'NULLS LAST' = 'NULLS LAST'
       if (!allKeys.has(sortKey)) {
         return
       }
 
+      if (matchArr[1] === '-') {
+        sortDirection = 'DESC'
+      }
+
+      if (matchArr[3] === '-') {
+        sortNulls = 'NULLS FIRST'
+      }
+
+      qb.addOrderBy(`${qb.alias}.${sortKey}`, sortDirection, sortNulls)
       sortKeys.add(sortKey)
-      qb.addOrderBy(`${qb.alias}.${sortKey}`, sortDirection)
     })
 
     if (!sortKeys.has('created_at')) {
