@@ -1,21 +1,11 @@
 /* eslint-disable quotes */
 
 import { Column, Entity, Index } from 'typeorm'
-import { BaseEntity } from '../../../shared/base/base.entity'
-import { BigIntTransformer } from '../../../shared/transformer/bigint.transformer'
+import { KcsapiEntity } from '../../../shared/kcsapi/kcsapi.entity'
 import { QuestApi } from '../dto/quest-api.dto'
 
 @Entity({ name: 'quest' })
-export class Quest extends BaseEntity {
-  @Column({ name: 'hash', type: 'varchar', unique: true, select: false })
-  hash: string
-
-  @Column({ name: 'data', type: 'json' })
-  data: QuestApi
-
-  @Column({ name: 'hit', type: 'bigint', nullable: true, default: 0, transformer: BigIntTransformer })
-  hit?: number
-
+export class Quest extends KcsapiEntity<QuestApi> {
   @Column({ name: 'is_verified', type: 'boolean', default: false })
   isVerified?: boolean
 

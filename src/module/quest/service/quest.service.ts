@@ -3,8 +3,8 @@ import { In, SelectQueryBuilder } from 'typeorm'
 import { BaseService } from '../../../shared/base/base.service'
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
-import { CryptoUtil } from '../../../shared/util/crypto.util'
 import { IdUtil } from '../../../shared/util/id.util'
+import { ObjectUtil } from '../../../shared/util/object.util'
 import { QueryBuilderUtil } from '../../../shared/util/query-builder.util'
 import { UserAgentService } from '../../user-agent/service/user-agent.service'
 import { QuestCreate } from '../dto/quest-create.dto'
@@ -115,14 +115,7 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
       }
     })
 
-    const hashObj = hashFields.reduce((obj, key) => {
-      if (key in data) {
-        Object.assign(obj, { [key]: data[key] })
-      }
-      return obj
-    }, {})
-
-    const hash = CryptoUtil.hash(JSON.stringify(hashObj))
+    const hash = ObjectUtil.hash(data, hashFields)
     const quest: Partial<Quest> = {
       id: IdUtil.generate(),
       hash,

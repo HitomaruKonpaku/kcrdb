@@ -3,7 +3,7 @@ import { In, SelectQueryBuilder } from 'typeorm'
 import { BaseService } from '../../../shared/base/base.service'
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
-import { CryptoUtil } from '../../../shared/util/crypto.util'
+import { ObjectUtil } from '../../../shared/util/object.util'
 import { QueryBuilderUtil } from '../../../shared/util/query-builder.util'
 import { UserAgentService } from '../../user-agent/service/user-agent.service'
 import { QuestItemCreate } from '../dto/quest-item-create.dto'
@@ -46,14 +46,7 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
       'data',
     ]
 
-    const hashObj = hashFields.reduce((obj, key) => {
-      if (key in body) {
-        Object.assign(obj, { [key]: body[key] })
-      }
-      return obj
-    }, {})
-
-    const hash = CryptoUtil.hash(JSON.stringify(hashObj))
+    const hash = ObjectUtil.hash(body, hashFields)
     let res = await this.repository.findOneBy({ hash })
     if (res) {
       res.hash = hash
