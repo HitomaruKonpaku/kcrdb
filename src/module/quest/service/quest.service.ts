@@ -35,7 +35,7 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     extra?: QuestExtra,
   ) {
     const qb = this.createQueryBuilder()
-    qb.addSelect('q.updatedAt')
+    qb.addSelect(`${qb.alias}.updatedAt`)
     this.initQueryBuilder(paging, filter, timeFilter, qb)
     const [items, total] = await qb.getManyAndCount()
     await this.applyJoin(items, extra)
@@ -51,7 +51,7 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     timeFilter?: TimeFilterDto,
   ) {
     const qb = this.initQueryBuilder(paging, filter, timeFilter)
-    qb.select('q.data')
+    qb.select(`${qb.alias}.data`)
     const [items, total] = await qb.getManyAndCount()
     return {
       total,

@@ -3,9 +3,27 @@ import { IsOptional } from 'class-validator'
 import { ApiPropertyNumberArray } from '../../../shared/decorator/api-property-number-array.decorator'
 import { ToArray } from '../../../shared/decorator/to-array.decorator'
 
-export class QuestItemFilter {
-  @ApiPropertyNumberArray('api_quest_id')
-  api_quest_id?: number[]
+export class RemodelSlotFilter {
+  @ApiPropertyNumberArray('flag_ship_id')
+  flag_ship_id?: number[]
+
+  @ApiPropertyNumberArray('helper_ship_id')
+  helper_ship_id?: number[]
+
+  @ApiPropertyNumberArray('day')
+  day?: number[]
+
+  @ApiPropertyNumberArray('api_id')
+  api_id?: number[]
+
+  @ApiPropertyNumberArray('api_slot_id')
+  api_slot_id?: number[]
+
+  @ApiPropertyNumberArray('api_slot_level')
+  api_slot_level?: number[]
+
+  @ApiPropertyNumberArray('api_certain_flag')
+  api_certain_flag?: number[]
 
   @IsOptional()
   @ToArray()
@@ -20,17 +38,11 @@ Fields:
 - <code>created_at</code>
 - <code>updated_at</code>
 - <code>hit</code>
-- <code>api_quest_id</code>
-- <code>api_select_no</code>
     `,
     examples: {
       default: {
         value: '-created_at',
         summary: 'default',
-      },
-      api_no: {
-        value: 'api_quest_id,api_select_no',
-        summary: 'api_quest_id',
       },
     },
   })

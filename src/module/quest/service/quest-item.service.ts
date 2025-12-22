@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { In, SelectQueryBuilder } from 'typeorm'
-import { BaseService } from '../../../shared/base/base.service'
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
-import { ObjectUtil } from '../../../shared/util/object.util'
+import { KcsapiService } from '../../../shared/kcsapi/kcsapi.service'
 import { QueryBuilderUtil } from '../../../shared/util/query-builder.util'
 import { UserAgentService } from '../../user-agent/service/user-agent.service'
 import { QuestItemCreate } from '../dto/quest-item-create.dto'
@@ -14,7 +13,7 @@ import { Quest } from '../model/quest.entity'
 import { QuestItemRepository } from '../repository/quest-item.repository'
 
 @Injectable()
-export class QuestItemService extends BaseService<QuestItem, QuestItemRepository> {
+export class QuestItemService extends KcsapiService<QuestItem, QuestItemRepository> {
   constructor(
     public readonly repository: QuestItemRepository,
     private readonly userAgentService: UserAgentService,
@@ -29,7 +28,7 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
     extra?: QuestItemExtra,
   ) {
     const qb = this.createQueryBuilder()
-    qb.addSelect('qi.updatedAt')
+    qb.addSelect(`${qb.alias}.updatedAt`)
     this.initQueryBuilder(paging, filter, timeFilter, qb)
     const [items, total] = await qb.getManyAndCount()
     await this.applyJoin(items, extra)
@@ -45,20 +44,7 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
       'api_select_no',
       'data',
     ]
-
-    const hash = ObjectUtil.hash(body, hashFields)
-    let res = await this.repository.findOneBy({ hash })
-    if (res) {
-      res.hash = hash
-      return res
-    }
-
-    const tmp: Partial<QuestItem> = {
-      ...body,
-      hash,
-    }
-    res = await this.insertLoop(tmp)
-    res.hash = hash
+    const res = super.createOneWithHashFields(body, hashFields)
     return res
   }
 
@@ -114,6 +100,7 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
     QueryBuilderUtil.applyQueryMatchFilter(
       qb,
       [
+        'state',
         'api_quest_id',
       ],
       filter,
@@ -123,6 +110,7 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
       [
         'created_at',
         'updated_at',
+        'state',
         'hit',
         'api_quest_id',
         'api_select_no',

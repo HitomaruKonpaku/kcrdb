@@ -1,5 +1,8 @@
 import { QuestItem } from '../module/quest/model/quest-item.entity'
 import { Quest } from '../module/quest/model/quest.entity'
+import { RemodelSlot } from '../module/remodel/model/remodel-slot.entity'
+import { RemodelSlotlistDetail } from '../module/remodel/model/remodel-slotlist-detail.entity'
+import { RemodelSlotlist } from '../module/remodel/model/remodel-slotlist.entity'
 import { Replay } from '../module/replay/model/replay.entity'
 import { Simulator } from '../module/simulator/model/simulator.entity'
 import { Token } from '../module/token/model/token.entity'
@@ -12,6 +15,9 @@ export const ENTITIES = [
   Simulator,
   Quest,
   QuestItem,
+  RemodelSlotlist,
+  RemodelSlotlistDetail,
+  RemodelSlot,
 
   UserAgent,
 

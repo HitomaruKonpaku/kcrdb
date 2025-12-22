@@ -1,45 +1,25 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
-import { IsBoolean, IsInt, IsOptional } from 'class-validator'
+import { IsBoolean, IsOptional } from 'class-validator'
+import { ApiPropertyNumberArray } from '../../../shared/decorator/api-property-number-array.decorator'
 import { ToArray } from '../../../shared/decorator/to-array.decorator'
 import { ToBoolean } from '../../../shared/decorator/to-boolean.decorator'
-import { ToNumber } from '../../../shared/decorator/to-number.decorator'
-import { ApiPropertyKcsapiState } from '../../../shared/kcsapi/kcsapi-state.decorator'
+import { ApiPropertyKcsapiStateArray } from '../../../shared/kcsapi/kcsapi-state-array.decorator'
 import { KcsapiState } from '../../../shared/kcsapi/kcsapi-state.enum'
-import { getPropertyNumberArrayDescription } from '../constant/quest.constant'
 
 export class QuestFilter {
-  @ApiPropertyKcsapiState()
-  state?: KcsapiState
+  @ApiPropertyKcsapiStateArray()
+  state?: KcsapiState[]
 
-  @IsOptional()
-  @IsInt({ each: true })
-  @ToArray()
-  @ToNumber()
-  @ApiPropertyOptional({
-    type: 'string',
-    description: getPropertyNumberArrayDescription('api_no'),
-  })
+  @ApiPropertyNumberArray('api_no')
   api_no?: number[]
 
-  @IsOptional()
-  @IsInt({ each: true })
-  @ToArray()
-  @ToNumber()
-  @ApiPropertyOptional({ type: 'string' })
+  @ApiPropertyNumberArray()
   api_category?: number[]
 
-  @IsOptional()
-  @IsInt({ each: true })
-  @ToArray()
-  @ToNumber()
-  @ApiPropertyOptional({ type: 'string' })
+  @ApiPropertyNumberArray()
   api_type?: number[]
 
-  @IsOptional()
-  @IsInt({ each: true })
-  @ToArray()
-  @ToNumber()
-  @ApiPropertyOptional({ type: 'string' })
+  @ApiPropertyNumberArray()
   api_label_type?: number[]
 
   @IsOptional()
@@ -50,18 +30,10 @@ export class QuestFilter {
   @ApiPropertyOptional()
   api_detail?: string
 
-  @IsOptional()
-  @IsInt({ each: true })
-  @ToArray()
-  @ToNumber()
-  @ApiPropertyOptional({ type: 'string' })
+  @ApiPropertyNumberArray()
   api_voice_id?: number[]
 
-  @IsOptional()
-  @IsInt({ each: true })
-  @ToArray()
-  @ToNumber()
-  @ApiPropertyOptional({ type: 'string' })
+  @ApiPropertyNumberArray()
   api_bonus_flag?: number[]
 
   @IsOptional()
