@@ -129,11 +129,6 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     return quest
   }
 
-  private createQueryBuilder() {
-    const qb = this.repository.repository.createQueryBuilder('q')
-    return qb
-  }
-
   private initQueryBuilder(
     paging?: PagingDto,
     filter?: QuestFilter,

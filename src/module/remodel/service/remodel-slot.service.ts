@@ -47,11 +47,6 @@ export class RemodelSlotService extends KcsapiService<RemodelSlot, RemodelSlotRe
     return res
   }
 
-  private createQueryBuilder() {
-    const qb = this.repository.repository.createQueryBuilder('rs')
-    return qb
-  }
-
   private initQueryBuilder(
     paging?: PagingDto,
     filter?: RemodelSlotFilter,

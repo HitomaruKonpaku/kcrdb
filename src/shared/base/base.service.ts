@@ -77,4 +77,9 @@ export abstract class BaseService<E extends BaseEntity, R extends BaseRepository
       throw new NotFoundException()
     }
   }
+
+  protected createQueryBuilder(alias: string = 'r') {
+    const qb = this.repository.repository.createQueryBuilder(alias)
+    return qb
+  }
 }

@@ -18,7 +18,7 @@ export class RemodelSlotCreate {
   @ApiProperty()
   api_id: number
 
-  @IsInt() 2
+  @IsInt()
   @ApiProperty()
   api_slot_id: number
 

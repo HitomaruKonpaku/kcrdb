@@ -84,11 +84,6 @@ export class QuestItemService extends KcsapiService<QuestItem, QuestItemReposito
     })
   }
 
-  private createQueryBuilder() {
-    const qb = this.repository.repository.createQueryBuilder('qi')
-    return qb
-  }
-
   private initQueryBuilder(
     paging?: PagingDto,
     filter?: QuestItemFilter,
