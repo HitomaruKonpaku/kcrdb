@@ -1,10 +1,10 @@
 /* eslint-disable camelcase */
-/* eslint-disable quotes */
 
 import { Injectable } from '@nestjs/common'
 import { Cron } from '@nestjs/schedule'
 import axios from 'axios'
 import { Brackets, DataSource } from 'typeorm'
+import { KcsapiState } from '../../../shared/kcsapi/kcsapi-state.enum'
 import { Logger } from '../../../shared/logger'
 import { IdUtil } from '../../../shared/util/id.util'
 import { Quest } from '../../quest/model/quest.entity'
@@ -57,10 +57,8 @@ export class AdminService {
       await this.dataSource.transaction(async (manager) => {
         await manager.createQueryBuilder()
           .update(Quest)
-          .set({ isVerified: true })
-          .andWhere('isVerified = FALSE')
-          .andWhere('isSus = FALSE')
-          .andWhere('isMod = FALSE')
+          .set({ state: KcsapiState.VERIFIED })
+          .andWhere('state = :state', { state: KcsapiState.NEW })
           .andWhere(new Brackets((qb) => {
             items.forEach((item, i) => {
               const api_no_key = `api_no_${i}`
@@ -78,10 +76,8 @@ export class AdminService {
 
         await manager.createQueryBuilder()
           .update(Quest)
-          .set({ isSus: true })
-          .andWhere('isVerified = FALSE')
-          .andWhere('isSus = FALSE')
-          .andWhere('isMod = FALSE')
+          .set({ state: KcsapiState.SUS })
+          .andWhere('state = :state', { state: KcsapiState.NEW })
           .andWhere('api_no IN (:...api_no)', { api_no: items.map((v) => v.api_no) })
           .execute()
       })
@@ -95,12 +91,8 @@ export class AdminService {
   public async confirmSusQuest() {
     const query = this.dataSource.createQueryBuilder()
       .update(Quest)
-      .set({
-        isVerified: false,
-        isSus: false,
-        isMod: true,
-      })
-      .andWhere('isSus = TRUE')
+      .set({ state: KcsapiState.MODDED })
+      .andWhere('state = :state', { state: KcsapiState.SUS })
 
     await query.execute()
   }
@@ -108,22 +100,14 @@ export class AdminService {
   public async resetSusQuest(q: AdminQuestSusResetQuery) {
     const query = this.dataSource.createQueryBuilder()
       .update(Quest)
-      .set({
-        isVerified: false,
-        isSus: false,
-        isMod: false,
-      })
+      .set({ state: KcsapiState.NEW })
 
     if (q?.api_no?.length) {
       query
+        .andWhere('state IN (:...state)', { state: [KcsapiState.SUS, KcsapiState.MODDED] })
         .andWhere('api_no IN (:...api_no)', { api_no: q.api_no })
-        .andWhere(new Brackets((qb) => {
-          qb
-            .orWhere('isSus = TRUE')
-            .orWhere('isMod = TRUE')
-        }))
     } else {
-      query.andWhere('isSus = TRUE')
+      query.andWhere('state = :state', { state: KcsapiState.SUS })
     }
 
     await query.execute()
@@ -132,9 +116,7 @@ export class AdminService {
   private async notifyUnknownQuests() {
     const quests = await this.dataSource
       .createQueryBuilder(Quest, 'q')
-      .andWhere('q.isVerified = FALSE')
-      .andWhere('q.isSus = FALSE')
-      .andWhere('q.isMod = FALSE')
+      .andWhere('q.state = :state', { state: KcsapiState.NEW })
       .getMany()
 
     if (!quests.length) {

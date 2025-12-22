@@ -24,14 +24,14 @@ export class AdminController {
 
   @Post('quest/sus/confirm')
   @HttpCode(200)
-  @ApiOperation({ description: 'Confirm quest <code>is_mod</code>' })
+  @ApiOperation({ description: 'Update quest <code>state</code> to <code>MODDED</code>' })
   confirmSusQuest() {
     return this.service.confirmSusQuest()
   }
 
   @Post('quest/sus/reset')
   @HttpCode(200)
-  @ApiOperation({ description: 'Reset quest <code>is_sus</code>/<code>is_mod</code>' })
+  @ApiOperation({ description: 'Reset quest <code>state</code> to <code>NEW</code>' })
   resetSusQuest(
     @Query() q: AdminQuestSusResetQuery,
   ) {

@@ -6,15 +6,6 @@ import { QuestApi } from '../dto/quest-api.dto'
 
 @Entity({ name: 'quest' })
 export class Quest extends KcsapiEntity<QuestApi> {
-  @Column({ name: 'is_verified', type: 'boolean', default: false })
-  isVerified?: boolean
-
-  @Column({ name: 'is_sus', type: 'boolean', default: false })
-  isSus?: boolean
-
-  @Column({ name: 'is_mod', type: 'boolean', default: false })
-  isMod?: boolean
-
   @Column({
     name: 'api_no',
     type: 'int',

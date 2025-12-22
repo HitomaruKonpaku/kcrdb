@@ -28,6 +28,36 @@ export class QueryBuilderUtil {
     }
   }
 
+  public static applyQueryMatchFilter(
+    qb: SelectQueryBuilder<BaseEntity>,
+    allowFields: string[],
+    filter?: Record<string, any>,
+  ) {
+    allowFields.forEach((key) => {
+      if (filter && filter[key] !== undefined) {
+        if (Array.isArray(filter[key])) {
+          if (filter[key].length) {
+            qb.andWhere(`${qb.alias}.${key} IN (:...${key})`, { [key]: filter[key] })
+          }
+        } else {
+          qb.andWhere(`${qb.alias}.${key} = :${key}`, { [key]: filter[key] })
+        }
+      }
+    })
+  }
+
+  public static applyQueryLikeFilter(
+    qb: SelectQueryBuilder<BaseEntity>,
+    allowFields: string[],
+    filter?: Record<string, any>,
+  ) {
+    allowFields.forEach((key) => {
+      if (filter && filter[key] !== undefined) {
+        qb.andWhere(`q.${key} ILIKE :${key}`, { [key]: `%${filter[key]}%` })
+      }
+    })
+  }
+
   public static applyQuerySort(
     qb: SelectQueryBuilder<BaseEntity>,
     allowFields: string[],

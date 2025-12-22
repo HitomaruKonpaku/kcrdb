@@ -3,6 +3,7 @@ import { In, SelectQueryBuilder } from 'typeorm'
 import { BaseService } from '../../../shared/base/base.service'
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
+import { KcsapiState } from '../../../shared/kcsapi/kcsapi-state.enum'
 import { IdUtil } from '../../../shared/util/id.util'
 import { ObjectUtil } from '../../../shared/util/object.util'
 import { QueryBuilderUtil } from '../../../shared/util/query-builder.util'
@@ -120,7 +121,9 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
       id: IdUtil.generate(),
       hash,
       data,
-      isSus: this.questSusService.isSus(data),
+      state: this.questSusService.isSus(data)
+        ? KcsapiState.SUS
+        : KcsapiState.NEW,
     }
 
     return quest
@@ -138,20 +141,36 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     baseQueryBuilder?: SelectQueryBuilder<Quest>,
   ): SelectQueryBuilder<Quest> {
     const qb = baseQueryBuilder || this.createQueryBuilder()
-    this.applyQueryApiNumberFilter(qb, filter)
-    this.applyQueryApiTextFilter(qb, filter)
-    this.applyQueryApiExistFilter(qb, filter)
-    this.applyQueryDefaultFilter(qb, filter)
     QueryBuilderUtil.applyQueryTimeFilter(qb, timeFilter)
+    QueryBuilderUtil.applyQueryMatchFilter(
+      qb,
+      [
+        'state',
+        'api_no',
+        'api_category',
+        'api_type',
+        'api_label_type',
+        'api_voice_id',
+        'api_bonus_flag',
+        'has_api_select_rewards',
+      ],
+      filter,
+    )
+    QueryBuilderUtil.applyQueryLikeFilter(
+      qb,
+      [
+        'api_title',
+        'api_detail',
+      ],
+      filter,
+    )
     QueryBuilderUtil.applyQuerySort(
       qb,
       [
         'created_at',
         'updated_at',
+        'state',
         'hit',
-        'is_verified',
-        'is_sus',
-        'is_mod',
         'api_no',
         'api_category',
         'api_type',
@@ -164,76 +183,6 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     )
     QueryBuilderUtil.applyQueryPaging(qb, paging)
     return qb
-  }
-
-  private applyQueryApiNumberFilter(
-    qb: SelectQueryBuilder<Quest>,
-    filter?: QuestFilter,
-  ) {
-    const keys = [
-      'api_no',
-      'api_category',
-      'api_type',
-      'api_label_type',
-      'api_voice_id',
-      'api_bonus_flag',
-    ]
-    keys.forEach((key) => {
-      if (filter && filter[key] !== undefined) {
-        if (Array.isArray(filter[key])) {
-          if (filter[key].length) {
-            qb.andWhere(`q.${key} IN (:...${key})`, { [key]: filter[key] })
-          }
-        } else {
-          qb.andWhere(`q.${key} = :${key}`, { [key]: filter[key] })
-        }
-      }
-    })
-  }
-
-  private applyQueryApiTextFilter(
-    qb: SelectQueryBuilder<Quest>,
-    filter?: QuestFilter,
-  ) {
-    const keys = [
-      'api_title',
-      'api_detail',
-    ]
-    keys.forEach((key) => {
-      if (filter && filter[key] !== undefined) {
-        qb.andWhere(`q.${key} ILIKE :${key}`, { [key]: `%${filter[key]}%` })
-      }
-    })
-  }
-
-  private applyQueryApiExistFilter(
-    qb: SelectQueryBuilder<Quest>,
-    filter?: QuestFilter,
-  ) {
-    const keys = [
-      'has_api_select_rewards',
-    ]
-    keys.forEach((key) => {
-      if (filter && filter[key] !== undefined) {
-        qb.andWhere(`q.${key} = :${key}`, { [key]: filter[key] })
-      }
-    })
-  }
-
-  private applyQueryDefaultFilter(
-    qb: SelectQueryBuilder<Quest>,
-    filter?: QuestFilter,
-  ) {
-    const keys = [
-      'is_verified',
-      'is_sus',
-      'is_mod',
-    ]
-    keys.forEach((key) => {
-      if (filter && filter[key] !== undefined) {
-        qb.andWhere(`q.${key} = :${key}`, { [key]: filter[key] })
-      }
-    })
   }
 
   private async applyJoin(

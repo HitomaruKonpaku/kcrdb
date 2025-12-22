@@ -3,9 +3,14 @@ import { IsBoolean, IsInt, IsOptional } from 'class-validator'
 import { ToArray } from '../../../shared/decorator/to-array.decorator'
 import { ToBoolean } from '../../../shared/decorator/to-boolean.decorator'
 import { ToNumber } from '../../../shared/decorator/to-number.decorator'
-import { getPropertyNumberArrayDescription, QUEST_IS_MOD_DESC, QUEST_IS_SUS_DESC, QUEST_IS_VERIFIED_DESC } from '../constant/quest.constant'
+import { ApiPropertyKcsapiState } from '../../../shared/kcsapi/kcsapi-state.decorator'
+import { KcsapiState } from '../../../shared/kcsapi/kcsapi-state.enum'
+import { getPropertyNumberArrayDescription } from '../constant/quest.constant'
 
 export class QuestFilter {
+  @ApiPropertyKcsapiState()
+  state?: KcsapiState
+
   @IsOptional()
   @IsInt({ each: true })
   @ToArray()
@@ -66,24 +71,6 @@ export class QuestFilter {
   has_api_select_rewards?: boolean
 
   @IsOptional()
-  @IsBoolean()
-  @ToBoolean()
-  @ApiPropertyOptional({ description: QUEST_IS_VERIFIED_DESC })
-  is_verified?: boolean
-
-  @IsOptional()
-  @IsBoolean()
-  @ToBoolean()
-  @ApiPropertyOptional({ description: QUEST_IS_SUS_DESC })
-  is_sus?: boolean
-
-  @IsOptional()
-  @IsBoolean()
-  @ToBoolean()
-  @ApiPropertyOptional({ description: QUEST_IS_MOD_DESC })
-  is_mod?: boolean
-
-  @IsOptional()
   @ToArray()
   @ApiPropertyOptional({
     type: 'string',
@@ -95,10 +82,8 @@ Default <code>ASC</code>, add <code>-</code> for <code>DESC</code>
 Fields:
 - <code>created_at</code>
 - <code>updated_at</code>
+- <code>state</code>
 - <code>hit</code>
-- <code>is_verified</code>
-- <code>is_sus</code>
-- <code>is_mod</code>
 - <code>api_no</code>
 - <code>api_category</code>
 - <code>api_type</code>

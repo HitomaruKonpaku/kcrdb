@@ -110,8 +110,14 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
     baseQueryBuilder?: SelectQueryBuilder<QuestItem>,
   ): SelectQueryBuilder<QuestItem> {
     const qb = baseQueryBuilder || this.createQueryBuilder()
-    this.applyQueryDefaultFilter(qb, filter)
     QueryBuilderUtil.applyQueryTimeFilter(qb, timeFilter)
+    QueryBuilderUtil.applyQueryMatchFilter(
+      qb,
+      [
+        'api_quest_id',
+      ],
+      filter,
+    )
     QueryBuilderUtil.applyQuerySort(
       qb,
       [
@@ -125,26 +131,6 @@ export class QuestItemService extends BaseService<QuestItem, QuestItemRepository
     )
     QueryBuilderUtil.applyQueryPaging(qb, paging)
     return qb
-  }
-
-  private applyQueryDefaultFilter(
-    qb: SelectQueryBuilder<QuestItem>,
-    filter?: QuestItemFilter,
-  ) {
-    const keys = [
-      'api_quest_id',
-    ]
-    keys.forEach((key) => {
-      if (filter && filter[key] !== undefined) {
-        if (Array.isArray(filter[key])) {
-          if (filter[key].length) {
-            qb.andWhere(`qi.${key} IN (:...${key})`, { [key]: filter[key] })
-          }
-        } else {
-          qb.andWhere(`qi.${key} = :${key}`, { [key]: filter[key] })
-        }
-      }
-    })
   }
 
   private async applyJoin(
