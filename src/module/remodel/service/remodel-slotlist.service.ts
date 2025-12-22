@@ -44,7 +44,7 @@ export class RemodelSlotlistService extends KcsapiService<RemodelSlotlist, Remod
   }
 
   private createQueryBuilder() {
-    const qb = this.repository.repository.createQueryBuilder('rs')
+    const qb = this.repository.repository.createQueryBuilder('rsl')
     return qb
   }
 
@@ -63,10 +63,6 @@ export class RemodelSlotlistService extends KcsapiService<RemodelSlotlist, Remod
         'flag_ship_id',
         'helper_ship_id',
         'day',
-        'api_id',
-        'api_slot_id',
-        'api_slot_level',
-        'api_certain_flag',
       ],
       filter,
     )
