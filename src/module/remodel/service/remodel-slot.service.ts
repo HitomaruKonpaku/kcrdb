@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+
 import { Injectable } from '@nestjs/common'
 import { ModuleRef } from '@nestjs/core'
 import { SelectQueryBuilder } from 'typeorm'
@@ -5,7 +7,7 @@ import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
 import { KcsapiService } from '../../../shared/kcsapi/kcsapi.service'
 import { QueryBuilderUtil } from '../../../shared/util/query-builder.util'
-import { RemodelSlotlistCreate } from '../dto/remodel-slotlist-create.dto'
+import { RemodelSlotCreate } from '../dto/remodel-slot-create.dto'
 import { RemodelSlotFilter } from '../dto/remodel-slotlist-filter.dto'
 import { RemodelSlot } from '../model/remodel-slot.entity'
 import { RemodelSlotRepository } from '../repository/remodel-slot.repository'
@@ -34,7 +36,7 @@ export class RemodelSlotService extends KcsapiService<RemodelSlot, RemodelSlotRe
     }
   }
 
-  public async create(body: RemodelSlotlistCreate) {
+  public async create(body: RemodelSlotCreate) {
     const hashFields = [
       'flag_ship_id',
       'helper_ship_id',
@@ -45,6 +47,22 @@ export class RemodelSlotService extends KcsapiService<RemodelSlot, RemodelSlotRe
       // 'api_certain_flag',
       'data',
     ]
+
+    // Remove user related data
+    if (body.data) {
+      if (body.data.api_after_slot) {
+        delete body.data.api_after_slot.api_id
+        delete body.data.api_after_slot.api_locked
+        delete body.data.api_after_slot.api_alv
+      }
+      if (body.data.api_use_slot_id) {
+        if (Array.isArray(body.data.api_use_slot_id)) {
+          body.data.api_use_slot_num = body.data.api_use_slot_id.length
+        }
+        delete body.data.api_use_slot_id
+      }
+    }
+
     const res = super.createOneWithHashFields(body, hashFields)
     return res
   }

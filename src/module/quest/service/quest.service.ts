@@ -1,13 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
+import { ModuleRef } from '@nestjs/core'
 import { In, SelectQueryBuilder } from 'typeorm'
-import { BaseService } from '../../../shared/base/base.service'
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
 import { KcsapiState } from '../../../shared/kcsapi/kcsapi-state.enum'
+import { KcsapiService } from '../../../shared/kcsapi/kcsapi.service'
 import { IdUtil } from '../../../shared/util/id.util'
 import { ObjectUtil } from '../../../shared/util/object.util'
 import { QueryBuilderUtil } from '../../../shared/util/query-builder.util'
-import { UserAgentService } from '../../user-agent/service/user-agent.service'
 import { QuestCreate } from '../dto/quest-create.dto'
 import { QuestExtra } from '../dto/quest-extra.dto'
 import { QuestFilter } from '../dto/quest-filter.dto'
@@ -18,14 +18,14 @@ import { QuestItemService } from './quest-item.service'
 import { QuestSusService } from './quest-sus.service'
 
 @Injectable()
-export class QuestService extends BaseService<Quest, QuestRepository> {
+export class QuestService extends KcsapiService<Quest, QuestRepository> {
   constructor(
     public readonly repository: QuestRepository,
-    private readonly userAgentService: UserAgentService,
+    public readonly moduleRef: ModuleRef,
     private readonly questItemService: QuestItemService,
     private readonly questSusService: QuestSusService,
   ) {
-    super(repository)
+    super(repository, moduleRef)
   }
 
   public async getAll(
@@ -180,19 +180,13 @@ export class QuestService extends BaseService<Quest, QuestRepository> {
     return qb
   }
 
-  private async applyJoin(
+  public async applyJoin(
     entities: Quest[],
     extra?: QuestExtra,
   ) {
-    if (!extra?.extend?.length) {
-      return
-    }
+    await super.applyJoin(entities, extra)
 
-    if (extra.extend.includes('origins')) {
-      await this.userAgentService.attachOrigins(entities, 'quest')
-    }
-
-    if (extra.extend.includes('clearItems')) {
+    if (extra?.extend?.includes('clearItems')) {
       await this.questItemService.attachClearItems(entities)
     }
   }

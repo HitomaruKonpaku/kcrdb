@@ -29,6 +29,6 @@ export class RemodelSlotlistDetailCreate {
   api_slot_level: number
 
   @IsObject()
-  @ApiProperty()
-  data: object
+  @ApiProperty({ type: Object })
+  data: Record<string, any>
 }

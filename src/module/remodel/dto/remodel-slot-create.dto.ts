@@ -34,6 +34,6 @@ export class RemodelSlotCreate {
   api_certain_flag?: number
 
   @IsObject()
-  @ApiProperty()
-  data: object
+  @ApiProperty({ type: Object })
+  data: Record<string, any>
 }
