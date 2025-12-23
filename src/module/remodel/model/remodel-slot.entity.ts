@@ -12,6 +12,6 @@ export class RemodelSlot extends RemodelBase<any> {
   @Column({ name: 'api_slot_level', type: 'smallint' })
   api_slot_level: number
 
-  @Column({ name: 'api_certain_flag', type: 'smallint' })
-  api_certain_flag: number
+  @Column({ name: 'api_certain_flag', type: 'smallint', nullable: true })
+  api_certain_flag?: number
 }

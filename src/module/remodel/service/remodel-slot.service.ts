@@ -40,7 +40,7 @@ export class RemodelSlotService extends KcsapiService<RemodelSlot, RemodelSlotRe
       'api_id',
       'api_slot_id',
       'api_slot_level',
-      'api_certain_flag',
+      // 'api_certain_flag',
       'data',
     ]
     const res = super.createOneWithHashFields(body, hashFields)

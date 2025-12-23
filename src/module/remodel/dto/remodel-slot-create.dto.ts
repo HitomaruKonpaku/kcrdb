@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger'
-import { IsInt, IsObject } from 'class-validator'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { IsInt, IsObject, IsOptional, Max, Min } from 'class-validator'
 
 export class RemodelSlotCreate {
   @IsInt()
@@ -11,6 +11,8 @@ export class RemodelSlotCreate {
   helper_ship_id: number
 
   @IsInt()
+  @Min(0)
+  @Max(6)
   @ApiProperty()
   day: number
 
@@ -26,9 +28,10 @@ export class RemodelSlotCreate {
   @ApiProperty()
   api_slot_level: number
 
+  @IsOptional()
   @IsInt()
-  @ApiProperty()
-  api_certain_flag: number
+  @ApiPropertyOptional()
+  api_certain_flag?: number
 
   @IsObject()
   @ApiProperty()

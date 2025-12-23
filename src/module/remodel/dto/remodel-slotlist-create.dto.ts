@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsInt, IsObject } from 'class-validator'
+import { IsInt, IsObject, Max, Min } from 'class-validator'
 
 export class RemodelSlotlistCreate {
   @IsInt()
@@ -11,6 +11,8 @@ export class RemodelSlotlistCreate {
   helper_ship_id: number
 
   @IsInt()
+  @Min(0)
+  @Max(6)
   @ApiProperty()
   day: number
 
