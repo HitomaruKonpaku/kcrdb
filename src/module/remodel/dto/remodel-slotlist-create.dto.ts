@@ -13,7 +13,7 @@ export class RemodelSlotlistCreate {
   @IsInt()
   @Min(0)
   @Max(6)
-  @ApiProperty()
+  @ApiProperty({ minimum: 0, maximum: 6 })
   day: number
 
   @IsObject({ each: true })

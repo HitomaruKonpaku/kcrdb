@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common'
+import { ModuleRef } from '@nestjs/core'
 import { In, SelectQueryBuilder } from 'typeorm'
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
 import { KcsapiService } from '../../../shared/kcsapi/kcsapi.service'
 import { QueryBuilderUtil } from '../../../shared/util/query-builder.util'
-import { UserAgentService } from '../../user-agent/service/user-agent.service'
 import { QuestItemCreate } from '../dto/quest-item-create.dto'
 import { QuestItemExtra } from '../dto/quest-item-extra.dto'
 import { QuestItemFilter } from '../dto/quest-item-filter.dto'
@@ -16,9 +16,9 @@ import { QuestItemRepository } from '../repository/quest-item.repository'
 export class QuestItemService extends KcsapiService<QuestItem, QuestItemRepository> {
   constructor(
     public readonly repository: QuestItemRepository,
-    private readonly userAgentService: UserAgentService,
+    public readonly moduleRef: ModuleRef,
   ) {
-    super(repository)
+    super(repository, moduleRef)
   }
 
   public async getAll(
@@ -114,18 +114,5 @@ export class QuestItemService extends KcsapiService<QuestItem, QuestItemReposito
     )
     QueryBuilderUtil.applyQueryPaging(qb, paging)
     return qb
-  }
-
-  private async applyJoin(
-    entities: QuestItem[],
-    extra?: QuestItemExtra,
-  ) {
-    if (!extra?.extend?.length) {
-      return
-    }
-
-    if (extra.extend.includes('origins')) {
-      await this.userAgentService.attachOrigins(entities, 'quest_item')
-    }
   }
 }

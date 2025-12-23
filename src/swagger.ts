@@ -13,6 +13,7 @@ export function setupSwagger<T>(app: INestApplication<T>) {
     .addTag('simulator')
     .addTag('quest')
     .addTag('quest-item')
+    .addTag('remodel')
     .addTag('kcsapi')
     .addApiKey(
       {

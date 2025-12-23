@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { ModuleRef } from '@nestjs/core'
 import { SelectQueryBuilder } from 'typeorm'
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
@@ -13,8 +14,9 @@ import { RemodelSlotRepository } from '../repository/remodel-slot.repository'
 export class RemodelSlotService extends KcsapiService<RemodelSlot, RemodelSlotRepository> {
   constructor(
     public readonly repository: RemodelSlotRepository,
+    public readonly moduleRef: ModuleRef,
   ) {
-    super(repository)
+    super(repository, moduleRef)
   }
 
   public async getAll(

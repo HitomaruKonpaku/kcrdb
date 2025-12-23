@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Query, UseInterceptors } from '@nestjs/common'
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger'
+import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { SourceName } from '../../../decorator/source-name.decorator'
 import { TrackUserAgent } from '../../../decorator/track-user-agent.decorator'
 import { DataHitHashInterceptor } from '../../../interceptor/data-hit-hash.interceptor'
@@ -31,6 +31,9 @@ export class RemodelSlotController {
   @Post()
   @UseInterceptors(DataHitHashInterceptor)
   @TrackUserAgent()
+  @ApiOperation({
+    tags: ['remodel', 'kcsapi'],
+  })
   @ApiCreatedResponse({ type: RemodelSlotCreate })
   create(
     @Body() body: RemodelSlotCreate,
