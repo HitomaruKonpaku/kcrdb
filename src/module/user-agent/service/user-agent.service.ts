@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import { In } from 'typeorm'
 import { BaseEntity } from '../../../shared/base/base.entity'
 import { BaseService } from '../../../shared/base/base.service'
 import { UserAgent } from '../model/user-agent.entity'
@@ -18,31 +17,14 @@ export class UserAgentService extends BaseService<UserAgent, UserAgentRepository
     sourceName: string,
     mapToProperty = 'origins',
   ) {
-    if (!entities?.length || !mapToProperty || !sourceName) {
+    if (!entities?.length || !sourceName || !mapToProperty) {
       return
     }
 
-    const items = await this.repository.repository.find({
-      select: [
-        'sourceId',
-        'raw',
-        'origin',
-        'xOrigin',
-        'xVersion',
-        'hit',
-      ],
-      where: {
-        sourceName,
-        sourceId: In(entities.map((v) => v.id).filter((v) => v)),
-      },
-      order: {
-        hit: 'DESC',
-        raw: 'ASC',
-        origin: { direction: 'ASC', nulls: 'LAST' },
-        xOrigin: { direction: 'ASC', nulls: 'LAST' },
-        xVersion: { direction: 'ASC', nulls: 'LAST' },
-      },
-    })
+    const items = await this.repository.findBySource(
+      sourceName,
+      entities.map((v) => v.id).filter((v) => v),
+    )
 
     entities.forEach((entity) => {
       // eslint-disable-next-line no-param-reassign

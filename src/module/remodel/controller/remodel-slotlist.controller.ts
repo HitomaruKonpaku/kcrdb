@@ -6,6 +6,7 @@ import { DataHitHashInterceptor } from '../../../interceptor/data-hit-hash.inter
 import { ApiPaginatedResponse } from '../../../shared/decorator/pagination.decorator'
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
+import { RemodelExtra } from '../dto/remodel-extra.dto'
 import { RemodelSlotlistCreate } from '../dto/remodel-slotlist-create.dto'
 import { RemodelSlotlistFilter } from '../dto/remodel-slotlist-detail-filter.dto'
 import { RemodelSlotlistService } from '../service/remodel-slotlist.service'
@@ -24,14 +25,16 @@ export class RemodelSlotlistController {
     @Query() paging: PagingDto,
     @Query() filter: RemodelSlotlistFilter,
     @Query() timeFilter: TimeFilterDto,
+    @Query() extra: RemodelExtra,
   ) {
-    return this.service.getAll(paging, filter, timeFilter)
+    return this.service.getAll(paging, filter, timeFilter, extra)
   }
 
   @Post()
   @UseInterceptors(DataHitHashInterceptor)
   @TrackUserAgent()
   @ApiOperation({
+    description: '<code>/kcsapi/api_req_kousyou/remodel_slotlist</code> response data',
     tags: ['remodel', 'kcsapi'],
   })
   @ApiCreatedResponse({ type: RemodelSlotlistCreate })

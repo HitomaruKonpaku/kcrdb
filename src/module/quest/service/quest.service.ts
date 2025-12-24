@@ -1,16 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { ModuleRef } from '@nestjs/core'
-import { In, SelectQueryBuilder } from 'typeorm'
-import { PagingDto } from '../../../shared/dto/paging.dto'
-import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
+import { In } from 'typeorm'
 import { KcsapiState } from '../../../shared/kcsapi/kcsapi-state.enum'
 import { KcsapiService } from '../../../shared/kcsapi/kcsapi.service'
 import { IdUtil } from '../../../shared/util/id.util'
 import { ObjectUtil } from '../../../shared/util/object.util'
-import { QueryBuilderUtil } from '../../../shared/util/query-builder.util'
 import { QuestCreate } from '../dto/quest-create.dto'
 import { QuestExtra } from '../dto/quest-extra.dto'
-import { QuestFilter } from '../dto/quest-filter.dto'
 import { QuestApiRoot } from '../interface/quest-api.interface'
 import { Quest } from '../model/quest.entity'
 import { QuestRepository } from '../repository/quest.repository'
@@ -28,48 +24,75 @@ export class QuestService extends KcsapiService<Quest, QuestRepository> {
     super(repository, moduleRef)
   }
 
-  public async getAll(
-    paging?: PagingDto,
-    filter?: QuestFilter,
-    timeFilter?: TimeFilterDto,
-    extra?: QuestExtra,
-  ) {
-    const qb = this.createQueryBuilder()
-    qb.addSelect(`${qb.alias}.updatedAt`)
-    this.initQueryBuilder(paging, filter, timeFilter, qb)
-    const [items, total] = await qb.getManyAndCount()
-    await this.applyJoin(items, extra)
-    return {
-      total,
-      items,
-    }
+  private getCheckFields(): string[] {
+    return [
+      'api_no',
+      'api_category',
+      'api_type',
+      'api_label_type',
+      'api_title',
+      'api_detail',
+    ]
   }
 
-  public async getAllRaw(
-    paging?: PagingDto,
-    filter?: QuestFilter,
-    timeFilter?: TimeFilterDto,
-  ) {
-    const qb = this.initQueryBuilder(paging, filter, timeFilter)
-    qb.select(`${qb.alias}.data`)
-    const [items, total] = await qb.getManyAndCount()
-    return {
-      total,
-      items: items.map((v) => v.data),
-    }
+  protected getHashFields(): string[] {
+    return [
+      ...this.getCheckFields(),
+      'api_voice_id',
+      'api_lost_badges',
+      'api_get_material',
+      'api_select_rewards',
+      'api_bonus_flag',
+    ]
   }
 
-  public async create(body: QuestCreate) {
+  protected getQueryMatchFilterFields(): string[] {
+    return [
+      'state',
+      'api_no',
+      'api_category',
+      'api_type',
+      'api_label_type',
+      'api_voice_id',
+      'api_bonus_flag',
+      'has_api_select_rewards',
+    ]
+  }
+
+  protected getQueryLikeFilterFields(): string[] {
+    return [
+      'api_title',
+      'api_detail',
+    ]
+  }
+
+  protected getQuerySortFields(): string[] {
+    return [
+      'created_at',
+      'updated_at',
+      'state',
+      'hit',
+      'api_no',
+      'api_category',
+      'api_type',
+      'api_label_type',
+      'api_voice_id',
+      'api_bonus_flag',
+      'has_api_select_rewards',
+    ]
+  }
+
+  public async createMany(body: QuestCreate) {
     if (!body.list.length) {
       return {
         total: 0,
       }
     }
 
-    const tmpQuests = body.list.map((data, index) => this.createInputQuest(data, index))
-    await this.repository.insertOrIgnore(tmpQuests)
+    const tmpEntities = body.list.map((data, index) => this.createInputQuest(data, index))
+    await this.repository.insertOrIgnore(tmpEntities)
 
-    const hashes = tmpQuests.map((v) => v.hash).filter((v) => v)
+    const hashes = tmpEntities.map((v) => v.hash).filter((v) => v)
     const [items, total] = await this.repository.repository.findAndCount({
       select: { id: true, hash: true },
       where: { hash: In(hashes) },
@@ -83,23 +106,8 @@ export class QuestService extends KcsapiService<Quest, QuestRepository> {
   }
 
   private createInputQuest(data: QuestApiRoot, index: number): Partial<Quest> {
-    const checkFields = [
-      'api_no',
-      'api_category',
-      'api_type',
-      'api_label_type',
-      'api_title',
-      'api_detail',
-    ]
-
-    const hashFields = [
-      ...checkFields,
-      'api_voice_id',
-      'api_lost_badges',
-      'api_get_material',
-      'api_select_rewards',
-      'api_bonus_flag',
-    ]
+    const checkFields = this.getCheckFields()
+    const hashFields = this.getHashFields()
 
     checkFields.forEach((key) => {
       if (!(key in data)) {
@@ -117,7 +125,7 @@ export class QuestService extends KcsapiService<Quest, QuestRepository> {
     })
 
     const hash = ObjectUtil.hash(data, hashFields)
-    const quest: Partial<Quest> = {
+    const entity: Partial<Quest> = {
       id: IdUtil.generate(),
       hash,
       data,
@@ -126,58 +134,7 @@ export class QuestService extends KcsapiService<Quest, QuestRepository> {
         : KcsapiState.NEW,
     }
 
-    return quest
-  }
-
-  private initQueryBuilder(
-    paging?: PagingDto,
-    filter?: QuestFilter,
-    timeFilter?: TimeFilterDto,
-    baseQueryBuilder?: SelectQueryBuilder<Quest>,
-  ): SelectQueryBuilder<Quest> {
-    const qb = baseQueryBuilder || this.createQueryBuilder()
-    QueryBuilderUtil.applyQueryTimeFilter(qb, timeFilter)
-    QueryBuilderUtil.applyQueryMatchFilter(
-      qb,
-      [
-        'state',
-        'api_no',
-        'api_category',
-        'api_type',
-        'api_label_type',
-        'api_voice_id',
-        'api_bonus_flag',
-        'has_api_select_rewards',
-      ],
-      filter,
-    )
-    QueryBuilderUtil.applyQueryLikeFilter(
-      qb,
-      [
-        'api_title',
-        'api_detail',
-      ],
-      filter,
-    )
-    QueryBuilderUtil.applyQuerySort(
-      qb,
-      [
-        'created_at',
-        'updated_at',
-        'state',
-        'hit',
-        'api_no',
-        'api_category',
-        'api_type',
-        'api_label_type',
-        'api_voice_id',
-        'api_bonus_flag',
-        'has_api_select_rewards',
-      ],
-      filter?.sort,
-    )
-    QueryBuilderUtil.applyQueryPaging(qb, paging)
-    return qb
+    return entity
   }
 
   public async applyJoin(

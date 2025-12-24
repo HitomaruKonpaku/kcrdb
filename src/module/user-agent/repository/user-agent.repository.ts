@@ -1,6 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
-import { DataSource, Repository } from 'typeorm'
+import { DataSource, In, Repository } from 'typeorm'
+import { BaseEntity } from '../../../shared/base/base.entity'
 import { BaseRepository } from '../../../shared/base/base.repository'
 import { Logger } from '../../../shared/logger'
 import { IdUtil } from '../../../shared/util/id.util'
@@ -50,6 +51,38 @@ CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS uq_default ON user_agent (
         skipUpdateIfNoValuesChanged: true,
       },
     )
+    return res
+  }
+
+  public async findBySource(
+    sourceName: string,
+    sourceIds: string[],
+  ): Promise<Omit<Omit<UserAgent, keyof BaseEntity>, 'sourceName'>[]> {
+    if (!sourceName || !sourceIds.length) {
+      return []
+    }
+
+    const res = await this.repository.find({
+      select: [
+        'sourceId',
+        'raw',
+        'origin',
+        'xOrigin',
+        'xVersion',
+        'hit',
+      ],
+      where: {
+        sourceName,
+        sourceId: In(sourceIds),
+      },
+      order: {
+        hit: 'DESC',
+        raw: 'ASC',
+        origin: { direction: 'ASC', nulls: 'LAST' },
+        xOrigin: { direction: 'ASC', nulls: 'LAST' },
+        xVersion: { direction: 'ASC', nulls: 'LAST' },
+      },
+    })
     return res
   }
 }

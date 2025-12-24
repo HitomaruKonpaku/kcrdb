@@ -7,6 +7,10 @@ export abstract class BaseRepository<E extends BaseEntity> {
     public readonly repository: Repository<E>,
   ) { }
 
+  public get tableName() {
+    return this.repository.metadata.tableName
+  }
+
   public async findOneBy(where: FindOptionsWhere<E> | FindOptionsWhere<E>[]) {
     const res = await this.repository.findOneBy(where)
     return res

@@ -16,8 +16,8 @@ export class QueryBuilderUtil {
     }
   }
 
-  public static applyQueryTimeFilter(
-    qb: SelectQueryBuilder<BaseEntity>,
+  public static applyQueryTimeFilter<T extends BaseEntity>(
+    qb: SelectQueryBuilder<T>,
     timeFilter?: TimeFilterDto,
   ) {
     if (timeFilter?.before !== undefined) {
@@ -28,8 +28,8 @@ export class QueryBuilderUtil {
     }
   }
 
-  public static applyQueryMatchFilter(
-    qb: SelectQueryBuilder<BaseEntity>,
+  public static applyQueryMatchFilter<T extends BaseEntity>(
+    qb: SelectQueryBuilder<T>,
     allowFields: string[],
     filter?: Record<string, any>,
   ) {
@@ -46,8 +46,8 @@ export class QueryBuilderUtil {
     })
   }
 
-  public static applyQueryLikeFilter(
-    qb: SelectQueryBuilder<BaseEntity>,
+  public static applyQueryLikeFilter<T extends BaseEntity>(
+    qb: SelectQueryBuilder<T>,
     allowFields: string[],
     filter?: Record<string, any>,
   ) {
@@ -58,8 +58,8 @@ export class QueryBuilderUtil {
     })
   }
 
-  public static applyQuerySort(
-    qb: SelectQueryBuilder<BaseEntity>,
+  public static applyQuerySort<T extends BaseEntity>(
+    qb: SelectQueryBuilder<T>,
     allowFields: string[],
     sorts?: string[],
   ) {

@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Query, UseInterceptors } from '@nestjs/common'
-import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger'
 import { KeyDelete } from '../../../decorator/key-delete.decorator'
 import { SourceName } from '../../../decorator/source-name.decorator'
 import { TrackUserAgent } from '../../../decorator/track-user-agent.decorator'
@@ -9,42 +9,28 @@ import { DataKeyDeleteInterceptor } from '../../../interceptor/data-key-delete.i
 import { ApiPaginatedResponse } from '../../../shared/decorator/pagination.decorator'
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
-import { QuestApi } from '../dto/quest-api.dto'
-import { QuestCreate } from '../dto/quest-create.dto'
-import { QuestExtra } from '../dto/quest-extra.dto'
-import { QuestFilter } from '../dto/quest-filter.dto'
-import { Quest } from '../dto/quest.dto'
-import { QuestService } from '../service/quest.service'
+import { ShipStatsCreate } from '../dto/ship-stats-create.dto'
+import { ShipStatsFilter } from '../dto/ship-stats-filter.dto'
+import { ShipStats } from '../dto/ship-stats.dto'
+import { ShipStatsService } from '../service/ship-stats.service'
 
-@Controller('quests')
-@ApiTags('quest')
-@SourceName('quest')
-export class QuestController {
+@Controller('ship_stats')
+@ApiTags('ship')
+@SourceName('ship_stats')
+export class ShipStatsController {
   constructor(
-    private readonly service: QuestService,
+    private readonly service: ShipStatsService,
   ) { }
 
   @Get()
   @UseInterceptors(DataCacheUrlInterceptor)
-  @ApiPaginatedResponse(Quest)
+  @ApiPaginatedResponse(ShipStats)
   getAll(
     @Query() paging: PagingDto,
-    @Query() filter: QuestFilter,
-    @Query() timeFilter: TimeFilterDto,
-    @Query() extra: QuestExtra,
-  ) {
-    return this.service.getAll(paging, filter, timeFilter, extra)
-  }
-
-  @Get('data')
-  @UseInterceptors(DataCacheUrlInterceptor)
-  @ApiPaginatedResponse(QuestApi)
-  getAllRaw(
-    @Query() paging: PagingDto,
-    @Query() filter: QuestFilter,
+    @Query() filter: ShipStatsFilter,
     @Query() timeFilter: TimeFilterDto,
   ) {
-    return this.service.getAllData(paging, filter, timeFilter)
+    return this.service.getAll(paging, filter, timeFilter)
   }
 
   @Post()
@@ -52,10 +38,6 @@ export class QuestController {
   @TrackUserAgent()
   @UseInterceptors(DataKeyDeleteInterceptor)
   @KeyDelete('hashes')
-  @ApiOperation({
-    description: '<code>/kcsapi/api_get_member/questlist</code> response data',
-    tags: ['quest', 'kcsapi'],
-  })
   @ApiCreatedResponse({
     schema: {
       allOf: [
@@ -74,7 +56,7 @@ export class QuestController {
     },
   })
   create(
-    @Body() body: QuestCreate,
+    @Body() body: ShipStatsCreate,
   ) {
     return this.service.createMany(body)
   }
