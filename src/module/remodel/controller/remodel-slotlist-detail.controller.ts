@@ -6,7 +6,7 @@ import { DataHitHashInterceptor } from '../../../interceptor/data-hit-hash.inter
 import { ApiPaginatedResponse } from '../../../shared/decorator/pagination.decorator'
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
-import { RemodelExtra } from '../dto/remodel-extra.dto'
+import { KcsapiExtraDto } from '../../../shared/kcsapi/dto/kcsapi-extra.dto'
 import { RemodelSlotlistDetailFilter } from '../dto/remodel-slot-filter.dto'
 import { RemodelSlotlistDetailCreate } from '../dto/remodel-slotlist-detail-create.dto'
 import { RemodelSlotlistDetailService } from '../service/remodel-slotlist-detail.service'
@@ -25,7 +25,7 @@ export class RemodelSlotlistDetailController {
     @Query() paging: PagingDto,
     @Query() filter: RemodelSlotlistDetailFilter,
     @Query() timeFilter: TimeFilterDto,
-    @Query() extra: RemodelExtra,
+    @Query() extra: KcsapiExtraDto,
   ) {
     return this.service.getAll(paging, filter, timeFilter, extra)
   }

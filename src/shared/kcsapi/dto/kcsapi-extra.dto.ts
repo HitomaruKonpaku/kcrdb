@@ -2,7 +2,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger'
 import { IsOptional } from 'class-validator'
 import { ToArray } from '../../../shared/decorator/to-array.decorator'
 
-export class RemodelExtra {
+export class KcsapiExtraDto {
   @IsOptional()
   @ToArray()
   @ApiPropertyOptional({

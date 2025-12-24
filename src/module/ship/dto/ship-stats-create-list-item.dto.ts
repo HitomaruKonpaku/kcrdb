@@ -1,5 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsArray, IsBoolean, IsInt, IsObject, IsOptional } from 'class-validator'
+import { Type } from 'class-transformer'
+import { IsArray, IsBoolean, IsInt, IsObject, IsOptional, ValidateNested } from 'class-validator'
+import { ShipStatsEstimation } from './ship-stats-estimation.dto'
 
 export class ShipStatsCreateListItem {
   @IsInt()
@@ -26,6 +28,8 @@ export class ShipStatsCreateListItem {
 
   @IsOptional()
   @IsObject()
+  @ValidateNested()
+  @Type(() => ShipStatsEstimation)
   @ApiPropertyOptional()
-  estimation?: Record<string, any>
+  estimation?: ShipStatsEstimation
 }

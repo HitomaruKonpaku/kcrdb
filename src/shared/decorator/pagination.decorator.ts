@@ -21,3 +21,23 @@ export const ApiPaginatedResponse = <T extends Type<unknown>>(dataType: T) => ap
     },
   }),
 )
+
+export const ApiPaginatedCreatedResponse = () => applyDecorators(
+  ApiOkResponse({
+    schema: {
+      allOf: [
+        {
+          properties: {
+            total: {
+              type: 'number',
+            },
+            items: {
+              type: 'array',
+              items: { type: 'string' },
+            },
+          },
+        },
+      ],
+    },
+  }),
+)

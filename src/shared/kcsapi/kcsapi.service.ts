@@ -7,6 +7,7 @@ import { PagingDto } from '../dto/paging.dto'
 import { TimeFilterDto } from '../dto/time-filter.dto'
 import { ObjectUtil } from '../util/object.util'
 import { QueryBuilderUtil } from '../util/query-builder.util'
+import { KcsapiExtraDto } from './dto/kcsapi-extra.dto'
 import { KcsapiEntity } from './kcsapi.entity'
 
 export abstract class KcsapiService<E extends KcsapiEntity<any>, R extends BaseRepository<E>> extends BaseService<E, R> {
@@ -41,7 +42,7 @@ export abstract class KcsapiService<E extends KcsapiEntity<any>, R extends BaseR
     paging?: PagingDto,
     filter?: Record<string, any>,
     timeFilter?: TimeFilterDto,
-    extra?: Record<string, any>,
+    extra?: KcsapiExtraDto,
   ) {
     const qb = this.createQueryBuilder()
     qb.addSelect(`${qb.alias}.updatedAt`)
@@ -124,7 +125,7 @@ export abstract class KcsapiService<E extends KcsapiEntity<any>, R extends BaseR
 
   protected async applyJoin(
     entities: E[],
-    extra?: { extend?: string[] },
+    extra?: KcsapiExtraDto,
   ) {
     if (extra?.extend?.includes('origins')) {
       await this.userAgentService.attachOrigins(entities, this.repository.tableName)

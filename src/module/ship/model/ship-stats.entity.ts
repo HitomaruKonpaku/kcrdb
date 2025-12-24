@@ -1,5 +1,6 @@
 import { Column, Entity, Index } from 'typeorm'
 import { KcsapiEntity } from '../../../shared/kcsapi/kcsapi.entity'
+import { ShipStatsEstimation } from '../dto/ship-stats-estimation.dto'
 import { ShipStatsType } from '../enum/ship-stats.enum'
 
 @Entity({ name: 'ship_stats' })
@@ -22,5 +23,5 @@ export class ShipStats extends KcsapiEntity<any> {
   slot_empty?: boolean
 
   @Column({ name: 'estimation', type: 'json', nullable: true })
-  estimation?: Record<string, any>
+  estimation?: ShipStatsEstimation
 }

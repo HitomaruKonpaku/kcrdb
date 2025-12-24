@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { KcsapiDto } from '../../../shared/kcsapi/kcsapi.dto'
+import { KcsapiDto } from '../../../shared/kcsapi/dto/kcsapi.dto'
 import { ShipStatsType } from '../enum/ship-stats.enum'
+import { ShipStatsEstimation } from './ship-stats-estimation.dto'
 
 export class ShipStats extends KcsapiDto {
   @ApiProperty()
@@ -22,5 +23,5 @@ export class ShipStats extends KcsapiDto {
   slot_empty: boolean
 
   @ApiPropertyOptional()
-  estimation?: Record<string, any>
+  estimation?: ShipStatsEstimation
 }
