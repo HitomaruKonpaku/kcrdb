@@ -1,10 +1,11 @@
 import { Column, Entity, Index } from 'typeorm'
 import { KcsapiEntity } from '../../../shared/kcsapi/kcsapi.entity'
+import { ShipStatsData } from '../dto/ship-stats-data.dto'
 import { ShipStatsEstimation } from '../dto/ship-stats-estimation.dto'
 import { ShipStatsType } from '../enum/ship-stats.enum'
 
 @Entity({ name: 'ship_stats' })
-export class ShipStats extends KcsapiEntity<any> {
+export class ShipStats extends KcsapiEntity<ShipStatsData> {
   @Index()
   @Column({ name: 'type', type: 'varchar' })
   type: ShipStatsType
