@@ -1,11 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsArray, IsObject, ValidateNested } from 'class-validator'
+import { IsArray, IsObject } from 'class-validator'
 import { QuestApiRoot } from '../interface/quest-api.interface'
 
 export class QuestCreate {
   @IsArray()
   @IsObject({ each: true })
-  @ValidateNested({ each: true })
   @ApiProperty({
     type: [Object],
     description: '<code>api_data.api_list</code> of <code>/kcsapi/api_get_member/questlist</code>',
