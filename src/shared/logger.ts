@@ -1,4 +1,5 @@
 import { ConsoleLogger, LogLevel } from '@nestjs/common'
+import { DateTime } from 'luxon'
 
 export class Logger extends ConsoleLogger {
   protected formatPid(): string {
@@ -15,6 +16,6 @@ export class Logger extends ConsoleLogger {
   }
 
   getTimestamp(): string {
-    return new Date().toISOString()
+    return DateTime.now().toFormat('yyyy-LL-dd HH:mm:ss.SSS Z')
   }
 }

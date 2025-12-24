@@ -6,6 +6,7 @@ import * as compression from 'compression'
 import 'dotenv/config'
 import { join } from 'path'
 import { AppModule } from './app.module'
+import { SwaggerLoggerMiddleware } from './middleware/swagger-logger.middleware'
 import { Logger } from './shared/logger'
 import { setupSwagger } from './swagger'
 import otelSDK from './tracing'
@@ -36,6 +37,11 @@ async function bootstrap() {
 
   app.setBaseViewsDir(join(__dirname, '..', 'view'))
   app.setViewEngine('hbs')
+
+  app.use((req, res, next) => {
+    const middleware = new SwaggerLoggerMiddleware()
+    middleware.use(req, res, next)
+  })
 
   setupSwagger(app)
 
