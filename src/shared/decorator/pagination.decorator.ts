@@ -1,5 +1,5 @@
 import { Type, applyDecorators } from '@nestjs/common'
-import { ApiExtraModels, ApiOkResponse, getSchemaPath } from '@nestjs/swagger'
+import { ApiCreatedResponse, ApiExtraModels, ApiOkResponse, getSchemaPath } from '@nestjs/swagger'
 
 export const ApiPaginatedResponse = <T extends Type<unknown>>(dataType: T) => applyDecorators(
   ApiExtraModels(dataType),
@@ -23,7 +23,7 @@ export const ApiPaginatedResponse = <T extends Type<unknown>>(dataType: T) => ap
 )
 
 export const ApiPaginatedCreatedResponse = () => applyDecorators(
-  ApiOkResponse({
+  ApiCreatedResponse({
     schema: {
       allOf: [
         {
@@ -31,7 +31,7 @@ export const ApiPaginatedCreatedResponse = () => applyDecorators(
             total: {
               type: 'number',
             },
-            items: {
+            ids: {
               type: 'array',
               items: { type: 'string' },
             },
