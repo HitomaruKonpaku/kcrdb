@@ -16,8 +16,9 @@ export class RemodelSlotlistService extends KcsapiService<RemodelSlotlist, Remod
   protected getHashFields(): string[] {
     return [
       'data',
-      'api_quest_id',
-      'api_select_no',
+      'flag_ship_id',
+      'helper_ship_id',
+      'day',
     ]
   }
 
