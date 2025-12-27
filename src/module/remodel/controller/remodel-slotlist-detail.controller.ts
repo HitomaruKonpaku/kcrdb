@@ -7,8 +7,8 @@ import { ApiPaginatedResponse } from '../../../shared/decorator/pagination.decor
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
 import { KcsapiExtraDto } from '../../../shared/kcsapi/dto/kcsapi-extra.dto'
-import { RemodelSlotlistDetailFilter } from '../dto/remodel-slot-filter.dto'
 import { RemodelSlotlistDetailCreate } from '../dto/remodel-slotlist-detail-create.dto'
+import { RemodelSlotlistDetailFilter } from '../dto/remodel-slotlist-detail-filter.dto'
 import { RemodelSlotlistDetailService } from '../service/remodel-slotlist-detail.service'
 
 @Controller('remodel_slotlist_detail')

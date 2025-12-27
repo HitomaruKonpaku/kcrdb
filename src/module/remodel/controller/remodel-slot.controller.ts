@@ -8,7 +8,7 @@ import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
 import { KcsapiExtraDto } from '../../../shared/kcsapi/dto/kcsapi-extra.dto'
 import { RemodelSlotCreate } from '../dto/remodel-slot-create.dto'
-import { RemodelSlotFilter } from '../dto/remodel-slotlist-filter.dto'
+import { RemodelSlotFilter } from '../dto/remodel-slot-filter.dto'
 import { RemodelSlotService } from '../service/remodel-slot.service'
 
 @Controller('remodel_slot')

@@ -3,7 +3,7 @@ import { IsOptional } from 'class-validator'
 import { ApiPropertyNumberArray } from '../../../shared/decorator/api-property-number-array.decorator'
 import { ToArray } from '../../../shared/decorator/to-array.decorator'
 
-export class RemodelSlotlistDetailFilter {
+export class RemodelSlotFilter {
   @ApiPropertyNumberArray('flag_ship_id')
   flag_ship_id?: number[]
 
@@ -21,6 +21,9 @@ export class RemodelSlotlistDetailFilter {
 
   @ApiPropertyNumberArray('api_slot_level')
   api_slot_level?: number[]
+
+  @ApiPropertyNumberArray('api_certain_flag')
+  api_certain_flag?: number[]
 
   @IsOptional()
   @ToArray()
