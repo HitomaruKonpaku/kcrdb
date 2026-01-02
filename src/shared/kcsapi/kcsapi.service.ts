@@ -103,6 +103,7 @@ export abstract class KcsapiService<E extends KcsapiEntity<any>, R extends BaseR
   ): SelectQueryBuilder<E> {
     const qb = baseQueryBuilder || this.createQueryBuilder()
     qb.andWhere(`${qb.alias}.is_active = TRUE`)
+    qb.andWhere(`${qb.alias}.deleted_at ISNULL`)
     QueryBuilderUtil.applyQueryTimeFilter(qb, timeFilter)
 
     let fields = this.getQueryMatchFilterFields()
