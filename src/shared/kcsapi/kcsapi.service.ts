@@ -102,6 +102,7 @@ export abstract class KcsapiService<E extends KcsapiEntity<any>, R extends BaseR
     baseQueryBuilder?: SelectQueryBuilder<E>,
   ): SelectQueryBuilder<E> {
     const qb = baseQueryBuilder || this.createQueryBuilder()
+    qb.andWhere(`${qb.alias}.is_active = TRUE`)
     QueryBuilderUtil.applyQueryTimeFilter(qb, timeFilter)
 
     let fields = this.getQueryMatchFilterFields()
