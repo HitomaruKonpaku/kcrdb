@@ -3,6 +3,15 @@ import { BaseEntity } from '../../../shared/base/base.entity'
 
 @Entity({ name: 'user_agent' })
 export class UserAgent extends BaseEntity {
+  @Column({
+    name: 'hash',
+    type: 'varchar',
+    nullable: true,
+    unique: true,
+    select: false,
+  })
+  hash?: string
+
   @Index()
   @Column({ name: 'source_name', type: 'varchar' })
   sourceName: string

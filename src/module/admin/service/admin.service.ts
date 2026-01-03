@@ -55,7 +55,8 @@ export class AdminService {
 
     try {
       await this.dataSource.transaction(async (manager) => {
-        await manager.createQueryBuilder()
+        await manager
+          .createQueryBuilder()
           .update(Quest)
           .set({ state: KcsapiState.VERIFIED })
           .andWhere('state = :state', { state: KcsapiState.NEW })
@@ -74,7 +75,8 @@ export class AdminService {
           }))
           .execute()
 
-        await manager.createQueryBuilder()
+        await manager
+          .createQueryBuilder()
           .update(Quest)
           .set({ state: KcsapiState.SUS })
           .andWhere('state = :state', { state: KcsapiState.NEW })
@@ -89,7 +91,8 @@ export class AdminService {
   }
 
   public async confirmSusQuest() {
-    const query = this.dataSource.createQueryBuilder()
+    const query = this.dataSource
+      .createQueryBuilder()
       .update(Quest)
       .set({ state: KcsapiState.MODDED })
       .andWhere('state = :state', { state: KcsapiState.SUS })
@@ -98,7 +101,8 @@ export class AdminService {
   }
 
   public async resetSusQuest(q: AdminQuestSusResetQuery) {
-    const query = this.dataSource.createQueryBuilder()
+    const query = this.dataSource
+      .createQueryBuilder()
       .update(Quest)
       .set({ state: KcsapiState.NEW })
 
@@ -142,7 +146,8 @@ export class AdminService {
         const repository = this.dataSource.getRepository(WebhookHistory)
 
         try {
-          await repository.createQueryBuilder()
+          await repository
+            .createQueryBuilder()
             .insert()
             .values({
               id,

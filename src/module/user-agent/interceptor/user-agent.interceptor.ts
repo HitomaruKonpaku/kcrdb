@@ -8,12 +8,14 @@ import {
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { Observable, tap } from 'rxjs'
-import { FindOptionsWhere, IsNull } from 'typeorm'
 import { parseSourceName } from '../../../decorator/source-name.decorator'
 import { Logger } from '../../../shared/logger'
+import { IdUtil } from '../../../shared/util/id.util'
+import { ObjectUtil } from '../../../shared/util/object.util'
 import { RequestUtil } from '../../../shared/util/request.util'
+import { USER_AGENT_UNIQUE_KEYS } from '../constant/user-agent.constant'
 import { UserAgent } from '../model/user-agent.entity'
-import { UserAgentService } from '../service/user-agent.service'
+import { UserAgentRepository } from '../repository/user-agent.repository'
 
 @Injectable()
 export class UserAgentInterceptor implements NestInterceptor {
@@ -21,7 +23,7 @@ export class UserAgentInterceptor implements NestInterceptor {
 
   constructor(
     private readonly reflector: Reflector,
-    private readonly service: UserAgentService,
+    private readonly repository: UserAgentRepository,
   ) { }
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
@@ -52,34 +54,24 @@ export class UserAgentInterceptor implements NestInterceptor {
           return
         }
 
-        try {
-          const items: Partial<UserAgent>[] = sourceIds.map((sourceId) => ({
+        const items: Partial<UserAgent>[] = sourceIds.map((sourceId) => {
+          const obj: Partial<UserAgent> = {
+            id: IdUtil.generate(),
             sourceName,
             sourceId,
             raw,
             origin,
             xOrigin,
             xVersion,
-          }))
+          }
+          obj.hash = ObjectUtil.hash(obj, USER_AGENT_UNIQUE_KEYS)
+          return obj
+        })
 
-          const findItems: FindOptionsWhere<UserAgent>[] = items.map((obj) => {
-            const tmp: FindOptionsWhere<UserAgent> = { ...obj }
-            const keys = Object.keys(tmp)
-            keys.forEach((key) => {
-              if (tmp[key] === undefined || tmp[key] === null) {
-                tmp[key] = IsNull()
-              }
-            })
-            return tmp
-          })
-
-          await this.service.insertOrIgnoreMany(items)
-          await this.service.repository.repository.update(
-            findItems,
-            { hit: () => 'COALESCE(hit, 0) + 1' },
-          )
+        try {
+          await this.repository.insertAndHit(items)
         } catch (error) {
-          this.logger.error(`intercept: ${error.message} | ${JSON.stringify({ error })}`)
+          this.logger.error(`insertAndHit: ${error.message} | ${JSON.stringify({ error })}`)
         }
       }),
     )
