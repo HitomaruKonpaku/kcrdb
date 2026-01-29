@@ -53,7 +53,7 @@ export class QueryBuilderUtil {
   ) {
     allowFields.forEach((key) => {
       if (filter && filter[key] !== undefined) {
-        qb.andWhere(`q.${key} ILIKE :${key}`, { [key]: `%${filter[key]}%` })
+        qb.andWhere(`${qb.alias}.${key} ILIKE :${key}`, { [key]: `%${filter[key]}%` })
       }
     })
   }
