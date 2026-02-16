@@ -60,6 +60,7 @@ export class RemodelSlotService extends KcsapiService<RemodelSlot, RemodelSlotRe
     /* eslint-disable no-param-reassign */
     // Remove user related data
     if (body.data) {
+      delete body.data.api_after_material
       if (body.data.api_after_slot) {
         delete body.data.api_after_slot.api_id
         delete body.data.api_after_slot.api_locked
