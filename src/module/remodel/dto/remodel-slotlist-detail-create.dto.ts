@@ -25,7 +25,9 @@ export class RemodelSlotlistDetailCreate {
   api_slot_id: number
 
   @IsInt()
-  @ApiProperty()
+  @Min(0)
+  @Max(10)
+  @ApiProperty({ minimum: 0, maximum: 10 })
   api_slot_level: number
 
   @IsObject()
