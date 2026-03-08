@@ -53,6 +53,8 @@ export class LoggingInterceptor implements NestInterceptor {
   private getErrorInfo(req: any, error: any) {
     const res = {
       ...this.getBaseInfo(req),
+      ua: req.get('User-Agent'),
+      origin: req.get('Origin'),
       error,
     }
     return res
