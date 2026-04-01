@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { ModuleRef } from '@nestjs/core'
-import { KcsapiService } from '../../../shared/kcsapi/kcsapi.service'
 import { RemodelSlotlistDetail } from '../model/remodel-slotlist-detail.entity'
 import { RemodelSlotlistDetailRepository } from '../repository/remodel-slotlist-detail.repository'
+import { RemodelBaseService } from './remodel.base.service'
 
 @Injectable()
-export class RemodelSlotlistDetailService extends KcsapiService<RemodelSlotlistDetail, RemodelSlotlistDetailRepository> {
+export class RemodelSlotlistDetailService extends RemodelBaseService<RemodelSlotlistDetail, RemodelSlotlistDetailRepository> {
   constructor(
     public readonly repository: RemodelSlotlistDetailRepository,
     public readonly moduleRef: ModuleRef,
@@ -50,5 +50,18 @@ export class RemodelSlotlistDetailService extends KcsapiService<RemodelSlotlistD
       'api_slot_id',
       'api_slot_level',
     ]
+  }
+
+  protected getSlotitemIds(items: RemodelSlotlistDetail[]): number[] {
+    const ids = [...new Set(
+      items
+        .reduce((arr, item) => {
+          arr.push(item.api_slot_id)
+          arr.push(item.data.api_req_slot_id)
+          return arr
+        }, [] as number[])
+        .filter((v) => v),
+    )]
+    return ids
   }
 }

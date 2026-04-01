@@ -3,10 +3,11 @@ import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { SourceName } from '../../../decorator/source-name.decorator'
 import { TrackUserAgent } from '../../../decorator/track-user-agent.decorator'
 import { DataHitHashInterceptor } from '../../../interceptor/data-hit-hash.interceptor'
-import { ApiPaginatedResponse } from '../../../shared/decorator/pagination.decorator'
+import { ApiPaginatedWithMetadataResponse } from '../../../shared/decorator/pagination.decorator'
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
-import { KcsapiExtraDto } from '../../../shared/kcsapi/dto/kcsapi-extra.dto'
+import { RemodelExtraDto } from '../dto/remodel-extra.dto'
+import { RemodelMetadataDto } from '../dto/remodel-metadata.dto'
 import { RemodelSlotCreate } from '../dto/remodel-slot-create.dto'
 import { RemodelSlotFilter } from '../dto/remodel-slot-filter.dto'
 import { RemodelSlotService } from '../service/remodel-slot.service'
@@ -20,12 +21,12 @@ export class RemodelSlotController {
   ) { }
 
   @Get()
-  @ApiPaginatedResponse(RemodelSlotCreate)
+  @ApiPaginatedWithMetadataResponse(RemodelSlotCreate, RemodelMetadataDto)
   getAll(
     @Query() paging: PagingDto,
     @Query() filter: RemodelSlotFilter,
     @Query() timeFilter: TimeFilterDto,
-    @Query() extra: KcsapiExtraDto,
+    @Query() extra: RemodelExtraDto,
   ) {
     return this.service.getAll(paging, filter, timeFilter, extra)
   }

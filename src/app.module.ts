@@ -14,10 +14,10 @@ import { AppService } from './app.service'
 import configuration from './config/configuration'
 import { ENTITIES } from './constant/common.constant'
 import { AdminModule } from './module/admin/admin.module'
+import { MstModule } from './module/mst/mst.module'
 import { QuestModule } from './module/quest/quest.module'
 import { RemodelModule } from './module/remodel/remodel.module'
 import { ReplayModule } from './module/replay/replay.module'
-import { ShipModule } from './module/ship/ship.module'
 import { SimulatorModule } from './module/simulator/simulator.module'
 import { TokenSeenAtInterceptor } from './module/token/interceptor/token-seen-at.interceptor'
 import { TokenModule } from './module/token/token.module'
@@ -100,7 +100,7 @@ import { Logger } from './shared/logger'
     SimulatorModule,
     QuestModule,
     RemodelModule,
-    ShipModule,
+    MstModule,
 
     UserAgentModule,
 

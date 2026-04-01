@@ -3,13 +3,13 @@ import { ModuleRef } from '@nestjs/core'
 import { SelectQueryBuilder } from 'typeorm'
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
-import { KcsapiService } from '../../../shared/kcsapi/kcsapi.service'
 import { RemodelSlotlistFilter } from '../dto/remodel-slotlist-filter.dto'
 import { RemodelSlotlist } from '../model/remodel-slotlist.entity'
 import { RemodelSlotlistRepository } from '../repository/remodel-slotlist.repository'
+import { RemodelBaseService } from './remodel.base.service'
 
 @Injectable()
-export class RemodelSlotlistService extends KcsapiService<RemodelSlotlist, RemodelSlotlistRepository> {
+export class RemodelSlotlistService extends RemodelBaseService<RemodelSlotlist, RemodelSlotlistRepository> {
   constructor(
     public readonly repository: RemodelSlotlistRepository,
     public readonly moduleRef: ModuleRef,
@@ -45,6 +45,20 @@ export class RemodelSlotlistService extends KcsapiService<RemodelSlotlist, Remod
       'helper_ship_id',
       'day',
     ]
+  }
+
+  protected getSlotitemIds(items: RemodelSlotlist[]): number[] {
+    const ids = [...new Set(
+      items
+        .reduce((arr, item) => {
+          item.data.forEach((v) => {
+            arr.push(v.api_slot_id)
+          })
+          return arr
+        }, [] as number[])
+        .filter((v) => v),
+    )]
+    return ids
   }
 
   protected initQueryBuilder(
