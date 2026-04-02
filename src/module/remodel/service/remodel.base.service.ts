@@ -1,4 +1,5 @@
 import { ModuleRef } from '@nestjs/core'
+import { KC_LANG_DEFAULT } from '../../../constant/common.constant'
 import { BaseRepository } from '../../../shared/base/base.repository'
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
@@ -33,7 +34,7 @@ export abstract class RemodelBaseService<E extends RemodelBase<E>, R extends Bas
   ) {
     const res = await super.getAll(paging, filter, timeFilter, extra)
     if (extra?.metadata) {
-      const metadata = await this.getMetadata(res.items)
+      const metadata = await this.getMetadata(res.items, extra?.['metadata.lang'] || KC_LANG_DEFAULT)
       Object.assign(res, { metadata })
     }
     return res
@@ -57,18 +58,26 @@ export abstract class RemodelBaseService<E extends RemodelBase<E>, R extends Bas
     return []
   }
 
-  protected async getMetadata(items: E[]) {
+  protected async getMetadata(items: E[], language: string) {
     const metadata: Record<string, any> = {}
     const shipIds = this.getShipIds(items)
     const slotitemIds = this.getSlotitemIds(items)
 
     await Promise.allSettled([
-      this.getMstShips(shipIds).then((v) => {
-        Object.assign(metadata, { api_mst_ship: v })
-      }),
-      this.getMstSlotitems(slotitemIds).then((v) => {
-        Object.assign(metadata, { api_mst_slotitem: v })
-      }),
+      this.getMstShips(shipIds, language)
+        .then((v) => {
+          Object.assign(metadata, { api_mst_ship: v })
+        })
+        .catch((error) => {
+          console.error(error.message)
+        }),
+      this.getMstSlotitems(slotitemIds, language)
+        .then((v) => {
+          Object.assign(metadata, { api_mst_slotitem: v })
+        })
+        .catch((error) => {
+          console.error(error.message)
+        }),
     ])
 
     const keys = [
@@ -84,22 +93,22 @@ export abstract class RemodelBaseService<E extends RemodelBase<E>, R extends Bas
     return res
   }
 
-  protected async getMstShips(ids: number[]): Promise<MstShip[]> {
+  protected async getMstShips(ids: number[], language: string): Promise<MstShip[]> {
     const keys = [
       'api_id',
       'api_name',
     ]
-    const items = await this.mstShipService.getByIds(ids)
+    const items = await this.mstShipService.getByIds(ids, language)
     const res: any = items.map((v) => keys.reduce((obj, key) => Object.assign(obj, { [key]: v[key] }), {}))
     return res
   }
 
-  protected async getMstSlotitems(ids: number[]): Promise<MstShip[]> {
+  protected async getMstSlotitems(ids: number[], language: string): Promise<MstShip[]> {
     const keys = [
       'api_id',
       'api_name',
     ]
-    const items = await this.mstSlotitemService.getByIds(ids)
+    const items = await this.mstSlotitemService.getByIds(ids, language)
     const res: any = items.map((v) => keys.reduce((obj, key) => Object.assign(obj, { [key]: v[key] }), {}))
     return res
   }

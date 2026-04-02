@@ -1,64 +1,67 @@
-import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager'
 import { ModuleRef } from '@nestjs/core'
-import axios from 'axios'
-import { Logger } from '../../../shared/logger'
-import { MstShip } from '../model/mst-ship.entity'
+import { KC_LANG_DEFAULT } from '../../../constant/common.constant'
+import { DataService } from '../../data/service/data.service'
+import { TranslateService } from '../../translate/service/translate.service'
 import { MstBaseEntity } from '../model/mst.base.entity'
 import { MstBaseRepository } from '../repository/mst.base.repository'
 
 export abstract class MstBaseService<E extends MstBaseEntity, R extends MstBaseRepository<E>> {
-  protected abstract readonly DATA_URL: string
   protected abstract readonly CACHE_KEY: string
-
-  protected readonly logger = new Logger(MstBaseService.name)
+  protected abstract readonly DATA_URL: string
 
   constructor(
     public readonly repository: R,
     public readonly moduleRef: ModuleRef,
   ) { }
 
-  protected get cache(): Cache {
-    return this.moduleRef.get(CACHE_MANAGER, { strict: false })
+  protected get dataService() {
+    return this.moduleRef.get(DataService, { strict: false })
   }
 
-  public async getByIds(ids: number[]): Promise<MstShip[]> {
-    const items = await this.getData()
-    const res = items.filter((v) => ids.includes(v.api_id))
+  protected get translateService() {
+    return this.moduleRef.get(TranslateService, { strict: false })
+  }
+
+  public async getByIds(ids: number[], language: string = KC_LANG_DEFAULT): Promise<E[]> {
+    if (!ids?.length) {
+      return []
+    }
+
+    const items = (!language || language === KC_LANG_DEFAULT)
+      ? await this.getItems()
+      : await this.getItemsByLanguage(language)
+
+    const res = ids.reduce((arr, id) => {
+      if (items[id]) {
+        arr.push(items[id])
+      }
+      return arr
+    }, [] as any[])
+
     return res
   }
 
-  public async getData(): Promise<MstShip[]> {
-    let items: any
+  protected async getItems(): Promise<Record<string, any>> {
+    const items = await this.dataService.getData<Record<string, any>>(
+      this.CACHE_KEY,
+      this.DATA_URL,
+      {
+        transformRemoteResponse: (data: any[]) => {
+          const res = data.reduce((obj, item) => {
+            Object.assign(obj, { [item.api_id]: item })
+            return obj
+          }, {})
+          return res
+        },
+      },
+    )
 
-    if (!items) {
-      try {
-        items = await this.fetchLocalData()
-      } catch (error) {
-        this.logger.warn(`getData#local: ${error.message}`)
-      }
-    }
-
-    if (!items) {
-      try {
-        items = await this.fetchRemoteData()
-        await this.cache.set(this.CACHE_KEY, JSON.stringify(items))
-      } catch (error) {
-        this.logger.warn(`getData#remote: ${error.message}`)
-      }
-    }
-
-    items = items || []
     return items
   }
 
-  public async fetchLocalData() {
-    const tmp = await this.cache.get<string>(this.CACHE_KEY)
-    const data = tmp ? JSON.parse(tmp) : tmp
-    return data
-  }
-
-  public async fetchRemoteData() {
-    const { data } = await axios.get<any[]>(this.DATA_URL)
-    return data
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected async getItemsByLanguage(language: string): Promise<Record<string, any>> {
+    const items = await this.getItems()
+    return items
   }
 }

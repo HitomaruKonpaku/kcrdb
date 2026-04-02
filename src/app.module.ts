@@ -12,8 +12,9 @@ import { OpenTelemetryModule, OpenTelemetryModuleOptions } from 'nestjs-otel'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import configuration from './config/configuration'
-import { ENTITIES } from './constant/common.constant'
+import { ENTITIES } from './constant/entity.constant'
 import { AdminModule } from './module/admin/admin.module'
+import { DataModule } from './module/data/data.module'
 import { MstModule } from './module/mst/mst.module'
 import { QuestModule } from './module/quest/quest.module'
 import { RemodelModule } from './module/remodel/remodel.module'
@@ -21,6 +22,7 @@ import { ReplayModule } from './module/replay/replay.module'
 import { SimulatorModule } from './module/simulator/simulator.module'
 import { TokenSeenAtInterceptor } from './module/token/interceptor/token-seen-at.interceptor'
 import { TokenModule } from './module/token/token.module'
+import { TranslateModule } from './module/translate/translate.module'
 import { UserAgentModule } from './module/user-agent/user-agent.module'
 import { WebhookModule } from './module/webhook/webhook.module'
 import { ErrorInterceptor } from './shared/interceptor/error.interceptor'
@@ -95,6 +97,9 @@ import { Logger } from './shared/logger'
         return opts
       },
     }),
+
+    DataModule,
+    TranslateModule,
 
     ReplayModule,
     SimulatorModule,
