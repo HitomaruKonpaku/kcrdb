@@ -60,8 +60,8 @@ export abstract class RemodelBaseService<E extends RemodelBase<E>, R extends Bas
 
   protected async getMetadata(items: E[], language: string) {
     const metadata: Record<string, any> = {}
-    const shipIds = this.getShipIds(items)
-    const slotitemIds = this.getSlotitemIds(items)
+    const shipIds = this.getShipIds(items).sort((a, b) => a - b)
+    const slotitemIds = this.getSlotitemIds(items).sort((a, b) => a - b)
 
     await Promise.allSettled([
       this.getMstShips(shipIds, language)

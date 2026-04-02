@@ -27,9 +27,14 @@ export abstract class MstBaseService<E extends MstBaseEntity, R extends MstBaseR
       return []
     }
 
-    const items = (!language || language === KC_LANG_DEFAULT)
-      ? await this.getItems()
-      : await this.getItemsByLanguage(language)
+    let items = await this.getItems()
+    if (language !== KC_LANG_DEFAULT) {
+      try {
+        items = await this.getItemsByLanguage(language)
+      } catch (error) {
+        console.warn(error.message)
+      }
+    }
 
     const res = ids.reduce((arr, id) => {
       if (items[id]) {
