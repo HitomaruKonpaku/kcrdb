@@ -24,4 +24,24 @@ Fields:
     },
   })
   extend?: string[]
+
+  @IsOptional()
+  @ApiPropertyOptional()
+  'origin.query'?: string
+
+  @IsOptional()
+  @ApiPropertyOptional()
+  'origin.raw'?: string
+
+  @IsOptional()
+  @ApiPropertyOptional()
+  'origin.origin'?: string
+
+  @IsOptional()
+  @ApiPropertyOptional()
+  'origin.x_origin'?: string
+
+  @IsOptional()
+  @ApiPropertyOptional()
+  'origin.x_version'?: string
 }

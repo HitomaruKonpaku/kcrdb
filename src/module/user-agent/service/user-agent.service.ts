@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { BaseEntity } from '../../../shared/base/base.entity'
 import { BaseService } from '../../../shared/base/base.service'
+import { UAFilter } from '../dto/ua-filter.dto'
 import { UserAgent } from '../model/user-agent.entity'
 import { UserAgentRepository } from '../repository/user-agent.repository'
 
@@ -15,6 +16,7 @@ export class UserAgentService extends BaseService<UserAgent, UserAgentRepository
   public async attachOrigins(
     entities: BaseEntity[],
     sourceName: string,
+    filter?: UAFilter,
     mapToProperty = 'origins',
   ) {
     if (!entities?.length || !sourceName || !mapToProperty) {
@@ -24,6 +26,7 @@ export class UserAgentService extends BaseService<UserAgent, UserAgentRepository
     const items = await this.repository.findBySource(
       sourceName,
       entities.map((v) => v.id).filter((v) => v),
+      filter,
     )
 
     entities.forEach((entity) => {

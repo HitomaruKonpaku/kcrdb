@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { In, Repository } from 'typeorm'
+import { Brackets, In, Repository } from 'typeorm'
 import { BaseEntity } from '../../../shared/base/base.entity'
 import { BaseRepository } from '../../../shared/base/base.repository'
 import { Logger } from '../../../shared/logger'
+import { QueryBuilderUtil } from '../../../shared/util/query-builder.util'
+import { UAFilter } from '../dto/ua-filter.dto'
 import { UserAgent } from '../model/user-agent.entity'
 
 @Injectable()
@@ -20,32 +22,47 @@ export class UserAgentRepository extends BaseRepository<UserAgent> {
   public async findBySource(
     sourceName: string,
     sourceIds: string[],
+    filter?: UAFilter,
   ): Promise<Omit<Omit<UserAgent, keyof BaseEntity>, 'sourceName'>[]> {
     if (!sourceName || !sourceIds.length) {
       return []
     }
 
-    const res = await this.repository.find({
-      select: [
-        'sourceId',
-        'raw',
-        'origin',
-        'xOrigin',
-        'xVersion',
-        'hit',
-      ],
-      where: {
-        sourceName,
-        sourceId: In(sourceIds),
-      },
-      order: {
-        hit: 'DESC',
-        raw: 'ASC',
-        origin: { direction: 'ASC', nulls: 'LAST' },
-        xOrigin: { direction: 'ASC', nulls: 'LAST' },
-        xVersion: { direction: 'ASC', nulls: 'LAST' },
-      },
-    })
+    const queryFields = [
+      'raw',
+      'origin',
+      'x_origin',
+      'x_version',
+    ]
+
+    const query = this.repository
+      .createQueryBuilder('ua')
+      .select('source_id', 'sourceId')
+      .addSelect('raw')
+      .addSelect('origin')
+      .addSelect('x_origin', 'xOrigin')
+      .addSelect('x_version', 'xVersion')
+      .addSelect('hit')
+      .andWhere('is_active = TRUE')
+      .andWhere('source_name = :sourceName', { sourceName })
+      .andWhere('source_id IN (:...sourceIds)', { sourceIds })
+      .addOrderBy('hit', 'DESC')
+      .addOrderBy('raw', 'ASC')
+      .addOrderBy('origin', 'ASC', 'NULLS LAST')
+      .addOrderBy('x_origin', 'ASC', 'NULLS LAST')
+      .addOrderBy('x_version', 'ASC', 'NULLS LAST')
+
+    QueryBuilderUtil.applyQueryLikeFilter(query, queryFields, filter)
+
+    if (filter?.query) {
+      query.andWhere(new Brackets((qb) => {
+        queryFields.forEach((key) => {
+          qb.orWhere(`${query.alias}.${key} ILIKE :query`, { query: `%${filter.query}%` })
+        })
+      }))
+    }
+
+    const res = await query.getRawMany()
     return res
   }
 

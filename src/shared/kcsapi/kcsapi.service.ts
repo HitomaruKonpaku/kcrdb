@@ -130,7 +130,17 @@ export abstract class KcsapiService<E extends KcsapiEntity<any>, R extends BaseR
     extra?: KcsapiExtraDto,
   ) {
     if (extra?.extend?.includes('origins')) {
-      await this.userAgentService.attachOrigins(entities, this.repository.tableName)
+      await this.userAgentService.attachOrigins(
+        entities,
+        this.repository.tableName,
+        {
+          query: extra['origin.query'],
+          raw: extra['origin.raw'],
+          origin: extra['origin.origin'],
+          x_origin: extra['origin.x_origin'],
+          x_version: extra['origin.x_version'],
+        },
+      )
     }
   }
 }
