@@ -31,6 +31,7 @@ export abstract class KcsapiEntity<T> extends BaseEntity {
   @Column({
     name: 'data',
     type: 'json',
+    nullable: true,
   })
   data: T
 }
