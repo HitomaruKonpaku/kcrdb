@@ -22,3 +22,5 @@ KanColle Replay DB
 
 - [kancolle-replay](https://github.com/KC3Kai/kancolle-replay)
 - [KC3Kai](https://github.com/KC3Kai/KC3Kai)
+- [poi-plugin-kcrdb](https://github.com/HitomaruKonpaku/poi-plugin-kcrdb)
+- [ElectronicObserver](https://github.com/ElectronicObserverEN/ElectronicObserver)
