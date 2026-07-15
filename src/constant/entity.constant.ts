@@ -9,6 +9,7 @@ import { RemodelSlotlist } from '../module/remodel/model/remodel-slotlist.entity
 import { Replay } from '../module/replay/model/replay.entity'
 import { Simulator } from '../module/simulator/model/simulator.entity'
 import { Token } from '../module/token/model/token.entity'
+import { EventReward } from '../module/event-reward/model/event-reward.entity'
 import { UserAgent } from '../module/user-agent/model/user-agent.entity'
 import { WebhookHistory } from '../module/webhook/model/webhook-history.entity'
 import { Webhook } from '../module/webhook/model/webhook.entity'
@@ -24,6 +25,8 @@ export const ENTITIES = [
   RemodelSlotlistDetail,
   RemodelSlot,
   RemodelSlotRecover,
+
+  EventReward,
 
   MstShip,
   MstSlotitem,

@@ -15,6 +15,7 @@ import configuration from './config/configuration'
 import { ENTITIES } from './constant/entity.constant'
 import { AdminModule } from './module/admin/admin.module'
 import { DataModule } from './module/data/data.module'
+import { EventRewardModule } from './module/event-reward/event-reward.module'
 import { MstModule } from './module/mst/mst.module'
 import { QuestModule } from './module/quest/quest.module'
 import { RemodelModule } from './module/remodel/remodel.module'
@@ -105,6 +106,7 @@ import { Logger } from './shared/logger'
     SimulatorModule,
     QuestModule,
     RemodelModule,
+    EventRewardModule,
     MstModule,
 
     UserAgentModule,

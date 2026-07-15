@@ -14,6 +14,7 @@ export function setupSwagger<T>(app: INestApplication<T>) {
     .addTag('quest')
     .addTag('quest-item')
     .addTag('remodel')
+    .addTag('event-reward')
     .addTag('ship')
     .addTag('kcsapi')
     .addApiKey(
