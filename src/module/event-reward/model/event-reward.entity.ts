@@ -3,7 +3,7 @@ import { APIGetEventitem, APIEventSelectReward } from '../../../shared/kcsapi/in
 import { KcsapiEntity } from '../../../shared/kcsapi/kcsapi.entity'
 
 @Entity({ name: 'event_reward' })
-export class EventReward extends KcsapiEntity<null> {
+export class EventReward extends KcsapiEntity<any> {
   @Index()
   @Column({ name: 'world', type: 'smallint' })
   world: number
