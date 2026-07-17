@@ -8,6 +8,7 @@ import { ApiPaginatedResponse } from '../../../shared/decorator/pagination.decor
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
 import { EventRewardCreate } from '../dto/event-reward-create.dto'
+import { EventReward } from '../dto/event-reward.dto'
 import { EventRewardFilter } from '../dto/event-reward-filter.dto'
 import { EventRewardService } from '../service/event-reward.service'
 
@@ -21,7 +22,7 @@ export class EventRewardController {
 
   @Get()
   @UseInterceptors(DataCacheUrlInterceptor)
-  @ApiPaginatedResponse(EventRewardCreate)
+  @ApiPaginatedResponse(EventReward)
   getAll(
     @Query() paging: PagingDto,
     @Query() filter: EventRewardFilter,
