@@ -7,9 +7,10 @@ import { DataHitHashInterceptor } from '../../../interceptor/data-hit-hash.inter
 import { ApiPaginatedResponse } from '../../../shared/decorator/pagination.decorator'
 import { PagingDto } from '../../../shared/dto/paging.dto'
 import { TimeFilterDto } from '../../../shared/dto/time-filter.dto'
+import { KcsapiExtraDto } from '../../../shared/kcsapi/dto/kcsapi-extra.dto'
 import { EventRewardCreate } from '../dto/event-reward-create.dto'
-import { EventReward } from '../dto/event-reward.dto'
 import { EventRewardFilter } from '../dto/event-reward-filter.dto'
+import { EventReward } from '../dto/event-reward.dto'
 import { EventRewardService } from '../service/event-reward.service'
 
 @Controller('event-rewards')
@@ -27,8 +28,9 @@ export class EventRewardController {
     @Query() paging: PagingDto,
     @Query() filter: EventRewardFilter,
     @Query() timeFilter: TimeFilterDto,
+    @Query() extra: KcsapiExtraDto,
   ) {
-    return this.service.getAll(paging, filter, timeFilter)
+    return this.service.getAll(paging, filter, timeFilter, extra)
   }
 
   @Post()
