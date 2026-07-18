@@ -11,6 +11,8 @@ import { KcsapiExtraDto } from './dto/kcsapi-extra.dto'
 import { KcsapiEntity } from './kcsapi.entity'
 
 export abstract class KcsapiService<E extends KcsapiEntity<any>, R extends BaseRepository<E>> extends BaseService<E, R> {
+  protected readonly hasData: boolean = true
+
   constructor(
     public readonly repository: R,
     public readonly moduleRef: ModuleRef,
@@ -46,6 +48,9 @@ export abstract class KcsapiService<E extends KcsapiEntity<any>, R extends BaseR
   ) {
     const qb = this.createQueryBuilder()
     qb.addSelect(`${qb.alias}.updatedAt`)
+    if (this.hasData) {
+      qb.addSelect(`${qb.alias}.data`)
+    }
     this.initQueryBuilder(paging, filter, timeFilter, qb)
     const [items, total] = await qb.getManyAndCount()
     await this.applyJoin(items, extra)
@@ -70,6 +75,9 @@ export abstract class KcsapiService<E extends KcsapiEntity<any>, R extends BaseR
   }
 
   public async create(body: Record<string, any>) {
+    if (!this.hasData) {
+      Object.assign(body, { data: null })
+    }
     const res = await this.createOneWithHashFields(body, this.getHashFields())
     return res
   }

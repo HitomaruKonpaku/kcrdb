@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { ModuleRef } from '@nestjs/core'
-import { RemodelSlotRecoverCreate } from '../dto/remodel-slot-recover-create.dto'
 import { RemodelSlotRecover } from '../model/remodel-slot-recover.entity'
 import { RemodelSlotRecoverRepository } from '../repository/remodel-slot-recover.repository'
 import { RemodelBaseService } from './remodel.base.service'
 
 @Injectable()
 export class RemodelSlotRecoverService extends RemodelBaseService<RemodelSlotRecover, RemodelSlotRecoverRepository> {
+  protected readonly hasData = false
+
   constructor(
     public readonly repository: RemodelSlotRecoverRepository,
     public readonly moduleRef: ModuleRef,
@@ -16,7 +17,6 @@ export class RemodelSlotRecoverService extends RemodelBaseService<RemodelSlotRec
 
   protected getHashFields(): string[] {
     return [
-      'data',
       'flag_ship_id',
       'helper_ship_id',
       'day',
@@ -57,11 +57,5 @@ export class RemodelSlotRecoverService extends RemodelBaseService<RemodelSlotRec
       'api_dev_num',
       'api_recover_flag',
     ]
-  }
-
-  public async create(body: RemodelSlotRecoverCreate) {
-    Object.assign(body, { data: null })
-    const res = await super.create(body)
-    return res
   }
 }

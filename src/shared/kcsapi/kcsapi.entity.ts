@@ -32,6 +32,7 @@ export abstract class KcsapiEntity<T> extends BaseEntity {
     name: 'data',
     type: 'json',
     nullable: true,
+    select: false,
   })
   data: T
 }
