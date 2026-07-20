@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { ModuleRef } from '@nestjs/core'
 import { In } from 'typeorm'
 import { KcsapiState } from '../../../shared/kcsapi/kcsapi-state.enum'
@@ -25,6 +26,7 @@ export class QuestService extends KcsapiService<Quest, QuestRepository> {
     private readonly questSusService: QuestSusService,
   ) {
     super(repository, moduleRef)
+    this.ttl = this.moduleRef.get(ConfigService, { strict: false }).get<number>('QUEST_TTL')
   }
 
   private getCheckFields(): string[] {

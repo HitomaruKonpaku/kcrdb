@@ -15,8 +15,9 @@ import { KcsapiEntity } from './kcsapi.entity'
 
 export abstract class KcsapiService<E extends KcsapiEntity<any>, R extends BaseRepository<E>> extends BaseService<E, R> {
   protected readonly logger = new Logger(this.constructor.name)
-  protected readonly ttl = 60e3
   protected readonly hasData: boolean = true
+
+  protected ttl?: number = 60e3
 
   constructor(
     public readonly repository: R,

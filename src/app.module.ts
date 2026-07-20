@@ -6,8 +6,6 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core'
 import { ScheduleModule } from '@nestjs/schedule'
 import { seconds, ThrottlerGuard, ThrottlerModule, ThrottlerModuleOptions } from '@nestjs/throttler'
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
-import * as ms from 'ms'
-import { StringValue } from 'ms'
 import { OpenTelemetryModule, OpenTelemetryModuleOptions } from 'nestjs-otel'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
@@ -58,7 +56,7 @@ import { Logger } from './shared/logger'
           stores: [
             createKeyv(configService.get('REDIS_URL')),
           ],
-          ttl: ms(configService.get('CACHE_TTL') as StringValue),
+          ttl: configService.get<number>('CACHE_TTL'),
         }
         return opts
       },
