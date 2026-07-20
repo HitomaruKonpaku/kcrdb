@@ -1,5 +1,5 @@
 import { ModuleRef } from '@nestjs/core'
-import { SelectQueryBuilder } from 'typeorm'
+import { FindOptionsWhere, SelectQueryBuilder } from 'typeorm'
 import { UserAgentService } from '../../module/user-agent/service/user-agent.service'
 import { BaseRepository } from '../base/base.repository'
 import { BaseService } from '../base/base.service'
@@ -87,20 +87,24 @@ export abstract class KcsapiService<E extends KcsapiEntity<any>, R extends BaseR
     hashFields: string[],
   ) {
     const hash = ObjectUtil.hash(body, hashFields)
-    let res = await this.repository.findOneBy({ hash } as any)
-    if (res) {
+    const data: any = { ...body, hash }
+    let res: E
+
+    try {
+      res = await this.insertLoop(data)
       res.hash = hash
       return res
-    }
+    } catch (error) {
+      if (error.code === '23505' && error.detail && error.detail.includes('(hash)')) {
+        res = await this.repository.findOneBy({ hash } as FindOptionsWhere<E>) as E
+        if (res) {
+          res.hash = hash
+        }
+        return res
+      }
 
-    const tmp: any = {
-      ...body,
-      hash,
+      throw error
     }
-
-    res = await this.insertLoop(tmp)
-    res.hash = hash
-    return res
   }
 
   protected initQueryBuilder(

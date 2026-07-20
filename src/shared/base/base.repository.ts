@@ -17,7 +17,7 @@ export abstract class BaseRepository<E extends BaseEntity> {
   }
 
   public async findOneById(id: E['id']) {
-    const res = await this.repository.findOneBy({ id } as any)
+    const res = await this.repository.findOneBy({ id } as FindOptionsWhere<E>)
     return res
   }
 
