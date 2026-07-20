@@ -99,8 +99,8 @@ export abstract class KcsapiService<E extends KcsapiEntity<any>, R extends BaseR
         res = await this.repository.findOneBy({ hash } as FindOptionsWhere<E>) as E
         if (res) {
           res.hash = hash
+          return res
         }
-        return res
       }
 
       throw error
