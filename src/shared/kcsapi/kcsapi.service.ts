@@ -1,4 +1,5 @@
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager'
+import { ConfigService } from '@nestjs/config'
 import { ModuleRef } from '@nestjs/core'
 import { FindOptionsWhere, SelectQueryBuilder } from 'typeorm'
 import { UserAgentService } from '../../module/user-agent/service/user-agent.service'
@@ -24,6 +25,11 @@ export abstract class KcsapiService<E extends KcsapiEntity<any>, R extends BaseR
     public readonly moduleRef: ModuleRef,
   ) {
     super(repository)
+    this.ttl = this.configService.get<number>('KCSAPI_TTL') || this.ttl
+  }
+
+  protected get configService() {
+    return this.moduleRef.get(ConfigService, { strict: false })
   }
 
   protected get cache(): Cache {

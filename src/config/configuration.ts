@@ -11,6 +11,8 @@ const cfg = {
   CACHE_TTL: ms(<StringValue>(process.env.CACHE_TTL || '1m')),
   // @ts-ignore
   QUEST_TTL: ms(<StringValue>(process.env.QUEST_TTL || '1m')),
+  // @ts-ignore
+  KCSAPI_TTL: ms(<StringValue>(process.env.KCSAPI_TTL || '1m')),
   ENCRYPTION_SECRET: process.env.ENCRYPTION_SECRET || 'kcrdb_secret',
 }
 

@@ -11,6 +11,8 @@ KanColle Replay DB
 | DATABASE_URL      |                       | postgresql://postgres:admin@localhost:5432/postgres |
 | REDIS_URL         |                       | redis://localhost:6379                              |
 | CACHE_TTL         |                       | 1m                                                  |
+| QUEST_TTL         |                       | 1m                                                  |
+| KCSAPI_TTL        |                       | 1m                                                  |
 | NO_COLOR          | Disable log color     |                                                     |
 | NO_TIMESTAMP      | Disable log timestamp |                                                     |
 | BODY_JSON_LIMIT   |                       | 500kb                                               |
