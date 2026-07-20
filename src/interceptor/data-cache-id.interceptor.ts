@@ -45,13 +45,13 @@ export class DataCacheIdInterceptor implements NestInterceptor {
   }
 
   private getCacheEntry(key: string) {
-    return from(this.cache.get<string>(key)).pipe(
+    return from(this.cache.get(key)).pipe(
       map((value) => ({ key, value })),
       catchError(() => of({ key, value: undefined })),
     )
   }
 
-  private handleCached(context: ExecutionContext, key: string, value: any): Observable<any> {
+  private handleCached(context: ExecutionContext, key: string, value: unknown): Observable<any> {
     const res = context.switchToHttp().getResponse<ServerResponse>()
     res.setHeader('X-Cache', 1)
 
@@ -65,7 +65,7 @@ export class DataCacheIdInterceptor implements NestInterceptor {
           }),
         ),
       ])),
-      map(() => JSON.parse(value)),
+      map(() => value),
     )
   }
 
@@ -80,7 +80,7 @@ export class DataCacheIdInterceptor implements NestInterceptor {
         }
 
         const key = CacheUtil.key(sourceName, data.id)
-        this.cache.set(key, JSON.stringify(data))
+        this.cache.set(key, data)
       }),
     )
   }
