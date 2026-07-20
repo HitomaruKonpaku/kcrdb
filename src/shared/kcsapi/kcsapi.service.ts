@@ -1,3 +1,4 @@
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager'
 import { ModuleRef } from '@nestjs/core'
 import { FindOptionsWhere, SelectQueryBuilder } from 'typeorm'
 import { UserAgentService } from '../../module/user-agent/service/user-agent.service'
@@ -5,12 +6,16 @@ import { BaseRepository } from '../base/base.repository'
 import { BaseService } from '../base/base.service'
 import { PagingDto } from '../dto/paging.dto'
 import { TimeFilterDto } from '../dto/time-filter.dto'
+import { Logger } from '../logger'
+import { CacheUtil } from '../util/cache.util'
 import { ObjectUtil } from '../util/object.util'
 import { QueryBuilderUtil } from '../util/query-builder.util'
 import { KcsapiExtraDto } from './dto/kcsapi-extra.dto'
 import { KcsapiEntity } from './kcsapi.entity'
 
 export abstract class KcsapiService<E extends KcsapiEntity<any>, R extends BaseRepository<E>> extends BaseService<E, R> {
+  protected readonly logger = new Logger(this.constructor.name)
+  protected readonly ttl = 60e3
   protected readonly hasData: boolean = true
 
   constructor(
@@ -18,6 +23,10 @@ export abstract class KcsapiService<E extends KcsapiEntity<any>, R extends BaseR
     public readonly moduleRef: ModuleRef,
   ) {
     super(repository)
+  }
+
+  protected get cache(): Cache {
+    return this.moduleRef.get(CACHE_MANAGER, { strict: false })
   }
 
   protected get userAgentService() {
@@ -88,22 +97,33 @@ export abstract class KcsapiService<E extends KcsapiEntity<any>, R extends BaseR
   ) {
     const hash = ObjectUtil.hash(body, hashFields)
     const data: any = { ...body, hash }
-    let res: E
+    const cacheKey = CacheUtil.key(this.repository.tableName, hash)
+    let res = await this.cache.get<E>(cacheKey).catch((error) => {
+      this.logger.warn(`createOneWithHashFields#cache#get: ${error?.message ?? error} | ${JSON.stringify({ key: cacheKey })}`)
+      return undefined
+    })
+    if (res) {
+      return res
+    }
 
     try {
       res = await this.insertLoop(data)
-      res.hash = hash
       return res
     } catch (error) {
       if (error.code === '23505' && error.detail && error.detail.includes('(hash)')) {
         res = await this.repository.findOneBy({ hash } as FindOptionsWhere<E>) as E
         if (res) {
-          res.hash = hash
           return res
         }
       }
-
       throw error
+    } finally {
+      if (res) {
+        res.hash = hash
+        this.cache.set(cacheKey, res, this.ttl).catch((error) => {
+          this.logger.warn(`createOneWithHashFields#cache#set: ${error?.message ?? error} | ${JSON.stringify({ key: cacheKey })}`)
+        })
+      }
     }
   }
 
