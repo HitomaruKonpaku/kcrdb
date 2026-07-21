@@ -8,7 +8,7 @@ export abstract class KcsapiEntity<T> extends BaseEntity {
     name: 'hash',
     type: 'varchar',
     unique: true,
-    select: false,
+    // select: false,
   })
   hash: string
 
