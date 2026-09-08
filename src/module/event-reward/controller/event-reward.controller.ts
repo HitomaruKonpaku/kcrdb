@@ -33,6 +33,18 @@ export class EventRewardController {
     return this.service.getAll(paging, filter, timeFilter, extra)
   }
 
+  @Get('stats')
+  @UseInterceptors(DataCacheUrlInterceptor)
+  getStats() {
+    return this.service.getStats()
+  }
+
+  @Get('stats/full')
+  @UseInterceptors(DataCacheUrlInterceptor)
+  getStatsFull() {
+    return this.service.getStatsFull()
+  }
+
   @Post()
   @UseInterceptors(DataHitHashInterceptor)
   @TrackUserAgent()

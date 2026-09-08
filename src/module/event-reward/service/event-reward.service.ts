@@ -45,4 +45,15 @@ export class EventRewardService extends KcsapiService<EventReward, EventRewardRe
       'difficulty',
     ]
   }
+
+  public async getStats() {
+    const items = await this.repository.getStats()
+    return { total: items.length, items }
+  }
+
+  public async getStatsFull() {
+    const { total, items } = await this.repository.getStatsFull()
+    await this.userAgentService.attachOrigins(items, this.repository.tableName)
+    return { total, items }
+  }
 }
