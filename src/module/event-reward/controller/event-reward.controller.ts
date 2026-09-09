@@ -35,14 +35,19 @@ export class EventRewardController {
 
   @Get('stats')
   @UseInterceptors(DataCacheUrlInterceptor)
-  getStats() {
-    return this.service.getStats()
+  getStats(
+    @Query() filter: EventRewardFilter,
+  ) {
+    return this.service.getStats(filter)
   }
 
   @Get('stats/full')
   @UseInterceptors(DataCacheUrlInterceptor)
-  getStatsFull() {
-    return this.service.getStatsFull()
+  getStatsFull(
+    @Query() filter: EventRewardFilter,
+    @Query() extra: KcsapiExtraDto,
+  ) {
+    return this.service.getStatsFull(filter, extra)
   }
 
   @Post()

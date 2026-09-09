@@ -62,6 +62,10 @@ export class QueryBuilderUtil {
     qb: SelectQueryBuilder<T>,
     allowFields: string[],
     sorts?: string[],
+    cfg?: {
+      skipSortDefault?: boolean
+      remapFields?: Record<string, string>
+    },
   ) {
     if (sorts === undefined) {
       qb.addOrderBy(`${qb.alias}.created_at`, 'DESC')
@@ -93,11 +97,12 @@ export class QueryBuilderUtil {
         sortNulls = 'NULLS FIRST'
       }
 
-      qb.addOrderBy(`${qb.alias}.${sortKey}`, sortDirection, sortNulls)
+      const sortPath = cfg?.remapFields?.[sortKey] ?? `${qb.alias}.${sortKey}`
+      qb.addOrderBy(sortPath, sortDirection, sortNulls)
       sortKeys.add(sortKey)
     })
 
-    if (!sortKeys.has('created_at')) {
+    if (!cfg?.skipSortDefault && !sortKeys.has('created_at')) {
       qb.addOrderBy(`${qb.alias}.created_at`, 'DESC')
     }
   }
