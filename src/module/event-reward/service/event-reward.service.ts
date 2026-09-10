@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { ModuleRef } from '@nestjs/core'
 import { KcsapiExtraDto } from '../../../shared/kcsapi/dto/kcsapi-extra.dto'
 import { KcsapiService } from '../../../shared/kcsapi/kcsapi.service'
 import { QueryBuilderUtil } from '../../../shared/util/query-builder.util'
+import { EventRewardCreate } from '../dto/event-reward-create.dto'
 import { EventRewardFilter } from '../dto/event-reward-filter.dto'
 import { EventReward } from '../model/event-reward.entity'
 import { EventRewardRepository } from '../repository/event-reward.repository'
@@ -115,5 +116,13 @@ export class EventRewardService extends KcsapiService<EventReward, EventRewardRe
       total,
       items,
     }
+  }
+
+  public create(body: EventRewardCreate): Promise<EventReward> {
+    const pastWorlds = this.configService.get<number[]>('PAST_EVENT_WORLDS') || []
+    if (pastWorlds.includes(body.world)) {
+      throw new BadRequestException('EVENT_ENDED')
+    }
+    return super.create(body)
   }
 }

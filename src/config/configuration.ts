@@ -21,6 +21,7 @@ const cfg = {
   KCSAPI_TTL: ttl('KCSAPI_TTL'),
   QUEST_TTL: ttl('QUEST_TTL'),
   ENCRYPTION_SECRET: process.env.ENCRYPTION_SECRET || 'kcrdb_secret',
+  PAST_EVENT_WORLDS: (process.env.PAST_EVENT_WORLDS || '').split(',').map((v) => Number(v.trim())).filter((v) => !Number.isNaN(v) && Number.isFinite(v) && v > 0),
 }
 
 // console.debug(cfg)
