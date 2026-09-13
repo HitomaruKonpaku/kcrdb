@@ -1,13 +1,10 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
-import { ArrayMaxSize, IsOptional } from 'class-validator'
+import { IsOptional } from 'class-validator'
 import { ApiPropertyNumberArray } from '../../../shared/decorator/api-property-number-array.decorator'
 import { ToArray } from '../../../shared/decorator/to-array.decorator'
+import { KcsapiFilterDto } from '../../../shared/kcsapi/dto/kcsapi-filter.dto'
 
-export class QuestItemFilter {
-  @ApiPropertyNumberArray()
-  @ArrayMaxSize(2)
-  hit?: number[]
-
+export class QuestItemFilter extends KcsapiFilterDto {
   @ApiPropertyNumberArray('api_quest_id')
   api_quest_id?: number[]
 

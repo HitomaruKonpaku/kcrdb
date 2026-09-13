@@ -2,8 +2,9 @@ import { ApiPropertyOptional } from '@nestjs/swagger'
 import { IsOptional } from 'class-validator'
 import { ApiPropertyNumberArray } from '../../../shared/decorator/api-property-number-array.decorator'
 import { ToArray } from '../../../shared/decorator/to-array.decorator'
+import { KcsapiFilterDto } from '../../../shared/kcsapi/dto/kcsapi-filter.dto'
 
-export class EventRewardFilter {
+export class EventRewardFilter extends KcsapiFilterDto {
   @ApiPropertyNumberArray('world')
   world?: number[]
 

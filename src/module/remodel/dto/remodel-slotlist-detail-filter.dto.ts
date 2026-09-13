@@ -2,23 +2,9 @@ import { ApiPropertyOptional } from '@nestjs/swagger'
 import { IsOptional } from 'class-validator'
 import { ApiPropertyNumberArray } from '../../../shared/decorator/api-property-number-array.decorator'
 import { ToArray } from '../../../shared/decorator/to-array.decorator'
+import { RemodelFilter } from './remodel-filter.dto'
 
-export class RemodelSlotlistDetailFilter {
-  @ApiPropertyNumberArray('flag_ship_id')
-  flag_ship_id?: number[]
-
-  @ApiPropertyNumberArray('helper_ship_id')
-  helper_ship_id?: number[]
-
-  @ApiPropertyNumberArray('day')
-  day?: number[]
-
-  @ApiPropertyNumberArray('api_id')
-  api_id?: number[]
-
-  @ApiPropertyNumberArray('api_slot_id')
-  api_slot_id?: number[]
-
+export class RemodelSlotlistDetailFilter extends RemodelFilter {
   @ApiPropertyNumberArray('api_slot_level')
   api_slot_level?: number[]
 
