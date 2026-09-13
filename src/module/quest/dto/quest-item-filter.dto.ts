@@ -1,9 +1,13 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
-import { IsOptional } from 'class-validator'
+import { ArrayMaxSize, IsOptional } from 'class-validator'
 import { ApiPropertyNumberArray } from '../../../shared/decorator/api-property-number-array.decorator'
 import { ToArray } from '../../../shared/decorator/to-array.decorator'
 
 export class QuestItemFilter {
+  @ApiPropertyNumberArray()
+  @ArrayMaxSize(2)
+  hit?: number[]
+
   @ApiPropertyNumberArray('api_quest_id')
   api_quest_id?: number[]
 

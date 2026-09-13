@@ -155,6 +155,17 @@ export abstract class KcsapiService<E extends KcsapiEntity<any>, R extends BaseR
       QueryBuilderUtil.applyQueryLikeFilter(qb, fields, filter)
     }
 
+    if (filter?.hit && Array.isArray(filter.hit)) {
+      if (filter.hit.length === 1) {
+        qb.andWhere(`${qb.alias}.hit <= :hit_max`, { hit_max: filter.hit[0] })
+      } else {
+        const hit = [filter.hit[0], filter.hit[1]].sort((a, b) => a - b)
+        qb
+          .andWhere(`${qb.alias}.hit >= :hit_min`, { hit_min: hit[0] })
+          .andWhere(`${qb.alias}.hit <= :hit_max`, { hit_max: hit[1] })
+      }
+    }
+
     fields = this.getQuerySortFields()
     if (fields.length) {
       QueryBuilderUtil.applyQuerySort(qb, fields, filter?.sort)

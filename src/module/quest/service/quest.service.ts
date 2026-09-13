@@ -53,7 +53,6 @@ export class QuestService extends KcsapiService<Quest, QuestRepository> {
   protected getQueryMatchFilterFields(): string[] {
     return [
       'state',
-      'hit',
       'api_no',
       'api_category',
       'api_type',
@@ -175,7 +174,7 @@ export class QuestService extends KcsapiService<Quest, QuestRepository> {
     return entity
   }
 
-  public async applyJoin(
+  protected async applyJoin(
     entities: Quest[],
     extra?: QuestExtra,
   ) {
