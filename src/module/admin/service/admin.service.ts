@@ -39,8 +39,8 @@ export class AdminService {
     const items = Object.keys(data)
       .map((key) => {
         const api_no = Number(key)
-        const api_title = data[key].name
-        const api_detail = data[key].desc
+        const api_title = data[key].name as string
+        const api_detail = data[key].desc as string
         return {
           api_no,
           api_title,
@@ -69,7 +69,12 @@ export class AdminService {
                 qb1
                   .andWhere(`api_no = :${api_no_key}`, { [api_no_key]: item.api_no })
                   .andWhere(`api_title = :${api_title_key}`, { [api_title_key]: item.api_title })
-                  .andWhere(`REPLACE(api_detail, '<br>', '') = REPLACE(:${api_detail_key}, '<br>', '')`, { [api_detail_key]: item.api_detail })
+                // if KC3 `api_detail` contains `<br>` do raw text compare
+                if (item.api_detail.includes('<br>')) {
+                  qb1.andWhere(`api_detail = :${api_detail_key}`, { [api_detail_key]: item.api_detail })
+                } else {
+                  qb1.andWhere(`REPLACE(api_detail, '<br>', '') = REPLACE(:${api_detail_key}, '<br>', '')`, { [api_detail_key]: item.api_detail })
+                }
               }))
             })
           }))

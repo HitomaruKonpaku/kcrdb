@@ -10,6 +10,9 @@ export class QuestFilter {
   @ApiPropertyKcsapiStateArray()
   state?: KcsapiState[]
 
+  @ApiPropertyNumberArray()
+  hit?: number
+
   @ApiPropertyNumberArray('api_no')
   api_no?: number[]
 

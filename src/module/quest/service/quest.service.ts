@@ -53,6 +53,7 @@ export class QuestService extends KcsapiService<Quest, QuestRepository> {
   protected getQueryMatchFilterFields(): string[] {
     return [
       'state',
+      'hit',
       'api_no',
       'api_category',
       'api_type',
