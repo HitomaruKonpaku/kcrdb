@@ -50,12 +50,12 @@ export class QuestItemService extends KcsapiService<QuestItem, QuestItemReposito
     }
 
     const items = await this.repository.repository.find({
-      select: [
-        'api_quest_id',
-        'api_select_no',
-        'data',
-        'hit',
-      ],
+      select: {
+        api_quest_id: true,
+        api_select_no: true,
+        data: true,
+        hit: true,
+      },
       where: {
         api_quest_id: In(entities.map((v) => v.api_no || v.data.api_no).filter((v) => v)),
       },
@@ -66,7 +66,6 @@ export class QuestItemService extends KcsapiService<QuestItem, QuestItemReposito
     })
 
     entities.forEach((entity) => {
-      // eslint-disable-next-line no-param-reassign
       entity[mapToProperty] = items
         .filter((v) => v.api_quest_id === entity.api_no || v.api_quest_id === entity.data.api_no)
         .map((v) => {

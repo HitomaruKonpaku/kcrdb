@@ -84,13 +84,6 @@ import { Logger } from './shared/logger'
         const opts: OpenTelemetryModuleOptions = {
           metrics: {
             // hostMetrics: true,
-            apiMetrics: {
-              enable: true,
-              ignoreRoutes: [
-                '/favicon.ico',
-              ],
-              ignoreUndefinedRoutes: false,
-            },
           },
         }
         return opts

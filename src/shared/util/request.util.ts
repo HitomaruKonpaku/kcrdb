@@ -1,5 +1,3 @@
-/* eslint-disable dot-notation */
-
 export class RequestUtil {
   public static getOrigin(headers: Record<string, any>) {
     const value = headers['origin'] as string

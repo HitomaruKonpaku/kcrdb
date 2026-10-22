@@ -28,20 +28,17 @@ export class MstShipService extends MstBaseService<MstShip, MstShipRepository> {
       let { api_name: name } = v
 
       if (shipAffix?.byId?.[id]) {
-        // eslint-disable-next-line no-param-reassign
         v.api_name = shipAffix.byId[id]
         return
       }
 
       if (ship[name]) {
-        // eslint-disable-next-line no-param-reassign
         v.api_name = ship[name]
         return
       }
 
       let tlName = ''
 
-      // eslint-disable-next-line no-plusplus
       for (let index = 0; index < 10; index++) {
         if (!name) {
           break
@@ -62,7 +59,6 @@ export class MstShipService extends MstBaseService<MstShip, MstShipRepository> {
         name = name.replace(key, '')
       }
 
-      // eslint-disable-next-line no-param-reassign
       v.api_name = tlName || v.api_name
     })
 

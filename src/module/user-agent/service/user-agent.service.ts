@@ -30,7 +30,6 @@ export class UserAgentService extends BaseService<UserAgent, UserAgentRepository
     )
 
     entities.forEach((entity) => {
-      // eslint-disable-next-line no-param-reassign
       entity[mapToProperty] = items
         .filter((v) => v.sourceId === entity.id)
         .map((v) => {

@@ -2,7 +2,7 @@ import { ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { json } from 'body-parser'
-import * as compression from 'compression'
+import compression = require('compression')
 import 'dotenv/config'
 import { join } from 'path'
 import { AppModule } from './app.module'

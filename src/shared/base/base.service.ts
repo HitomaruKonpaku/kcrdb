@@ -46,13 +46,11 @@ export abstract class BaseService<E extends BaseEntity, R extends BaseRepository
 
     do {
       try {
-        // eslint-disable-next-line no-await-in-loop
         await this.repository.insert({ ...data, id })
         break
       } catch (error) {
         if (error.code === '23505' && error.detail && error.detail.includes('(id)')) {
           id = IdUtil.generate()
-          // eslint-disable-next-line no-continue
           continue
         }
         throw error

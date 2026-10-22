@@ -1,4 +1,4 @@
-/* eslint-disable quotes */
+/* eslint-disable @stylistic/quotes */
 
 import { Column, Entity, Index } from 'typeorm'
 import { KcsapiEntity } from '../../../shared/kcsapi/kcsapi.entity'

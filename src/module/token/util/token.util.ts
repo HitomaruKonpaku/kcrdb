@@ -1,5 +1,3 @@
-/* eslint-disable dot-notation */
-
 import { IncomingMessage } from 'http'
 import { Token } from '../model/token.entity'
 

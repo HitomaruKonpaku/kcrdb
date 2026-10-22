@@ -6,8 +6,7 @@ import { Logger } from './shared/logger'
 
 const logger = new Logger('Tracing')
 
-const enabled = false
-  || ['true', '1'].includes(process.env.METRICS_ENABLED ?? '')
+const enabled = ['true', '1'].includes(process.env.METRICS_ENABLED ?? '')
 
 const host = process.env.HOST || 'localhost'
 const port = Number(process.env.METRICS_PORT) || 8081
@@ -19,19 +18,20 @@ class XNodeSDK extends NodeSDK {
   }
 }
 
-// eslint-disable-next-line import/no-mutable-exports
 let otelSDK: XNodeSDK | undefined
 
 if (enabled) {
   otelSDK = new XNodeSDK({
-    metricReader: new PrometheusExporter(
-      {
-        port,
-      },
-      () => {
-        // logger.log(`📊 Metrics: ${xUrl}`)
-      },
-    ),
+    metricReaders: [
+      new PrometheusExporter(
+        {
+          port,
+        },
+        () => {
+          logger.log(`📊 Metrics: ${xUrl}`)
+        },
+      ),
+    ],
     contextManager: new AsyncLocalStorageContextManager(),
     instrumentations: [
       // getNodeAutoInstrumentations({

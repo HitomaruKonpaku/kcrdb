@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
-import * as ms from 'ms'
-import { StringValue } from 'ms'
+import ms, { StringValue } from 'ms'
 
 const ttl = (key: string, defaultValue: StringValue = '1m') => {
   try {

@@ -71,7 +71,6 @@ export class RemodelSlotService extends RemodelBaseService<RemodelSlot, RemodelS
   }
 
   public async create(body: RemodelSlotCreate) {
-    /* eslint-disable no-param-reassign */
     // Remove user related data
     if (body.data) {
       delete body.data.api_after_material
@@ -87,7 +86,6 @@ export class RemodelSlotService extends RemodelBaseService<RemodelSlot, RemodelS
         delete body.data.api_use_slot_id
       }
     }
-    /* eslint-enable no-param-reassign */
 
     const res = await super.create(body)
     return res

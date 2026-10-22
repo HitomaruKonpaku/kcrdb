@@ -1,5 +1,3 @@
-/* eslint-disable no-param-reassign */
-
 import {
   CallHandler,
   ExecutionContext,

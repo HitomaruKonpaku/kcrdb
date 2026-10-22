@@ -86,7 +86,6 @@ export class EventRewardService extends KcsapiService<EventReward, EventRewardRe
 
     const items = await qb.getRawMany()
     items.forEach((v) => {
-      // eslint-disable-next-line no-param-reassign
       v.hit = Number(v.hit)
     })
 

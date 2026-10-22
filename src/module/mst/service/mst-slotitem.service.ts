@@ -22,7 +22,6 @@ export class MstSlotitemService extends MstBaseService<MstSlotitem, MstSlotitemR
 
     Object.values(items).forEach((v) => {
       const tl = tls[v.api_name]
-      // eslint-disable-next-line no-param-reassign
       v.api_name = tl ?? v.api_name
     })
 
