@@ -29,5 +29,6 @@ COPY --from=builder      /app/dist ./dist
 COPY --from=builder      /app/view ./view
 
 ENV NODE_ENV=production
+ENV HOST=0.0.0.0
 
 ENTRYPOINT [ "/sbin/tini", "--", "node", "dist/main" ]
