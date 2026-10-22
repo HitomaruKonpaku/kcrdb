@@ -38,6 +38,9 @@ if (enabled) {
       getNodeAutoInstrumentations({
         '@opentelemetry/instrumentation-nestjs-core': {},
         '@opentelemetry/instrumentation-fs': { enabled: false },
+        '@opentelemetry/instrumentation-http': {
+          ignoreIncomingRequestHook: (req) => req.url === '/metrics',
+        },
       }),
     ],
   })
