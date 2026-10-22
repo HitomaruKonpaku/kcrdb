@@ -32,6 +32,7 @@
     "@nestjs/swagger": "^12.0.3",
     "@nestjs/throttler": "^6.7.1",
     "@nestjs/typeorm": "^12.0.2",
+    "@opentelemetry/auto-instrumentations-node": "^0.82.0",
     "@opentelemetry/context-async-hooks": "^3.0.0",
     "@opentelemetry/exporter-prometheus": "^0.300.0",
     "@opentelemetry/instrumentation-nestjs-core": "^0.71.0",

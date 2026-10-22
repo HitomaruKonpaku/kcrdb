@@ -1,6 +1,6 @@
+import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks'
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus'
-import { NestInstrumentation } from '@opentelemetry/instrumentation-nestjs-core'
 import { NodeSDK } from '@opentelemetry/sdk-node'
 import { Logger } from './shared/logger'
 
@@ -28,16 +28,16 @@ if (enabled) {
           port,
         },
         () => {
-          logger.log(`📊 Metrics: ${xUrl}`)
+          // logger.log(`📊 Metrics: ${xUrl}`)
         },
       ),
     ],
     contextManager: new AsyncLocalStorageContextManager(),
     instrumentations: [
-      // getNodeAutoInstrumentations({
-      //   '@opentelemetry/instrumentation-nestjs-core': {},
-      // }),
-      new NestInstrumentation(),
+      getNodeAutoInstrumentations({
+        '@opentelemetry/instrumentation-nestjs-core': {},
+        '@opentelemetry/instrumentation-fs': { enabled: false },
+      }),
     ],
   })
 
