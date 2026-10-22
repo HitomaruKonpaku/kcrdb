@@ -25,6 +25,7 @@ if (enabled) {
     metricReaders: [
       new PrometheusExporter(
         {
+          host,
           port,
         },
         () => {
